@@ -69,9 +69,9 @@ public class MemberTest {
         Member member = new Member();
         member.setMemberId(memberId);
         member.setFullName(fullName);
-{}
+        
         String toString = member.toString();
-{}
+        
         assertTrue(toString.contains(memberId.toString()));
         assertTrue(toString.contains(fullName));
     }
