@@ -105,7 +105,8 @@ public class GroupServiceImpl implements GroupService {
         groupRepository.deleteById(groupId);
     }
 
-    private Groups convertToGroup(Artist artist) {
+    // Changed to public for testing purposes
+    public Groups convertToGroup(Artist artist) {
         Groups group = new Groups();
         group.setArtistId(artist.getArtistId());
         group.setArtist(artist);
