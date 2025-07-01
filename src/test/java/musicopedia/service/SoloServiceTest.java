@@ -45,7 +45,7 @@ public class SoloServiceTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.Solo);
+        testArtist.setType(ArtistType.SOLO);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
 
@@ -53,26 +53,26 @@ public class SoloServiceTest {
         testSolo.setArtistId(testId);
         testSolo.setArtist(testArtist);
         testSolo.setBirthDate(LocalDate.of(1993, 5, 16));
-        testSolo.setGender(ArtistGender.Female);
+        testSolo.setGender(ArtistGender.FEMALE);
         
         // Extended entity is handled through reflection or other mechanisms
     }
 
     @Test
     void testFindAll() {
-        Artist artist1 = createSoloArtist("Solo 1", LocalDate.of(1990, 1, 1), null, ArtistGender.Female);
-        Artist artist2 = createSoloArtist("Solo 2", LocalDate.of(1985, 5, 10), null, ArtistGender.Male);
+        Artist artist1 = createSoloArtist("Solo 1", LocalDate.of(1990, 1, 1), null, ArtistGender.FEMALE);
+        Artist artist2 = createSoloArtist("Solo 2", LocalDate.of(1985, 5, 10), null, ArtistGender.MALE);
 
         List<Artist> artists = Arrays.asList(artist1, artist2);
         
-        when(soloRepository.findByType(ArtistType.Solo)).thenReturn(artists);
+        when(soloRepository.findByType(ArtistType.SOLO)).thenReturn(artists);
 
         List<Solo> result = soloService.findAll();
 
         assertEquals(2, result.size());
         assertEquals("Solo 1", result.get(0).getArtist().getArtistName());
         assertEquals("Solo 2", result.get(1).getArtist().getArtistName());
-        verify(soloRepository, times(1)).findByType(ArtistType.Solo);
+        verify(soloRepository, times(1)).findByType(ArtistType.SOLO);
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SoloServiceTest {
         mockSolo.setArtistId(testId);
         mockSolo.setArtist(testArtist);
         mockSolo.setBirthDate(LocalDate.of(1993, 5, 16));
-        mockSolo.setGender(ArtistGender.Female);
+        mockSolo.setGender(ArtistGender.FEMALE);
         
         // Mock the convertToSolo method to return our mock Solo
         doReturn(mockSolo).when(soloServiceSpy).convertToSolo(testArtist);
@@ -116,7 +116,7 @@ public class SoloServiceTest {
         Artist groupArtist = new Artist();
         groupArtist.setArtistId(testId);
         groupArtist.setArtistName("Group Artist");
-        groupArtist.setType(ArtistType.Group);
+        groupArtist.setType(ArtistType.GROUP);
         
         when(soloRepository.findById(testId)).thenReturn(Optional.of(groupArtist));
 
@@ -132,24 +132,24 @@ public class SoloServiceTest {
         Artist artist1 = new Artist();
         artist1.setArtistId(UUID.randomUUID());
         artist1.setArtistName("Solo 1");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         
         Artist artist2 = new Artist();
         artist2.setArtistId(UUID.randomUUID());
         artist2.setArtistName("Solo 2");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
         
         Artist artist3 = new Artist();
         artist3.setArtistId(UUID.randomUUID());
         artist3.setArtistName("Solo 3");
-        artist3.setType(ArtistType.Solo);
+        artist3.setType(ArtistType.SOLO);
 
         Artist artistWithNullBirthDate = new Artist();
         artistWithNullBirthDate.setArtistId(UUID.randomUUID());
         artistWithNullBirthDate.setArtistName("Solo Null Date");
-        artistWithNullBirthDate.setType(ArtistType.Solo);
+        artistWithNullBirthDate.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(artist1, artist2, artist3, artistWithNullBirthDate));
         
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -159,25 +159,25 @@ public class SoloServiceTest {
         solo1.setArtistId(artist1.getArtistId());
         solo1.setArtist(artist1);
         solo1.setBirthDate(LocalDate.of(1990, 1, 1));
-        solo1.setGender(ArtistGender.Female);
+        solo1.setGender(ArtistGender.FEMALE);
         
         Solo solo2 = new Solo();
         solo2.setArtistId(artist2.getArtistId());
         solo2.setArtist(artist2);
         solo2.setBirthDate(LocalDate.of(1995, 5, 10));
-        solo2.setGender(ArtistGender.Male);
+        solo2.setGender(ArtistGender.MALE);
         
         Solo solo3 = new Solo();
         solo3.setArtistId(artist3.getArtistId());
         solo3.setArtist(artist3);
         solo3.setBirthDate(LocalDate.of(2000, 10, 15));
-        solo3.setGender(ArtistGender.Female);
+        solo3.setGender(ArtistGender.FEMALE);
 
         Solo soloWithNullBirthDate = new Solo();
         soloWithNullBirthDate.setArtistId(artistWithNullBirthDate.getArtistId());
         soloWithNullBirthDate.setArtist(artistWithNullBirthDate);
         soloWithNullBirthDate.setBirthDate(null);
-        soloWithNullBirthDate.setGender(ArtistGender.Male);
+        soloWithNullBirthDate.setGender(ArtistGender.MALE);
         
         // Mock convertToSolo for each artist
         doReturn(solo1).when(soloServiceSpy).convertToSolo(artist1);
@@ -200,14 +200,14 @@ public class SoloServiceTest {
         Artist artist1 = new Artist();
         artist1.setArtistId(UUID.randomUUID());
         artist1.setArtistName("Female Solo");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         
         Artist artist2 = new Artist();
         artist2.setArtistId(UUID.randomUUID());
         artist2.setArtistName("Male Solo");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(artist1, artist2));
 
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -217,19 +217,19 @@ public class SoloServiceTest {
         solo1.setArtistId(artist1.getArtistId());
         solo1.setArtist(artist1);
         solo1.setBirthDate(LocalDate.of(1990, 1, 1));
-        solo1.setGender(ArtistGender.Female);
+        solo1.setGender(ArtistGender.FEMALE);
         
         Solo solo2 = new Solo();
         solo2.setArtistId(artist2.getArtistId());
         solo2.setArtist(artist2);
         solo2.setBirthDate(LocalDate.of(1985, 5, 10));
-        solo2.setGender(ArtistGender.Male);
+        solo2.setGender(ArtistGender.MALE);
         
         // Mock convertToSolo for each artist
         doReturn(solo1).when(soloServiceSpy).convertToSolo(artist1);
         doReturn(solo2).when(soloServiceSpy).convertToSolo(artist2);
 
-        List<Solo> result = soloServiceSpy.findByGender(ArtistGender.Female);
+        List<Solo> result = soloServiceSpy.findByGender(ArtistGender.FEMALE);
 
         assertEquals(1, result.size());
         assertEquals("Female Solo", result.get(0).getArtist().getArtistName());
@@ -241,14 +241,14 @@ public class SoloServiceTest {
         Artist activeArtist = new Artist();
         activeArtist.setArtistId(UUID.randomUUID());
         activeArtist.setArtistName("Active");
-        activeArtist.setType(ArtistType.Solo);
+        activeArtist.setType(ArtistType.SOLO);
         
         Artist deceasedArtist = new Artist();
         deceasedArtist.setArtistId(UUID.randomUUID());
         deceasedArtist.setArtistName("Deceased");
-        deceasedArtist.setType(ArtistType.Solo);
+        deceasedArtist.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(activeArtist, deceasedArtist));
 
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -258,7 +258,7 @@ public class SoloServiceTest {
         active.setArtistId(activeArtist.getArtistId());
         active.setArtist(activeArtist);
         active.setBirthDate(LocalDate.of(1990, 1, 1));
-        active.setGender(ArtistGender.Female);
+        active.setGender(ArtistGender.FEMALE);
         active.setDeathDate(null);
         
         Solo deceased = new Solo();
@@ -266,7 +266,7 @@ public class SoloServiceTest {
         deceased.setArtist(deceasedArtist);
         deceased.setBirthDate(LocalDate.of(1950, 5, 10));
         deceased.setDeathDate(LocalDate.of(2010, 12, 1));
-        deceased.setGender(ArtistGender.Male);
+        deceased.setGender(ArtistGender.MALE);
         
         // Mock convertToSolo for each artist
         doReturn(active).when(soloServiceSpy).convertToSolo(activeArtist);
@@ -284,14 +284,14 @@ public class SoloServiceTest {
         Artist activeArtist = new Artist();
         activeArtist.setArtistId(UUID.randomUUID());
         activeArtist.setArtistName("Active");
-        activeArtist.setType(ArtistType.Solo);
+        activeArtist.setType(ArtistType.SOLO);
         
         Artist deceasedArtist = new Artist();
         deceasedArtist.setArtistId(UUID.randomUUID());
         deceasedArtist.setArtistName("Deceased");
-        deceasedArtist.setType(ArtistType.Solo);
+        deceasedArtist.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(activeArtist, deceasedArtist));
 
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -301,7 +301,7 @@ public class SoloServiceTest {
         active.setArtistId(activeArtist.getArtistId());
         active.setArtist(activeArtist);
         active.setBirthDate(LocalDate.of(1990, 1, 1));
-        active.setGender(ArtistGender.Female);
+        active.setGender(ArtistGender.FEMALE);
         active.setDeathDate(null);
         
         Solo deceased = new Solo();
@@ -309,7 +309,7 @@ public class SoloServiceTest {
         deceased.setArtist(deceasedArtist);
         deceased.setBirthDate(LocalDate.of(1950, 5, 10));
         deceased.setDeathDate(LocalDate.of(2010, 12, 1));
-        deceased.setGender(ArtistGender.Male);
+        deceased.setGender(ArtistGender.MALE);
         
         // Mock convertToSolo for each artist
         doReturn(active).when(soloServiceSpy).convertToSolo(activeArtist);
@@ -329,7 +329,7 @@ public class SoloServiceTest {
 
         assertEquals(testId, savedSolo.getArtistId());
         assertEquals("IU", savedSolo.getArtist().getArtistName());
-        assertEquals(ArtistType.Solo, testArtist.getType());
+        assertEquals(ArtistType.SOLO, testArtist.getType());
         verify(soloRepository, times(1)).save(testArtist);
     }
 
@@ -387,7 +387,7 @@ public class SoloServiceTest {
         Artist iuArtist = new Artist();
         iuArtist.setArtistId(UUID.randomUUID());
         iuArtist.setArtistName("IU");
-        iuArtist.setType(ArtistType.Solo);
+        iuArtist.setType(ArtistType.SOLO);
 
         Solo result = soloServiceImpl.convertToSolo(iuArtist);
 
@@ -395,7 +395,7 @@ public class SoloServiceTest {
         assertEquals(iuArtist.getArtistId(), result.getArtistId());
         assertEquals(iuArtist, result.getArtist());
         assertEquals(LocalDate.of(1993, 5, 16), result.getBirthDate());
-        assertEquals(ArtistGender.Female, result.getGender());
+        assertEquals(ArtistGender.FEMALE, result.getGender());
     }
 
     @Test
@@ -405,7 +405,7 @@ public class SoloServiceTest {
         Artist otherArtist = new Artist();
         otherArtist.setArtistId(UUID.randomUUID());
         otherArtist.setArtistName("Other Artist");
-        otherArtist.setType(ArtistType.Solo);
+        otherArtist.setType(ArtistType.SOLO);
 
         Solo result = soloServiceImpl.convertToSolo(otherArtist);
 
@@ -423,7 +423,7 @@ public class SoloServiceTest {
         Artist artistWithNullName = new Artist();
         artistWithNullName.setArtistId(UUID.randomUUID());
         artistWithNullName.setArtistName(null);
-        artistWithNullName.setType(ArtistType.Solo);
+        artistWithNullName.setType(ArtistType.SOLO);
 
         Solo result = soloServiceImpl.convertToSolo(artistWithNullName);
 
@@ -439,7 +439,7 @@ public class SoloServiceTest {
         Artist artist = new Artist();
         artist.setArtistId(artistId);
         artist.setArtistName(name);
-        artist.setType(ArtistType.Solo);
+        artist.setType(ArtistType.SOLO);
         
         Solo solo = new Solo();
         solo.setArtistId(artistId);

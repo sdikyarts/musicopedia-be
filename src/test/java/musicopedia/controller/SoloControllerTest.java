@@ -52,7 +52,7 @@ public class SoloControllerTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.Solo);
+        testArtist.setType(ArtistType.SOLO);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
 
@@ -60,7 +60,7 @@ public class SoloControllerTest {
         testSolo.setArtistId(testId);
         testSolo.setArtist(testArtist);
         testSolo.setBirthDate(LocalDate.of(1993, 5, 16));
-        testSolo.setGender(ArtistGender.Female);
+        testSolo.setGender(ArtistGender.FEMALE);
     }
 
     @Test
@@ -118,14 +118,14 @@ public class SoloControllerTest {
     @Test
     void testGetSoloistsByGender() throws Exception {
         List<Solo> soloists = Arrays.asList(testSolo);
-        when(soloService.findByGender(ArtistGender.Female)).thenReturn(soloists);
+        when(soloService.findByGender(ArtistGender.FEMALE)).thenReturn(soloists);
 
-        mockMvc.perform(get("/api/soloists/gender/{gender}", "Female"))
+        mockMvc.perform(get("/api/soloists/gender/{gender}", "FEMALE"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
 
-        verify(soloService, times(1)).findByGender(ArtistGender.Female);
+        verify(soloService, times(1)).findByGender(ArtistGender.FEMALE);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class SoloControllerTest {
         Solo soloWithoutArtist = new Solo();
         soloWithoutArtist.setArtistId(testId);
         soloWithoutArtist.setBirthDate(LocalDate.of(1993, 5, 16));
-        soloWithoutArtist.setGender(ArtistGender.Female);
+        soloWithoutArtist.setGender(ArtistGender.FEMALE);
 
         String jsonContent = objectMapper.writeValueAsString(soloWithoutArtist);
 

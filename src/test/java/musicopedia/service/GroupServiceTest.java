@@ -44,7 +44,7 @@ public class GroupServiceTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("BTS");
-        testArtist.setType(ArtistType.Group);
+        testArtist.setType(ArtistType.GROUP);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
 
@@ -52,7 +52,7 @@ public class GroupServiceTest {
         testGroup.setArtistId(testId);
         testGroup.setArtist(testArtist);
         testGroup.setFormationDate(LocalDate.of(2013, 6, 13));
-        testGroup.setGroupGender(ArtistGender.Male);
+        testGroup.setGroupGender(ArtistGender.MALE);
     }
 
     @Test
@@ -60,23 +60,23 @@ public class GroupServiceTest {
         Artist artist1 = new Artist();
         artist1.setArtistId(UUID.randomUUID());
         artist1.setArtistName("Group 1");
-        artist1.setType(ArtistType.Group);
+        artist1.setType(ArtistType.GROUP);
 
         Artist artist2 = new Artist();
         artist2.setArtistId(UUID.randomUUID());
         artist2.setArtistName("Group 2");
-        artist2.setType(ArtistType.Group);
+        artist2.setType(ArtistType.GROUP);
 
         List<Artist> artists = Arrays.asList(artist1, artist2);
         
-        when(groupRepository.findByType(ArtistType.Group)).thenReturn(artists);
+        when(groupRepository.findByType(ArtistType.GROUP)).thenReturn(artists);
 
         List<Groups> result = groupService.findAll();
 
         assertEquals(2, result.size());
         assertEquals("Group 1", result.get(0).getArtist().getArtistName());
         assertEquals("Group 2", result.get(1).getArtist().getArtistName());
-        verify(groupRepository, times(1)).findByType(ArtistType.Group);
+        verify(groupRepository, times(1)).findByType(ArtistType.GROUP);
     }
 
     @Test
@@ -105,7 +105,7 @@ public class GroupServiceTest {
         Artist soloArtist = new Artist();
         soloArtist.setArtistId(testId);
         soloArtist.setArtistName("Solo Artist");
-        soloArtist.setType(ArtistType.Solo);
+        soloArtist.setType(ArtistType.SOLO);
         
         when(groupRepository.findById(testId)).thenReturn(Optional.of(soloArtist));
 
@@ -121,24 +121,24 @@ public class GroupServiceTest {
         Artist artist1 = new Artist();
         artist1.setArtistId(UUID.randomUUID());
         artist1.setArtistName("Group 1");
-        artist1.setType(ArtistType.Group);
+        artist1.setType(ArtistType.GROUP);
         
         Artist artist2 = new Artist();
         artist2.setArtistId(UUID.randomUUID());
         artist2.setArtistName("Group 2");
-        artist2.setType(ArtistType.Group);
+        artist2.setType(ArtistType.GROUP);
         
         Artist artist3 = new Artist();
         artist3.setArtistId(UUID.randomUUID());
         artist3.setArtistName("Group 3");
-        artist3.setType(ArtistType.Group);
+        artist3.setType(ArtistType.GROUP);
 
         Artist artistWithNullDate = new Artist();
         artistWithNullDate.setArtistId(UUID.randomUUID());
         artistWithNullDate.setArtistName("Group Null Date");
-        artistWithNullDate.setType(ArtistType.Group);
+        artistWithNullDate.setType(ArtistType.GROUP);
 
-        when(groupRepository.findByType(ArtistType.Group))
+        when(groupRepository.findByType(ArtistType.GROUP))
             .thenReturn(Arrays.asList(artist1, artist2, artist3, artistWithNullDate));
             
         // Create a spy of GroupServiceImpl to override convertToGroup
@@ -185,14 +185,14 @@ public class GroupServiceTest {
         Artist activeGroup = new Artist();
         activeGroup.setArtistId(UUID.randomUUID());
         activeGroup.setArtistName("Active");
-        activeGroup.setType(ArtistType.Group);
+        activeGroup.setType(ArtistType.GROUP);
         
         Artist disbandedGroup = new Artist();
         disbandedGroup.setArtistId(UUID.randomUUID());
         disbandedGroup.setArtistName("Disbanded");
-        disbandedGroup.setType(ArtistType.Group);
+        disbandedGroup.setType(ArtistType.GROUP);
 
-        when(groupRepository.findByType(ArtistType.Group))
+        when(groupRepository.findByType(ArtistType.GROUP))
             .thenReturn(Arrays.asList(activeGroup, disbandedGroup));
             
         // Create a spy of GroupServiceImpl to override convertToGroup
@@ -226,14 +226,14 @@ public class GroupServiceTest {
         Artist activeGroup = new Artist();
         activeGroup.setArtistId(UUID.randomUUID());
         activeGroup.setArtistName("Active");
-        activeGroup.setType(ArtistType.Group);
+        activeGroup.setType(ArtistType.GROUP);
         
         Artist disbandedGroup = new Artist();
         disbandedGroup.setArtistId(UUID.randomUUID());
         disbandedGroup.setArtistName("Disbanded");
-        disbandedGroup.setType(ArtistType.Group);
+        disbandedGroup.setType(ArtistType.GROUP);
 
-        when(groupRepository.findByType(ArtistType.Group))
+        when(groupRepository.findByType(ArtistType.GROUP))
             .thenReturn(Arrays.asList(activeGroup, disbandedGroup));
             
         // Create a spy of GroupServiceImpl to override convertToGroup
@@ -267,14 +267,14 @@ public class GroupServiceTest {
         Artist maleGroupArtist = new Artist();
         maleGroupArtist.setArtistId(UUID.randomUUID());
         maleGroupArtist.setArtistName("Male Group");
-        maleGroupArtist.setType(ArtistType.Group);
+        maleGroupArtist.setType(ArtistType.GROUP);
         
         Artist femaleGroupArtist = new Artist();
         femaleGroupArtist.setArtistId(UUID.randomUUID());
         femaleGroupArtist.setArtistName("Female Group");
-        femaleGroupArtist.setType(ArtistType.Group);
+        femaleGroupArtist.setType(ArtistType.GROUP);
         
-        when(groupRepository.findByType(ArtistType.Group))
+        when(groupRepository.findByType(ArtistType.GROUP))
             .thenReturn(Arrays.asList(maleGroupArtist, femaleGroupArtist));
             
         // Create a spy of GroupServiceImpl to override convertToGroup
@@ -284,19 +284,19 @@ public class GroupServiceTest {
         maleGroup.setArtistId(maleGroupArtist.getArtistId());
         maleGroup.setArtist(maleGroupArtist);
         maleGroup.setFormationDate(LocalDate.of(2013, 1, 1));
-        maleGroup.setGroupGender(ArtistGender.Male);
+        maleGroup.setGroupGender(ArtistGender.MALE);
         
         Groups femaleGroup = new Groups();
         femaleGroup.setArtistId(femaleGroupArtist.getArtistId());
         femaleGroup.setArtist(femaleGroupArtist);
         femaleGroup.setFormationDate(LocalDate.of(2014, 1, 1));
-        femaleGroup.setGroupGender(ArtistGender.Female);
+        femaleGroup.setGroupGender(ArtistGender.FEMALE);
         
         // Mock convertToGroup for each artist
         doReturn(maleGroup).when(groupServiceSpy).convertToGroup(maleGroupArtist);
         doReturn(femaleGroup).when(groupServiceSpy).convertToGroup(femaleGroupArtist);
 
-        List<Groups> result = groupServiceSpy.findByGroupGender(ArtistGender.Male);
+        List<Groups> result = groupServiceSpy.findByGroupGender(ArtistGender.MALE);
 
         assertEquals(1, result.size());
         assertEquals("Male Group", result.get(0).getArtist().getArtistName());
@@ -310,7 +310,7 @@ public class GroupServiceTest {
 
         assertEquals(testId, savedGroup.getArtistId());
         assertEquals("BTS", savedGroup.getArtist().getArtistName());
-        assertEquals(ArtistType.Group, testArtist.getType());
+        assertEquals(ArtistType.GROUP, testArtist.getType());
         verify(groupRepository, times(1)).save(testArtist);
     }
 

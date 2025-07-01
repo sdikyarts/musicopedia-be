@@ -33,7 +33,7 @@ public class SoloRepositoryTest {
     private Artist createSoloArtist(String name, String genre, String country, String language) {
         Artist soloArtist = new Artist();
         soloArtist.setArtistName(name);
-        soloArtist.setType(ArtistType.Solo);
+        soloArtist.setType(ArtistType.SOLO);
         soloArtist.setGenre(genre);
         soloArtist.setOriginCountry(country);
         soloArtist.setPrimaryLanguage(language);
@@ -46,7 +46,7 @@ public class SoloRepositoryTest {
         solo.setArtist(artist);
         solo.setBirthDate(birthDate);
         solo.setDeathDate(deathDate);
-        solo.setGender(ArtistGender.Female);
+        solo.setGender(ArtistGender.FEMALE);
     }
 
     @BeforeEach
@@ -61,7 +61,7 @@ public class SoloRepositoryTest {
 
         Artist group = new Artist();
         group.setArtistName("BTS");
-        group.setType(ArtistType.Group);
+        group.setType(ArtistType.GROUP);
         group.setGenre("K-pop");
         group.setOriginCountry("KR");
         artistRepository.save(group);
@@ -69,49 +69,49 @@ public class SoloRepositoryTest {
 
     @Test
     public void testFindByType() {
-        List<Artist> soloArtists = soloRepository.findByType(ArtistType.Solo);
+        List<Artist> soloArtists = soloRepository.findByType(ArtistType.SOLO);
         assertEquals(3, soloArtists.size());
     }
 
     @Test
     public void testFindSoloArtistsByGenre() {
-        List<Artist> kpopArtists = soloRepository.findSoloArtistsByGenre(ArtistType.Solo, "K-pop");
+        List<Artist> kpopArtists = soloRepository.findSoloArtistsByGenre(ArtistType.SOLO, "K-pop");
         assertEquals(1, kpopArtists.size());
         assertEquals("IU", kpopArtists.get(0).getArtistName());
         
-        List<Artist> popArtists = soloRepository.findSoloArtistsByGenre(ArtistType.Solo, "Pop");
+        List<Artist> popArtists = soloRepository.findSoloArtistsByGenre(ArtistType.SOLO, "Pop");
         assertEquals(2, popArtists.size());
         assertTrue(popArtists.stream().anyMatch(artist -> artist.getArtistName().equals("Taylor Swift")));
     }
 
     @Test
     public void testFindSoloArtistsByCountry() {
-        List<Artist> koreanArtists = soloRepository.findSoloArtistsByCountry(ArtistType.Solo, "KR");
+        List<Artist> koreanArtists = soloRepository.findSoloArtistsByCountry(ArtistType.SOLO, "KR");
         assertEquals(1, koreanArtists.size());
         assertEquals("IU", koreanArtists.get(0).getArtistName());
         
-        List<Artist> usArtists = soloRepository.findSoloArtistsByCountry(ArtistType.Solo, "US");
+        List<Artist> usArtists = soloRepository.findSoloArtistsByCountry(ArtistType.SOLO, "US");
         assertEquals(1, usArtists.size());
         assertEquals("Taylor Swift", usArtists.get(0).getArtistName());
     }
 
     @Test
     public void testFindSoloArtistsByNameContaining() {
-        List<Artist> swiftArtists = soloRepository.findSoloArtistsByNameContaining(ArtistType.Solo, "Swift");
+        List<Artist> swiftArtists = soloRepository.findSoloArtistsByNameContaining(ArtistType.SOLO, "Swift");
         assertEquals(1, swiftArtists.size());
         assertEquals("Taylor Swift", swiftArtists.get(0).getArtistName());
         
-        List<Artist> iuArtists = soloRepository.findSoloArtistsByNameContaining(ArtistType.Solo, "IU");
+        List<Artist> iuArtists = soloRepository.findSoloArtistsByNameContaining(ArtistType.SOLO, "IU");
         assertEquals(1, iuArtists.size());
         assertEquals("IU", iuArtists.get(0).getArtistName());
     }
 
     @Test
     public void testCountSoloArtistsByLanguage() {
-        long englishArtists = soloRepository.countSoloArtistsByLanguage(ArtistType.Solo, "English");
+        long englishArtists = soloRepository.countSoloArtistsByLanguage(ArtistType.SOLO, "English");
         assertEquals(2, englishArtists);
         
-        long koreanArtists = soloRepository.countSoloArtistsByLanguage(ArtistType.Solo, "Korean");
+        long koreanArtists = soloRepository.countSoloArtistsByLanguage(ArtistType.SOLO, "Korean");
         assertEquals(1, koreanArtists);
     }
 }

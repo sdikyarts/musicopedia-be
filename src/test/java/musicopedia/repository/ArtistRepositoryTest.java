@@ -28,7 +28,7 @@ public class ArtistRepositoryTest {
     public void testSaveAndFindArtist() {
         Artist artist = new Artist();
         artist.setArtistName("Test Artist");
-        artist.setType(ArtistType.Solo);
+        artist.setType(ArtistType.SOLO);
         artist.setGenre("Pop");
         artist.setOriginCountry("US");
         artist.setPrimaryLanguage("English");
@@ -40,20 +40,20 @@ public class ArtistRepositoryTest {
         Optional<Artist> foundArtist = artistRepository.findById(savedArtist.getArtistId());
         assertTrue(foundArtist.isPresent());
         assertEquals("Test Artist", foundArtist.get().getArtistName());
-        assertEquals(ArtistType.Solo, foundArtist.get().getType());
+        assertEquals(ArtistType.SOLO, foundArtist.get().getType());
     }
 
     @Test
     public void testFindByArtistNameContainingIgnoreCase() {
         Artist artist1 = new Artist();
         artist1.setArtistName("BTS");
-        artist1.setType(ArtistType.Group);
+        artist1.setType(ArtistType.GROUP);
         artist1.setOriginCountry("KR");
         artistRepository.save(artist1);
 
         Artist artist2 = new Artist();
         artist2.setArtistName("Blackpink");
-        artist2.setType(ArtistType.Group);
+        artist2.setType(ArtistType.GROUP);
         artist2.setOriginCountry("KR");
         artistRepository.save(artist2);
 
@@ -66,19 +66,19 @@ public class ArtistRepositoryTest {
     public void testFindByType() {
         Artist soloArtist = new Artist();
         soloArtist.setArtistName("IU");
-        soloArtist.setType(ArtistType.Solo);
+        soloArtist.setType(ArtistType.SOLO);
         artistRepository.save(soloArtist);
 
         Artist groupArtist = new Artist();
         groupArtist.setArtistName("Twice");
-        groupArtist.setType(ArtistType.Group);
+        groupArtist.setType(ArtistType.GROUP);
         artistRepository.save(groupArtist);
 
-        List<Artist> soloArtists = artistRepository.findByType(ArtistType.Solo);
+        List<Artist> soloArtists = artistRepository.findByType(ArtistType.SOLO);
         assertEquals(1, soloArtists.size());
         assertEquals("IU", soloArtists.get(0).getArtistName());
 
-        List<Artist> groupArtists = artistRepository.findByType(ArtistType.Group);
+        List<Artist> groupArtists = artistRepository.findByType(ArtistType.GROUP);
         assertEquals(1, groupArtists.size());
         assertEquals("Twice", groupArtists.get(0).getArtistName());
     }
@@ -87,13 +87,13 @@ public class ArtistRepositoryTest {
     public void testFindByGenreContainingIgnoreCase() {
         Artist artist1 = new Artist();
         artist1.setArtistName("Artist1");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         artist1.setGenre("K-pop");
         artistRepository.save(artist1);
 
         Artist artist2 = new Artist();
         artist2.setArtistName("Artist2");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
         artist2.setGenre("Rock");
         artistRepository.save(artist2);
 
@@ -106,13 +106,13 @@ public class ArtistRepositoryTest {
     public void testFindByOriginCountry() {
         Artist artist1 = new Artist();
         artist1.setArtistName("Artist1");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         artist1.setOriginCountry("JP");
         artistRepository.save(artist1);
 
         Artist artist2 = new Artist();
         artist2.setArtistName("Artist2");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
         artist2.setOriginCountry("US");
         artistRepository.save(artist2);
 
@@ -125,13 +125,13 @@ public class ArtistRepositoryTest {
     public void testFindByPrimaryLanguageIgnoreCase() {
         Artist artist1 = new Artist();
         artist1.setArtistName("Artist1");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         artist1.setPrimaryLanguage("Korean");
         artistRepository.save(artist1);
 
         Artist artist2 = new Artist();
         artist2.setArtistName("Artist2");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
         artist2.setPrimaryLanguage("Japanese");
         artistRepository.save(artist2);
 
@@ -144,23 +144,23 @@ public class ArtistRepositoryTest {
     public void testCountByType() {
         Artist artist1 = new Artist();
         artist1.setArtistName("Solo1");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         artistRepository.save(artist1);
 
         Artist artist2 = new Artist();
         artist2.setArtistName("Solo2");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
         artistRepository.save(artist2);
 
         Artist artist3 = new Artist();
         artist3.setArtistName("Group1");
-        artist3.setType(ArtistType.Group);
+        artist3.setType(ArtistType.GROUP);
         artistRepository.save(artist3);
 
-        long soloCount = artistRepository.countByType(ArtistType.Solo);
+        long soloCount = artistRepository.countByType(ArtistType.SOLO);
         assertEquals(2, soloCount);
 
-        long groupCount = artistRepository.countByType(ArtistType.Group);
+        long groupCount = artistRepository.countByType(ArtistType.GROUP);
         assertEquals(1, groupCount);
     }
 
@@ -169,7 +169,7 @@ public class ArtistRepositoryTest {
         String spotifyId = "spotify12345";
         Artist artist = new Artist();
         artist.setArtistName("Spotify Artist");
-        artist.setType(ArtistType.Solo);
+        artist.setType(ArtistType.SOLO);
         artist.setSpotifyId(spotifyId);
         artistRepository.save(artist);
 

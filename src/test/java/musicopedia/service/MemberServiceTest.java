@@ -43,7 +43,7 @@ public class MemberServiceTest {
         testSoloArtist = new Artist();
         testSoloArtist.setArtistId(UUID.randomUUID());
         testSoloArtist.setArtistName("IU");
-        testSoloArtist.setType(ArtistType.Solo);
+        testSoloArtist.setType(ArtistType.SOLO);
 
         testMember = new Member();
         testMember.setMemberId(testId);

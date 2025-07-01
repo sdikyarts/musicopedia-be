@@ -52,7 +52,7 @@ public class GroupControllerTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("BLACKPINK");
-        testArtist.setType(ArtistType.Group);
+        testArtist.setType(ArtistType.GROUP);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
 
@@ -60,7 +60,7 @@ public class GroupControllerTest {
         testGroup.setArtistId(testId);
         testGroup.setArtist(testArtist);
         testGroup.setFormationDate(LocalDate.of(2016, 8, 8));
-        testGroup.setGroupGender(ArtistGender.Female);
+        testGroup.setGroupGender(ArtistGender.FEMALE);
     }
 
     @Test
@@ -144,14 +144,14 @@ public class GroupControllerTest {
     @Test
     void testGetGroupsByGender() throws Exception {
         List<Groups> groups = Arrays.asList(testGroup);
-        when(groupService.findByGroupGender(ArtistGender.Female)).thenReturn(groups);
+        when(groupService.findByGroupGender(ArtistGender.FEMALE)).thenReturn(groups);
 
-        mockMvc.perform(get("/api/groups/gender/{gender}", "Female"))
+        mockMvc.perform(get("/api/groups/gender/{gender}", "FEMALE"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
 
-        verify(groupService, times(1)).findByGroupGender(ArtistGender.Female);
+        verify(groupService, times(1)).findByGroupGender(ArtistGender.FEMALE);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class GroupControllerTest {
         Groups groupWithoutArtist = new Groups();
         groupWithoutArtist.setArtistId(testId);
         groupWithoutArtist.setFormationDate(LocalDate.of(2016, 8, 8));
-        groupWithoutArtist.setGroupGender(ArtistGender.Female);
+        groupWithoutArtist.setGroupGender(ArtistGender.FEMALE);
 
         String jsonContent = objectMapper.writeValueAsString(groupWithoutArtist);
 

@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,17 +27,17 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional(readOnly = true)
     public List<Groups> findAll() {
-        List<Artist> artists = groupRepository.findByType(ArtistType.Group);
+        List<Artist> artists = groupRepository.findByType(ArtistType.GROUP);
         return artists.stream()
                 .map(this::convertToGroup)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Groups> findById(UUID groupId) {
         return groupRepository.findById(groupId)
-                .filter(artist -> artist.getType() == ArtistType.Group)
+                .filter(artist -> artist.getType() == ArtistType.GROUP)
                 .map(this::convertToGroup);
     }
 
@@ -52,7 +51,7 @@ public class GroupServiceImpl implements GroupService {
                            !formationDate.isBefore(startDate) && 
                            !formationDate.isAfter(endDate);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -60,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
     public List<Groups> findActiveGroups() {
         return findAll().stream()
                 .filter(group -> group.getDisbandDate() == null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -68,7 +67,7 @@ public class GroupServiceImpl implements GroupService {
     public List<Groups> findDisbandedGroups() {
         return findAll().stream()
                 .filter(group -> group.getDisbandDate() != null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -76,12 +75,12 @@ public class GroupServiceImpl implements GroupService {
     public List<Groups> findByGroupGender(ArtistGender gender) {
         return findAll().stream()
                 .filter(group -> group.getGroupGender() == gender)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public Groups save(Groups group, Artist artist) {
-        artist.setType(ArtistType.Group);
+        artist.setType(ArtistType.GROUP);
         Artist savedArtist = groupRepository.save(artist);
         group.setArtistId(savedArtist.getArtistId());
         group.setArtist(savedArtist);

@@ -1,5 +1,5 @@
 package musicopedia.model.enums;
 
 public enum ArtistType {
-    Solo, Group, Franchise, Various
+    SOLO, GROUP, FRANCHISE, VARIOUS
 }

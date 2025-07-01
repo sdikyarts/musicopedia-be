@@ -39,7 +39,7 @@ public class ArtistServiceTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("Test Artist");
-        testArtist.setType(ArtistType.Solo);
+        testArtist.setType(ArtistType.SOLO);
         testArtist.setGenre("Pop");
         testArtist.setSpotifyId("spotifyid123");
     }
@@ -97,13 +97,13 @@ public class ArtistServiceTest {
     @Test
     void testFindByType() {
         List<Artist> soloArtists = Arrays.asList(testArtist);
-        when(artistRepository.findByType(ArtistType.Solo)).thenReturn(soloArtists);
+        when(artistRepository.findByType(ArtistType.SOLO)).thenReturn(soloArtists);
 
-        List<Artist> result = artistService.findByType(ArtistType.Solo);
+        List<Artist> result = artistService.findByType(ArtistType.SOLO);
 
         assertEquals(1, result.size());
-        assertEquals(ArtistType.Solo, result.get(0).getType());
-        verify(artistRepository, times(1)).findByType(ArtistType.Solo);
+        assertEquals(ArtistType.SOLO, result.get(0).getType());
+        verify(artistRepository, times(1)).findByType(ArtistType.SOLO);
     }
 
     @Test

@@ -20,13 +20,13 @@ public class ModelIntegrationTest {
         Artist groupArtist = new Artist();
         groupArtist.setArtistId(groupArtistId);
         groupArtist.setArtistName("Test Group");
-        groupArtist.setType(ArtistType.Group);
+        groupArtist.setType(ArtistType.GROUP);
         
         Groups group = new Groups();
         group.setArtistId(groupArtistId);
         group.setArtist(groupArtist);
         group.setFormationDate(LocalDate.of(2015, 1, 1));
-        group.setGroupGender(ArtistGender.Mixed);
+        group.setGroupGender(ArtistGender.MIXED);
         
         UUID memberId = UUID.randomUUID();
         Member member = new Member();
@@ -38,13 +38,13 @@ public class ModelIntegrationTest {
         Artist soloArtist = new Artist();
         soloArtist.setArtistId(soloArtistId);
         soloArtist.setArtistName("Solo Artist Name");
-        soloArtist.setType(ArtistType.Solo);
+        soloArtist.setType(ArtistType.SOLO);
         
         Solo solo = new Solo();
         solo.setArtistId(soloArtistId);
         solo.setArtist(soloArtist);
         solo.setBirthDate(LocalDate.of(1995, 5, 15));
-        solo.setGender(ArtistGender.Female);
+        solo.setGender(ArtistGender.FEMALE);
         
         member.setSoloArtist(soloArtist);
         
@@ -56,7 +56,7 @@ public class ModelIntegrationTest {
         membership.setId(membershipId);
         membership.setGroup(groupArtist);
         membership.setMember(member);
-        membership.setStatus(MembershipStatus.Current);
+        membership.setStatus(MembershipStatus.CURRENT);
         membership.setJoinDate(LocalDate.of(2020, 1, 1));
         
         assertEquals(groupArtistId, membership.getId().getGroupId());
@@ -65,7 +65,7 @@ public class ModelIntegrationTest {
         assertEquals(groupArtist, membership.getGroup());
         assertEquals(member, membership.getMember());
         
-        assertEquals(MembershipStatus.Current, membership.getStatus());
+        assertEquals(MembershipStatus.CURRENT, membership.getStatus());
         
         assertEquals("Test Group", membership.getGroup().getArtistName());
         assertEquals("Test Member", membership.getMember().getFullName());
@@ -97,11 +97,11 @@ public class ModelIntegrationTest {
         membership.setId(membershipId);
         membership.setGroup(groupArtist);
         membership.setMember(member);
-        membership.setStatus(MembershipStatus.Former);
+        membership.setStatus(MembershipStatus.FORMER);
         membership.setJoinDate(joinDate);
         membership.setLeaveDate(leaveDate);
         
-        assertEquals(MembershipStatus.Former, membership.getStatus());
+        assertEquals(MembershipStatus.FORMER, membership.getStatus());
         assertEquals(joinDate, membership.getJoinDate());
         assertEquals(leaveDate, membership.getLeaveDate());
         
@@ -127,10 +127,10 @@ public class ModelIntegrationTest {
         membership.setId(membershipId);
         membership.setGroup(groupArtist);
         membership.setMember(member);
-        membership.setStatus(MembershipStatus.Inactive);
+        membership.setStatus(MembershipStatus.INACTIVE);
         membership.setJoinDate(LocalDate.of(2018, 5, 10));
         
-        assertEquals(MembershipStatus.Inactive, membership.getStatus());
+        assertEquals(MembershipStatus.INACTIVE, membership.getStatus());
         assertNotNull(membership.getJoinDate());
         assertNull(membership.getLeaveDate());
     }

@@ -45,12 +45,12 @@ public class GroupMembershipRepositoryTest {
     void setup() {
         group1 = new Artist();
         group1.setArtistName("BTS");
-        group1.setType(ArtistType.Group);
+        group1.setType(ArtistType.GROUP);
         artistRepository.save(group1);
         
         group2 = new Artist();
         group2.setArtistName("Blackpink");
-        group2.setType(ArtistType.Group);
+        group2.setType(ArtistType.GROUP);
         artistRepository.save(group2);
         
         member1 = new Member();
@@ -65,16 +65,16 @@ public class GroupMembershipRepositoryTest {
         member3.setFullName("Member 3");
         memberRepository.save(member3);
         
-        createMembership(group1, member1, MembershipStatus.Current, 
+        createMembership(group1, member1, MembershipStatus.CURRENT, 
                 LocalDate.of(2013, 6, 13), null);
         
-        createMembership(group1, member2, MembershipStatus.Current,
+        createMembership(group1, member2, MembershipStatus.CURRENT,
                 LocalDate.of(2013, 6, 13), null);
         
-        createMembership(group2, member3, MembershipStatus.Current,
+        createMembership(group2, member3, MembershipStatus.CURRENT,
                 LocalDate.of(2016, 8, 8), null);
         
-        createMembership(group2, member1, MembershipStatus.Former,
+        createMembership(group2, member1, MembershipStatus.FORMER,
                 LocalDate.of(2015, 1, 1), LocalDate.of(2016, 1, 1));
     }
     
@@ -122,11 +122,11 @@ public class GroupMembershipRepositoryTest {
     @Test
     public void testFindByGroupIdAndStatus() {
         List<GroupMembership> currentMembers = groupMembershipRepository.findByGroupIdAndStatus(
-                group1.getArtistId(), MembershipStatus.Current);
+                group1.getArtistId(), MembershipStatus.CURRENT);
         assertEquals(2, currentMembers.size());
         
         List<GroupMembership> formerMembers = groupMembershipRepository.findByGroupIdAndStatus(
-                group1.getArtistId(), MembershipStatus.Former);
+                group1.getArtistId(), MembershipStatus.FORMER);
         assertEquals(0, formerMembers.size());
     }
 
@@ -164,7 +164,7 @@ public class GroupMembershipRepositoryTest {
     @Test
     public void testCountByGroupIdAndStatus() {
         long count = groupMembershipRepository.countByGroupIdAndStatus(
-                group1.getArtistId(), MembershipStatus.Current);
+                group1.getArtistId(), MembershipStatus.CURRENT);
         assertEquals(2, count);
     }
 

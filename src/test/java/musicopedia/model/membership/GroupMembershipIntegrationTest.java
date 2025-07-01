@@ -29,13 +29,13 @@ public class GroupMembershipIntegrationTest {
         groupArtist = new Artist();
         groupArtist.setArtistId(groupId);
         groupArtist.setArtistName("Test Music Group");
-        groupArtist.setType(ArtistType.Group);
+        groupArtist.setType(ArtistType.GROUP);
         
         group = new Groups();
         group.setArtistId(groupId);
         group.setArtist(groupArtist);
         group.setFormationDate(LocalDate.of(2010, 1, 1));
-        group.setGroupGender(ArtistGender.Mixed);
+        group.setGroupGender(ArtistGender.MIXED);
         
         members = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -58,7 +58,7 @@ public class GroupMembershipIntegrationTest {
             membership.setId(id);
             membership.setGroup(groupArtist);
             membership.setMember(members.get(i));
-            membership.setStatus(MembershipStatus.Current);
+            membership.setStatus(MembershipStatus.CURRENT);
             membership.setJoinDate(LocalDate.of(2010, 1, 1));
             
             memberships.add(membership);
@@ -73,7 +73,7 @@ public class GroupMembershipIntegrationTest {
             membership.setId(id);
             membership.setGroup(groupArtist);
             membership.setMember(members.get(i));
-            membership.setStatus(MembershipStatus.Former);
+            membership.setStatus(MembershipStatus.FORMER);
             membership.setJoinDate(LocalDate.of(2010, 1, 1));
             membership.setLeaveDate(LocalDate.of(2020, 12, 31));
             
@@ -88,7 +88,7 @@ public class GroupMembershipIntegrationTest {
         membership.setId(id);
         membership.setGroup(groupArtist);
         membership.setMember(members.get(4));
-        membership.setStatus(MembershipStatus.Inactive);
+        membership.setStatus(MembershipStatus.INACTIVE);
         membership.setJoinDate(LocalDate.of(2010, 1, 1));
         
         memberships.add(membership);
@@ -99,13 +99,13 @@ public class GroupMembershipIntegrationTest {
         assertEquals(5, memberships.size());
         
         long currentCount = memberships.stream()
-                .filter(m -> m.getStatus() == MembershipStatus.Current)
+                .filter(m -> m.getStatus() == MembershipStatus.CURRENT)
                 .count();
         long formerCount = memberships.stream()
-                .filter(m -> m.getStatus() == MembershipStatus.Former)
+                .filter(m -> m.getStatus() == MembershipStatus.FORMER)
                 .count();
         long inactiveCount = memberships.stream()
-                .filter(m -> m.getStatus() == MembershipStatus.Inactive)
+                .filter(m -> m.getStatus() == MembershipStatus.INACTIVE)
                 .count();
         
         assertEquals(2, currentCount);
@@ -116,11 +116,11 @@ public class GroupMembershipIntegrationTest {
     @Test
     public void testCurrentMemberships() {
         List<GroupMembership> currentMemberships = memberships.stream()
-                .filter(m -> m.getStatus() == MembershipStatus.Current)
+                .filter(m -> m.getStatus() == MembershipStatus.CURRENT)
                 .toList();
         
         for (GroupMembership membership : currentMemberships) {
-            assertEquals(MembershipStatus.Current, membership.getStatus());
+            assertEquals(MembershipStatus.CURRENT, membership.getStatus());
             assertNotNull(membership.getJoinDate());
             assertNull(membership.getLeaveDate());
             assertEquals(groupArtist, membership.getGroup());
@@ -130,11 +130,11 @@ public class GroupMembershipIntegrationTest {
     @Test
     public void testFormerMemberships() {
         List<GroupMembership> formerMemberships = memberships.stream()
-                .filter(m -> m.getStatus() == MembershipStatus.Former)
+                .filter(m -> m.getStatus() == MembershipStatus.FORMER)
                 .toList();
         
         for (GroupMembership membership : formerMemberships) {
-            assertEquals(MembershipStatus.Former, membership.getStatus());
+            assertEquals(MembershipStatus.FORMER, membership.getStatus());
             assertNotNull(membership.getJoinDate());
             assertNotNull(membership.getLeaveDate());
             assertTrue(membership.getJoinDate().isBefore(membership.getLeaveDate()));
@@ -145,11 +145,11 @@ public class GroupMembershipIntegrationTest {
     @Test
     public void testInactiveMemberships() {
         List<GroupMembership> inactiveMemberships = memberships.stream()
-                .filter(m -> m.getStatus() == MembershipStatus.Inactive)
+                .filter(m -> m.getStatus() == MembershipStatus.INACTIVE)
                 .toList();
         
         for (GroupMembership membership : inactiveMemberships) {
-            assertEquals(MembershipStatus.Inactive, membership.getStatus());
+            assertEquals(MembershipStatus.INACTIVE, membership.getStatus());
             assertNotNull(membership.getJoinDate());
             assertNull(membership.getLeaveDate());
             assertEquals(groupArtist, membership.getGroup());
@@ -171,21 +171,21 @@ public class GroupMembershipIntegrationTest {
         membership.setId(id);
         membership.setGroup(groupArtist);
         membership.setMember(newMember);
-        membership.setStatus(MembershipStatus.Current);
+        membership.setStatus(MembershipStatus.CURRENT);
         membership.setJoinDate(LocalDate.now().minusYears(1));
         
-        assertEquals(MembershipStatus.Current, membership.getStatus());
+        assertEquals(MembershipStatus.CURRENT, membership.getStatus());
         assertNull(membership.getLeaveDate());
         
-        membership.setStatus(MembershipStatus.Inactive);
-        assertEquals(MembershipStatus.Inactive, membership.getStatus());
+        membership.setStatus(MembershipStatus.INACTIVE);
+        assertEquals(MembershipStatus.INACTIVE, membership.getStatus());
         assertNull(membership.getLeaveDate());
         
         LocalDate leaveDate = LocalDate.now();
-        membership.setStatus(MembershipStatus.Former);
+        membership.setStatus(MembershipStatus.FORMER);
         membership.setLeaveDate(leaveDate);
         
-        assertEquals(MembershipStatus.Former, membership.getStatus());
+        assertEquals(MembershipStatus.FORMER, membership.getStatus());
         assertEquals(leaveDate, membership.getLeaveDate());
     }
 }

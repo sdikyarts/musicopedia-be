@@ -18,11 +18,11 @@ public class GroupsTest {
         Artist artist = new Artist();
         artist.setArtistId(artistId);
         artist.setArtistName("Test Group");
-        artist.setType(ArtistType.Group);
+        artist.setType(ArtistType.GROUP);
         
         LocalDate formationDate = LocalDate.of(2015, 1, 1);
         LocalDate disbandDate = null;
-        ArtistGender groupGender = ArtistGender.Mixed;
+        ArtistGender groupGender = ArtistGender.MIXED;
         
         Groups group = new Groups();
         group.setArtistId(artistId);
@@ -76,12 +76,12 @@ public class GroupsTest {
         Groups group = new Groups();
         group.setArtistId(artistId);
         group.setFormationDate(formationDate);
-        group.setGroupGender(ArtistGender.Mixed);
+        group.setGroupGender(ArtistGender.MIXED);
         
         String toString = group.toString();
         
         assertTrue(toString.contains(artistId.toString()));
         assertTrue(toString.contains(formationDate.toString()));
-        assertTrue(toString.contains(ArtistGender.Mixed.toString()));
+        assertTrue(toString.contains(ArtistGender.MIXED.toString()));
     }
 }

@@ -23,7 +23,9 @@ jobs:
         run: chmod +x ./gradlew
           
       - name: Build and run unit tests with coverage
-        run: ./gradlew build jacocoTestReport
+        run: |
+          ./gradlew build jacocoTestReport
+          ./gradlew copyRuntimeLibs
         
       - name: SonarCloud Scan
         if: github.ref == 'refs/heads/main'

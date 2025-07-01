@@ -14,7 +14,7 @@ public class ArtistTest {
         String artistName = "Test Artist";
         String description = "This is a test artist description";
         String image = "base64encodedimage";
-        ArtistType type = ArtistType.Group;
+        ArtistType type = ArtistType.GROUP;
         String primaryLanguage = "English";
         String genre = "Pop";
         String originCountry = "US";

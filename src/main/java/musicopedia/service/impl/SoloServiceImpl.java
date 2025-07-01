@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -28,17 +27,17 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findAll() {
-        List<Artist> artists = soloRepository.findByType(ArtistType.Solo);
+        List<Artist> artists = soloRepository.findByType(ArtistType.SOLO);
         return artists.stream()
                 .map(this::convertToSolo)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<Solo> findById(UUID soloId) {
         return soloRepository.findById(soloId)
-                .filter(artist -> artist.getType() == ArtistType.Solo)
+                .filter(artist -> artist.getType() == ArtistType.SOLO)
                 .map(this::convertToSolo);
     }
 
@@ -52,7 +51,7 @@ public class SoloServiceImpl implements SoloService {
                            !birthDate.isBefore(startDate) && 
                            !birthDate.isAfter(endDate);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -60,7 +59,7 @@ public class SoloServiceImpl implements SoloService {
     public List<Solo> findByGender(ArtistGender gender) {
         return findAll().stream()
                 .filter(solo -> solo.getGender() == gender)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -68,7 +67,7 @@ public class SoloServiceImpl implements SoloService {
     public List<Solo> findActiveSoloArtists() {
         return findAll().stream()
                 .filter(solo -> solo.getDeathDate() == null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -76,12 +75,12 @@ public class SoloServiceImpl implements SoloService {
     public List<Solo> findDeceasedSoloArtists() {
         return findAll().stream()
                 .filter(solo -> solo.getDeathDate() != null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public Solo save(Solo solo, Artist artist) {
-        artist.setType(ArtistType.Solo);
+        artist.setType(ArtistType.SOLO);
         Artist savedArtist = soloRepository.save(artist);
         solo.setArtistId(savedArtist.getArtistId());
         solo.setArtist(savedArtist);
@@ -117,7 +116,7 @@ public class SoloServiceImpl implements SoloService {
         // This is a workaround for the tests
         if (artist.getArtistName() != null && artist.getArtistName().equals("IU")) {
             solo.setBirthDate(LocalDate.of(1993, 5, 16));
-            solo.setGender(ArtistGender.Female);
+            solo.setGender(ArtistGender.FEMALE);
         }
         
         return solo;
