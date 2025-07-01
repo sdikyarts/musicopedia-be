@@ -26,7 +26,7 @@ public class ModelIntegrationTest {
         group.setArtistId(groupArtistId);
         group.setArtist(groupArtist);
         group.setFormationDate(LocalDate.of(2015, 1, 1));
-        group.setGroupGender(ArtistGender.Mixed);
+        group.setGroupGender(ArtistGender.MIXED);
         
         UUID memberId = UUID.randomUUID();
         Member member = new Member();
@@ -44,7 +44,7 @@ public class ModelIntegrationTest {
         solo.setArtistId(soloArtistId);
         solo.setArtist(soloArtist);
         solo.setBirthDate(LocalDate.of(1995, 5, 15));
-        solo.setGender(ArtistGender.Female);
+        solo.setGender(ArtistGender.FEMALE);
         
         member.setSoloArtist(soloArtist);
         

@@ -46,7 +46,7 @@ public class SoloRepositoryTest {
         solo.setArtist(artist);
         solo.setBirthDate(birthDate);
         solo.setDeathDate(deathDate);
-        solo.setGender(ArtistGender.Female);
+        solo.setGender(ArtistGender.FEMALE);
     }
 
     @BeforeEach

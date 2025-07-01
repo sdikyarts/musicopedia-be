@@ -9,41 +9,41 @@ public class ArtistGenderTest {
     public void testEnumValues() {
         // Test that all expected enum values exist
         assertEquals(5, ArtistGender.values().length);
-        assertNotNull(ArtistGender.valueOf("Male"));
-        assertNotNull(ArtistGender.valueOf("Female"));
-        assertNotNull(ArtistGender.valueOf("Mixed"));
-        assertNotNull(ArtistGender.valueOf("Non_Binary"));
-        assertNotNull(ArtistGender.valueOf("Unknown"));
+        assertNotNull(ArtistGender.valueOf("MALE"));
+        assertNotNull(ArtistGender.valueOf("FEMALE"));
+        assertNotNull(ArtistGender.valueOf("MIXED"));
+        assertNotNull(ArtistGender.valueOf("NON_BINARY"));
+        assertNotNull(ArtistGender.valueOf("UNKNOWN"));
     }
 
     @Test
     public void testEnumOrdinals() {
         // Test the ordinal values
-        assertEquals(0, ArtistGender.Male.ordinal());
-        assertEquals(1, ArtistGender.Female.ordinal());
-        assertEquals(2, ArtistGender.Mixed.ordinal());
-        assertEquals(3, ArtistGender.Non_Binary.ordinal());
-        assertEquals(4, ArtistGender.Unknown.ordinal());
+        assertEquals(0, ArtistGender.MALE.ordinal());
+        assertEquals(1, ArtistGender.FEMALE.ordinal());
+        assertEquals(2, ArtistGender.MIXED.ordinal());
+        assertEquals(3, ArtistGender.NON_BINARY.ordinal());
+        assertEquals(4, ArtistGender.UNKNOWN.ordinal());
     }
 
     @Test
     public void testEnumToString() {
         // Test string representation
-        assertEquals("Male", ArtistGender.Male.toString());
-        assertEquals("Female", ArtistGender.Female.toString());
-        assertEquals("Mixed", ArtistGender.Mixed.toString());
-        assertEquals("Non_Binary", ArtistGender.Non_Binary.toString());
-        assertEquals("Unknown", ArtistGender.Unknown.toString());
+        assertEquals("MALE", ArtistGender.MALE.toString());
+        assertEquals("FEMALE", ArtistGender.FEMALE.toString());
+        assertEquals("MIXED", ArtistGender.MIXED.toString());
+        assertEquals("NON_BINARY", ArtistGender.NON_BINARY.toString());
+        assertEquals("UNKNOWN", ArtistGender.UNKNOWN.toString());
     }
 
     @Test
     public void testValueOf() {
         // Test valueOf() method
-        assertSame(ArtistGender.Male, ArtistGender.valueOf("Male"));
-        assertSame(ArtistGender.Female, ArtistGender.valueOf("Female"));
-        assertSame(ArtistGender.Mixed, ArtistGender.valueOf("Mixed"));
-        assertSame(ArtistGender.Non_Binary, ArtistGender.valueOf("Non_Binary"));
-        assertSame(ArtistGender.Unknown, ArtistGender.valueOf("Unknown"));
+        assertSame(ArtistGender.MALE, ArtistGender.valueOf("MALE"));
+        assertSame(ArtistGender.FEMALE, ArtistGender.valueOf("FEMALE"));
+        assertSame(ArtistGender.MIXED, ArtistGender.valueOf("MIXED"));
+        assertSame(ArtistGender.NON_BINARY, ArtistGender.valueOf("NON_BINARY"));
+        assertSame(ArtistGender.UNKNOWN, ArtistGender.valueOf("UNKNOWN"));
     }
 
     @Test

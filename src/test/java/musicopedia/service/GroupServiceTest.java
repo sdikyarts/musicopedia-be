@@ -52,7 +52,7 @@ public class GroupServiceTest {
         testGroup.setArtistId(testId);
         testGroup.setArtist(testArtist);
         testGroup.setFormationDate(LocalDate.of(2013, 6, 13));
-        testGroup.setGroupGender(ArtistGender.Male);
+        testGroup.setGroupGender(ArtistGender.MALE);
     }
 
     @Test
@@ -284,19 +284,19 @@ public class GroupServiceTest {
         maleGroup.setArtistId(maleGroupArtist.getArtistId());
         maleGroup.setArtist(maleGroupArtist);
         maleGroup.setFormationDate(LocalDate.of(2013, 1, 1));
-        maleGroup.setGroupGender(ArtistGender.Male);
+        maleGroup.setGroupGender(ArtistGender.MALE);
         
         Groups femaleGroup = new Groups();
         femaleGroup.setArtistId(femaleGroupArtist.getArtistId());
         femaleGroup.setArtist(femaleGroupArtist);
         femaleGroup.setFormationDate(LocalDate.of(2014, 1, 1));
-        femaleGroup.setGroupGender(ArtistGender.Female);
+        femaleGroup.setGroupGender(ArtistGender.FEMALE);
         
         // Mock convertToGroup for each artist
         doReturn(maleGroup).when(groupServiceSpy).convertToGroup(maleGroupArtist);
         doReturn(femaleGroup).when(groupServiceSpy).convertToGroup(femaleGroupArtist);
 
-        List<Groups> result = groupServiceSpy.findByGroupGender(ArtistGender.Male);
+        List<Groups> result = groupServiceSpy.findByGroupGender(ArtistGender.MALE);
 
         assertEquals(1, result.size());
         assertEquals("Male Group", result.get(0).getArtist().getArtistName());

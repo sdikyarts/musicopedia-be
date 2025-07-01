@@ -117,7 +117,7 @@ public class SoloServiceImpl implements SoloService {
         // This is a workaround for the tests
         if (artist.getArtistName() != null && artist.getArtistName().equals("IU")) {
             solo.setBirthDate(LocalDate.of(1993, 5, 16));
-            solo.setGender(ArtistGender.Female);
+            solo.setGender(ArtistGender.FEMALE);
         }
         
         return solo;

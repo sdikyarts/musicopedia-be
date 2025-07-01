@@ -45,7 +45,7 @@ public class GroupRepositoryTest {
         groups.setArtistId(artist.getArtistId());
         groups.setArtist(artist);
         groups.setFormationDate(LocalDate.parse(formationDate));
-        groups.setGroupGender(ArtistGender.Mixed);
+        groups.setGroupGender(ArtistGender.MIXED);
     }
 
     @BeforeEach

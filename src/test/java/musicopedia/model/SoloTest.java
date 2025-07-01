@@ -22,7 +22,7 @@ public class SoloTest {
         
         LocalDate birthDate = LocalDate.of(1990, 3, 15);
         LocalDate deathDate = null;
-        ArtistGender gender = ArtistGender.Male;
+        ArtistGender gender = ArtistGender.MALE;
         
         Solo solo = new Solo();
         solo.setArtistId(artistId);
@@ -76,12 +76,12 @@ public class SoloTest {
         Solo solo = new Solo();
         solo.setArtistId(artistId);
         solo.setBirthDate(birthDate);
-        solo.setGender(ArtistGender.Female);
+        solo.setGender(ArtistGender.FEMALE);
         
         String toString = solo.toString();
         
         assertTrue(toString.contains(artistId.toString()));
         assertTrue(toString.contains(birthDate.toString()));
-        assertTrue(toString.contains(ArtistGender.Female.toString()));
+        assertTrue(toString.contains(ArtistGender.FEMALE.toString()));
     }
 }

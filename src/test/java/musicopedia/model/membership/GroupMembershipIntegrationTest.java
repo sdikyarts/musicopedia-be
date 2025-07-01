@@ -35,7 +35,7 @@ public class GroupMembershipIntegrationTest {
         group.setArtistId(groupId);
         group.setArtist(groupArtist);
         group.setFormationDate(LocalDate.of(2010, 1, 1));
-        group.setGroupGender(ArtistGender.Mixed);
+        group.setGroupGender(ArtistGender.MIXED);
         
         members = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
