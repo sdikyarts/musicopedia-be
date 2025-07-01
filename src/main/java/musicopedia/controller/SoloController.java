@@ -16,7 +16,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/soloists")
-@CrossOrigin(origins = "*")
 public class SoloController {
 
     private final SoloService soloService;

@@ -14,7 +14,6 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/memberships")
-@CrossOrigin(origins = "*")
 public class GroupMembershipController {
 
     private final GroupMembershipService groupMembershipService;
