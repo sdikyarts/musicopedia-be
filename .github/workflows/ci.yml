@@ -1,0 +1,34 @@
+name: Continuous Integration (CI)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out the Git repository
+        uses: actions/checkout@v4
+        
+      - name: Set up Java toolchain
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+          
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+          
+      - name: Build and run unit tests with coverage
+        run: ./gradlew build jacocoTestReport
+        
+      - name: SonarCloud Scan
+        if: github.ref == 'refs/heads/main'
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: https://sonarcloud.io
+
