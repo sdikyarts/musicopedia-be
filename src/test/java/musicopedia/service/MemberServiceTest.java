@@ -102,8 +102,9 @@ public class MemberServiceTest {
         Member member1 = createMember("Member 1", LocalDate.of(1990, 1, 1));
         Member member2 = createMember("Member 2", LocalDate.of(1995, 5, 5));
         Member member3 = createMember("Member 3", LocalDate.of(2000, 10, 10));
+        Member memberWithNullBirthDate = createMember("Member Null", null);
         
-        List<Member> members = Arrays.asList(member1, member2, member3);
+        List<Member> members = Arrays.asList(member1, member2, member3, memberWithNullBirthDate);
         
         when(memberRepository.findAll()).thenReturn(members);
 
