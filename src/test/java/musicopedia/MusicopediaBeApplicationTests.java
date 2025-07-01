@@ -22,7 +22,10 @@ class MusicopediaBeApplicationTests {
 
     @Test
     void contextLoads() {
-        // The test will pass if the application context loads successfully with our test database settings
+        // This test method is intentionally empty.
+        // It verifies that the Spring application context can be loaded successfully
+        // with the test configuration and database settings.
+        // If the context fails to load, the test will fail during setup.
     }
 
     @Test
