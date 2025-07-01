@@ -28,13 +28,15 @@ public interface SoloRepository extends JpaRepository<Artist, UUID> {
     @Query("SELECT COUNT(a) FROM Artist a WHERE a.type = :type AND LOWER(a.primaryLanguage) = LOWER(:language)")
     long countSoloArtistsByLanguage(@Param("type") ArtistType type, @Param("language") String language);
 
-    List<Artist> findByBirthDate(LocalDate birthDate);
+    @Query("SELECT a FROM Artist a JOIN Solo s ON a.artistId = s.artistId WHERE s.birthDate = :birthDate")
+    List<Artist> findByBirthDate(@Param("birthDate") LocalDate birthDate);
 
-    List<Artist> findByDeathDate(LocalDate deathDate);
+    @Query("SELECT a FROM Artist a JOIN Solo s ON a.artistId = s.artistId WHERE s.deathDate = :deathDate")
+    List<Artist> findByDeathDate(@Param("deathDate") LocalDate deathDate);
 
-    @Query("SELECT a FROM Artist a WHERE a.deathDate IS NULL OR a.deathDate > CURRENT_DATE")
+    @Query("SELECT a FROM Artist a JOIN Solo s ON a.artistId = s.artistId WHERE s.deathDate IS NULL OR s.deathDate > CURRENT_DATE")
     List<Artist> findAliveArtists();
 
-    @Query("SELECT a FROM Artist a WHERE a.deathDate IS NOT NULL AND a.deathDate <= CURRENT_DATE")
+    @Query("SELECT a FROM Artist a JOIN Solo s ON a.artistId = s.artistId WHERE s.deathDate IS NOT NULL AND s.deathDate <= CURRENT_DATE")
     List<Artist> findDeceasedArtists();
 }
