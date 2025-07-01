@@ -1,5 +1,5 @@
 package musicopedia.model.enums;
 
 public enum ArtistGender {
-    Male, Female, Mixed, Non_Binary, Unknown
+    MALE, FEMALE, MIXED, NON_BINARY, UNKNOWN
 }
