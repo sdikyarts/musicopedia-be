@@ -41,6 +41,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.jupiter")
     }
+    testImplementation("com.h2database:h2")
     
     testImplementation(platform("org.junit:junit-bom:${junitJupiterVersion}"))
     testImplementation("org.junit.jupiter:junit-jupiter-api")
