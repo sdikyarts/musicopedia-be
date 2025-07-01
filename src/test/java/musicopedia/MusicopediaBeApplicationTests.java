@@ -1,23 +1,24 @@
 package musicopedia;
 
-import musicopedia.config.TestConfig;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-@DataJpaTest
+@SpringBootTest(properties = {
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=PostgreSQL",
+    "spring.datasource.username=sa",
+    "spring.datasource.password=",
+    "spring.datasource.driver-class-name=org.h2.Driver",
+    "spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect"
+})
 @ActiveProfiles("test")
-@Import(TestConfig.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class MusicopediaBeApplicationTests {
 
-    // Just using DataJpaTest which provides a focused test environment
-
     @Test
     void contextLoads() {
-        // Empty test that should pass without loading the full application context
-        // The DataJpaTest annotation applies only the necessary configuration for JPA tests
+        // The test will pass if the application context loads successfully with our test database settings
     }
 }
