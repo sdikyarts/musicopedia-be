@@ -27,9 +27,9 @@ public interface GroupRepository extends JpaRepository<Artist, UUID> {
     @Query("SELECT COUNT(a) FROM Artist a WHERE a.type = :type AND LOWER(a.primaryLanguage) = LOWER(:language)")
     long countGroupsByLanguage(@Param("type") ArtistType type, @Param("language") String language);
 
-    @Query("SELECT a FROM Artist a WHERE a.type = :type AND a.formationDate = :formationDate")
+    @Query("SELECT a FROM Artist a JOIN Groups g ON a.artistId = g.artistId WHERE a.type = :type AND g.formationDate = :formationDate")
     List<Artist> findGroupsByFormationDate(@Param("type") ArtistType type, @Param("formationDate") String formationDate);
 
-    @Query("SELECT a FROM Artist a WHERE a.type = :type AND a.disbandDate = :disbandDate")
+    @Query("SELECT a FROM Artist a JOIN Groups g ON a.artistId = g.artistId WHERE a.type = :type AND g.disbandDate = :disbandDate")
     List<Artist> findGroupsByDisbandDate(@Param("type") ArtistType type, @Param("disbandDate") String disbandDate);
 }
