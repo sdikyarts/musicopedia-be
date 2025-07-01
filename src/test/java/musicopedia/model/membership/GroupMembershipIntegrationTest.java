@@ -29,7 +29,7 @@ public class GroupMembershipIntegrationTest {
         groupArtist = new Artist();
         groupArtist.setArtistId(groupId);
         groupArtist.setArtistName("Test Music Group");
-        groupArtist.setType(ArtistType.Group);
+        groupArtist.setType(ArtistType.GROUP);
         
         group = new Groups();
         group.setArtistId(groupId);

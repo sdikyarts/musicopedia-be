@@ -45,12 +45,12 @@ public class GroupMembershipRepositoryTest {
     void setup() {
         group1 = new Artist();
         group1.setArtistName("BTS");
-        group1.setType(ArtistType.Group);
+        group1.setType(ArtistType.GROUP);
         artistRepository.save(group1);
         
         group2 = new Artist();
         group2.setArtistName("Blackpink");
-        group2.setType(ArtistType.Group);
+        group2.setType(ArtistType.GROUP);
         artistRepository.save(group2);
         
         member1 = new Member();

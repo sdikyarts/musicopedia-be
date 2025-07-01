@@ -45,7 +45,7 @@ public class SoloServiceTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.Solo);
+        testArtist.setType(ArtistType.SOLO);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
 
@@ -65,14 +65,14 @@ public class SoloServiceTest {
 
         List<Artist> artists = Arrays.asList(artist1, artist2);
         
-        when(soloRepository.findByType(ArtistType.Solo)).thenReturn(artists);
+        when(soloRepository.findByType(ArtistType.SOLO)).thenReturn(artists);
 
         List<Solo> result = soloService.findAll();
 
         assertEquals(2, result.size());
         assertEquals("Solo 1", result.get(0).getArtist().getArtistName());
         assertEquals("Solo 2", result.get(1).getArtist().getArtistName());
-        verify(soloRepository, times(1)).findByType(ArtistType.Solo);
+        verify(soloRepository, times(1)).findByType(ArtistType.SOLO);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class SoloServiceTest {
         Artist groupArtist = new Artist();
         groupArtist.setArtistId(testId);
         groupArtist.setArtistName("Group Artist");
-        groupArtist.setType(ArtistType.Group);
+        groupArtist.setType(ArtistType.GROUP);
         
         when(soloRepository.findById(testId)).thenReturn(Optional.of(groupArtist));
 
@@ -132,24 +132,24 @@ public class SoloServiceTest {
         Artist artist1 = new Artist();
         artist1.setArtistId(UUID.randomUUID());
         artist1.setArtistName("Solo 1");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         
         Artist artist2 = new Artist();
         artist2.setArtistId(UUID.randomUUID());
         artist2.setArtistName("Solo 2");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
         
         Artist artist3 = new Artist();
         artist3.setArtistId(UUID.randomUUID());
         artist3.setArtistName("Solo 3");
-        artist3.setType(ArtistType.Solo);
+        artist3.setType(ArtistType.SOLO);
 
         Artist artistWithNullBirthDate = new Artist();
         artistWithNullBirthDate.setArtistId(UUID.randomUUID());
         artistWithNullBirthDate.setArtistName("Solo Null Date");
-        artistWithNullBirthDate.setType(ArtistType.Solo);
+        artistWithNullBirthDate.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(artist1, artist2, artist3, artistWithNullBirthDate));
         
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -200,14 +200,14 @@ public class SoloServiceTest {
         Artist artist1 = new Artist();
         artist1.setArtistId(UUID.randomUUID());
         artist1.setArtistName("Female Solo");
-        artist1.setType(ArtistType.Solo);
+        artist1.setType(ArtistType.SOLO);
         
         Artist artist2 = new Artist();
         artist2.setArtistId(UUID.randomUUID());
         artist2.setArtistName("Male Solo");
-        artist2.setType(ArtistType.Solo);
+        artist2.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(artist1, artist2));
 
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -241,14 +241,14 @@ public class SoloServiceTest {
         Artist activeArtist = new Artist();
         activeArtist.setArtistId(UUID.randomUUID());
         activeArtist.setArtistName("Active");
-        activeArtist.setType(ArtistType.Solo);
+        activeArtist.setType(ArtistType.SOLO);
         
         Artist deceasedArtist = new Artist();
         deceasedArtist.setArtistId(UUID.randomUUID());
         deceasedArtist.setArtistName("Deceased");
-        deceasedArtist.setType(ArtistType.Solo);
+        deceasedArtist.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(activeArtist, deceasedArtist));
 
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -284,14 +284,14 @@ public class SoloServiceTest {
         Artist activeArtist = new Artist();
         activeArtist.setArtistId(UUID.randomUUID());
         activeArtist.setArtistName("Active");
-        activeArtist.setType(ArtistType.Solo);
+        activeArtist.setType(ArtistType.SOLO);
         
         Artist deceasedArtist = new Artist();
         deceasedArtist.setArtistId(UUID.randomUUID());
         deceasedArtist.setArtistName("Deceased");
-        deceasedArtist.setType(ArtistType.Solo);
+        deceasedArtist.setType(ArtistType.SOLO);
 
-        when(soloRepository.findByType(ArtistType.Solo))
+        when(soloRepository.findByType(ArtistType.SOLO))
             .thenReturn(Arrays.asList(activeArtist, deceasedArtist));
 
         // Create a spy of SoloServiceImpl to override convertToSolo
@@ -329,7 +329,7 @@ public class SoloServiceTest {
 
         assertEquals(testId, savedSolo.getArtistId());
         assertEquals("IU", savedSolo.getArtist().getArtistName());
-        assertEquals(ArtistType.Solo, testArtist.getType());
+        assertEquals(ArtistType.SOLO, testArtist.getType());
         verify(soloRepository, times(1)).save(testArtist);
     }
 
@@ -387,7 +387,7 @@ public class SoloServiceTest {
         Artist iuArtist = new Artist();
         iuArtist.setArtistId(UUID.randomUUID());
         iuArtist.setArtistName("IU");
-        iuArtist.setType(ArtistType.Solo);
+        iuArtist.setType(ArtistType.SOLO);
 
         Solo result = soloServiceImpl.convertToSolo(iuArtist);
 
@@ -405,7 +405,7 @@ public class SoloServiceTest {
         Artist otherArtist = new Artist();
         otherArtist.setArtistId(UUID.randomUUID());
         otherArtist.setArtistName("Other Artist");
-        otherArtist.setType(ArtistType.Solo);
+        otherArtist.setType(ArtistType.SOLO);
 
         Solo result = soloServiceImpl.convertToSolo(otherArtist);
 
@@ -423,7 +423,7 @@ public class SoloServiceTest {
         Artist artistWithNullName = new Artist();
         artistWithNullName.setArtistId(UUID.randomUUID());
         artistWithNullName.setArtistName(null);
-        artistWithNullName.setType(ArtistType.Solo);
+        artistWithNullName.setType(ArtistType.SOLO);
 
         Solo result = soloServiceImpl.convertToSolo(artistWithNullName);
 
@@ -439,7 +439,7 @@ public class SoloServiceTest {
         Artist artist = new Artist();
         artist.setArtistId(artistId);
         artist.setArtistName(name);
-        artist.setType(ArtistType.Solo);
+        artist.setType(ArtistType.SOLO);
         
         Solo solo = new Solo();
         solo.setArtistId(artistId);

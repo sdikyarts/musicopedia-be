@@ -57,7 +57,7 @@ public class GroupMembershipControllerTest {
         testGroup = new Artist();
         testGroup.setArtistId(testGroupId);
         testGroup.setArtistName("BLACKPINK");
-        testGroup.setType(ArtistType.Group);
+        testGroup.setType(ArtistType.GROUP);
 
         testMember = new Member();
         testMember.setMemberId(testMemberId);

@@ -48,7 +48,7 @@ public class ArtistControllerTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.Solo);
+        testArtist.setType(ArtistType.SOLO);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
         testArtist.setSpotifyId("spotify123");
@@ -128,14 +128,14 @@ public class ArtistControllerTest {
     @Test
     void testGetArtistsByType() throws Exception {
         List<Artist> artists = Arrays.asList(testArtist);
-        when(artistService.findByType(ArtistType.Solo)).thenReturn(artists);
+        when(artistService.findByType(ArtistType.SOLO)).thenReturn(artists);
 
-        mockMvc.perform(get("/api/artists/type/{type}", "Solo"))
+        mockMvc.perform(get("/api/artists/type/{type}", "SOLO"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].type").value("Solo"));
+                .andExpect(jsonPath("$[0].type").value("SOLO"));
 
-        verify(artistService, times(1)).findByType(ArtistType.Solo);
+        verify(artistService, times(1)).findByType(ArtistType.SOLO);
     }
 
     @Test

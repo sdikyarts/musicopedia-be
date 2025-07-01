@@ -18,7 +18,7 @@ public class GroupsTest {
         Artist artist = new Artist();
         artist.setArtistId(artistId);
         artist.setArtistName("Test Group");
-        artist.setType(ArtistType.Group);
+        artist.setType(ArtistType.GROUP);
         
         LocalDate formationDate = LocalDate.of(2015, 1, 1);
         LocalDate disbandDate = null;

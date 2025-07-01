@@ -52,7 +52,7 @@ public class SoloControllerTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.Solo);
+        testArtist.setType(ArtistType.SOLO);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
 

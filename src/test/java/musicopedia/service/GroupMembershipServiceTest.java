@@ -50,7 +50,7 @@ public class GroupMembershipServiceTest {
         testGroup = new Artist();
         testGroup.setArtistId(groupId);
         testGroup.setArtistName("BTS");
-        testGroup.setType(ArtistType.Group);
+        testGroup.setType(ArtistType.GROUP);
         
         testMember = new Member();
         testMember.setMemberId(memberId);

@@ -20,7 +20,7 @@ public class ModelIntegrationTest {
         Artist groupArtist = new Artist();
         groupArtist.setArtistId(groupArtistId);
         groupArtist.setArtistName("Test Group");
-        groupArtist.setType(ArtistType.Group);
+        groupArtist.setType(ArtistType.GROUP);
         
         Groups group = new Groups();
         group.setArtistId(groupArtistId);
@@ -38,7 +38,7 @@ public class ModelIntegrationTest {
         Artist soloArtist = new Artist();
         soloArtist.setArtistId(soloArtistId);
         soloArtist.setArtistName("Solo Artist Name");
-        soloArtist.setType(ArtistType.Solo);
+        soloArtist.setType(ArtistType.SOLO);
         
         Solo solo = new Solo();
         solo.setArtistId(soloArtistId);

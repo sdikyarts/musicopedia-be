@@ -52,7 +52,7 @@ public class GroupControllerTest {
         testArtist = new Artist();
         testArtist.setArtistId(testId);
         testArtist.setArtistName("BLACKPINK");
-        testArtist.setType(ArtistType.Group);
+        testArtist.setType(ArtistType.GROUP);
         testArtist.setOriginCountry("KR");
         testArtist.setPrimaryLanguage("Korean");
 

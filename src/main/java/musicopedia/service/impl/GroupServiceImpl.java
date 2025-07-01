@@ -28,7 +28,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional(readOnly = true)
     public List<Groups> findAll() {
-        List<Artist> artists = groupRepository.findByType(ArtistType.Group);
+        List<Artist> artists = groupRepository.findByType(ArtistType.GROUP);
         return artists.stream()
                 .map(this::convertToGroup)
                 .collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class GroupServiceImpl implements GroupService {
     @Transactional(readOnly = true)
     public Optional<Groups> findById(UUID groupId) {
         return groupRepository.findById(groupId)
-                .filter(artist -> artist.getType() == ArtistType.Group)
+                .filter(artist -> artist.getType() == ArtistType.GROUP)
                 .map(this::convertToGroup);
     }
 
@@ -81,7 +81,7 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Groups save(Groups group, Artist artist) {
-        artist.setType(ArtistType.Group);
+        artist.setType(ArtistType.GROUP);
         Artist savedArtist = groupRepository.save(artist);
         group.setArtistId(savedArtist.getArtistId());
         group.setArtist(savedArtist);

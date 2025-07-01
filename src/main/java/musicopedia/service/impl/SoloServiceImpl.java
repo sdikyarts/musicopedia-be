@@ -28,7 +28,7 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findAll() {
-        List<Artist> artists = soloRepository.findByType(ArtistType.Solo);
+        List<Artist> artists = soloRepository.findByType(ArtistType.SOLO);
         return artists.stream()
                 .map(this::convertToSolo)
                 .collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class SoloServiceImpl implements SoloService {
     @Transactional(readOnly = true)
     public Optional<Solo> findById(UUID soloId) {
         return soloRepository.findById(soloId)
-                .filter(artist -> artist.getType() == ArtistType.Solo)
+                .filter(artist -> artist.getType() == ArtistType.SOLO)
                 .map(this::convertToSolo);
     }
 
@@ -81,7 +81,7 @@ public class SoloServiceImpl implements SoloService {
 
     @Override
     public Solo save(Solo solo, Artist artist) {
-        artist.setType(ArtistType.Solo);
+        artist.setType(ArtistType.SOLO);
         Artist savedArtist = soloRepository.save(artist);
         solo.setArtistId(savedArtist.getArtistId());
         solo.setArtist(savedArtist);

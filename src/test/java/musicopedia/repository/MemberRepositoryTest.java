@@ -36,7 +36,7 @@ public class MemberRepositoryTest {
     void setup() {
         soloArtist = new Artist();
         soloArtist.setArtistName("IU");
-        soloArtist.setType(ArtistType.Solo);
+        soloArtist.setType(ArtistType.SOLO);
         artistRepository.save(soloArtist);
 
         Member member1 = new Member();

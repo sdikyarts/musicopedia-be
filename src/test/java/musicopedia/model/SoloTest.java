@@ -18,7 +18,7 @@ public class SoloTest {
         Artist artist = new Artist();
         artist.setArtistId(artistId);
         artist.setArtistName("Solo Artist");
-        artist.setType(ArtistType.Solo);
+        artist.setType(ArtistType.SOLO);
         
         LocalDate birthDate = LocalDate.of(1990, 3, 15);
         LocalDate deathDate = null;
