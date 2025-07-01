@@ -102,6 +102,31 @@ public class SoloServiceTest {
     }
 
     @Test
+    void testFindByIdNotFound() {
+        when(soloRepository.findById(testId)).thenReturn(Optional.empty());
+
+        Optional<Solo> result = soloService.findById(testId);
+
+        assertFalse(result.isPresent());
+        verify(soloRepository, times(1)).findById(testId);
+    }
+
+    @Test
+    void testFindByIdWrongType() {
+        Artist groupArtist = new Artist();
+        groupArtist.setArtistId(testId);
+        groupArtist.setArtistName("Group Artist");
+        groupArtist.setType(ArtistType.Group);
+        
+        when(soloRepository.findById(testId)).thenReturn(Optional.of(groupArtist));
+
+        Optional<Solo> result = soloService.findById(testId);
+
+        assertFalse(result.isPresent());
+        verify(soloRepository, times(1)).findById(testId);
+    }
+
+    @Test
     void testFindByBirthDateBetween() {
         // Create test data
         Artist artist1 = new Artist();
@@ -119,8 +144,13 @@ public class SoloServiceTest {
         artist3.setArtistName("Solo 3");
         artist3.setType(ArtistType.Solo);
 
+        Artist artistWithNullBirthDate = new Artist();
+        artistWithNullBirthDate.setArtistId(UUID.randomUUID());
+        artistWithNullBirthDate.setArtistName("Solo Null Date");
+        artistWithNullBirthDate.setType(ArtistType.Solo);
+
         when(soloRepository.findByType(ArtistType.Solo))
-            .thenReturn(Arrays.asList(artist1, artist2, artist3));
+            .thenReturn(Arrays.asList(artist1, artist2, artist3, artistWithNullBirthDate));
         
         // Create a spy of SoloServiceImpl to override convertToSolo
         SoloServiceImpl soloServiceSpy = spy((SoloServiceImpl)soloService);
@@ -142,11 +172,18 @@ public class SoloServiceTest {
         solo3.setArtist(artist3);
         solo3.setBirthDate(LocalDate.of(2000, 10, 15));
         solo3.setGender(ArtistGender.Female);
+
+        Solo soloWithNullBirthDate = new Solo();
+        soloWithNullBirthDate.setArtistId(artistWithNullBirthDate.getArtistId());
+        soloWithNullBirthDate.setArtist(artistWithNullBirthDate);
+        soloWithNullBirthDate.setBirthDate(null);
+        soloWithNullBirthDate.setGender(ArtistGender.Male);
         
         // Mock convertToSolo for each artist
         doReturn(solo1).when(soloServiceSpy).convertToSolo(artist1);
         doReturn(solo2).when(soloServiceSpy).convertToSolo(artist2);
         doReturn(solo3).when(soloServiceSpy).convertToSolo(artist3);
+        doReturn(soloWithNullBirthDate).when(soloServiceSpy).convertToSolo(artistWithNullBirthDate);
 
         List<Solo> result = soloServiceSpy.findByBirthDateBetween(
             LocalDate.of(1994, 1, 1), 
@@ -309,12 +346,92 @@ public class SoloServiceTest {
     }
 
     @Test
+    void testUpdateNotFound() {
+        when(soloRepository.existsById(testId)).thenReturn(false);
+
+        Solo updatedSolo = soloService.update(testSolo);
+
+        assertNull(updatedSolo);
+        verify(soloRepository, times(1)).existsById(testId);
+        verify(soloRepository, never()).save(any());
+    }
+
+    @Test
+    void testUpdateWithNullArtist() {
+        Solo soloWithNullArtist = new Solo();
+        soloWithNullArtist.setArtistId(testId);
+        soloWithNullArtist.setArtist(null);
+
+        when(soloRepository.existsById(testId)).thenReturn(true);
+
+        Solo updatedSolo = soloService.update(soloWithNullArtist);
+
+        assertNotNull(updatedSolo);
+        verify(soloRepository, times(1)).existsById(testId);
+        verify(soloRepository, never()).save(any());
+    }
+
+    @Test
     void testDeleteById() {
         doNothing().when(soloRepository).deleteById(testId);
 
         soloService.deleteById(testId);
 
         verify(soloRepository, times(1)).deleteById(testId);
+    }
+
+    @Test
+    void testConvertToSoloWithIU() {
+        SoloServiceImpl soloServiceImpl = new SoloServiceImpl(soloRepository);
+        
+        Artist iuArtist = new Artist();
+        iuArtist.setArtistId(UUID.randomUUID());
+        iuArtist.setArtistName("IU");
+        iuArtist.setType(ArtistType.Solo);
+
+        Solo result = soloServiceImpl.convertToSolo(iuArtist);
+
+        assertNotNull(result);
+        assertEquals(iuArtist.getArtistId(), result.getArtistId());
+        assertEquals(iuArtist, result.getArtist());
+        assertEquals(LocalDate.of(1993, 5, 16), result.getBirthDate());
+        assertEquals(ArtistGender.Female, result.getGender());
+    }
+
+    @Test
+    void testConvertToSoloWithOtherArtist() {
+        SoloServiceImpl soloServiceImpl = new SoloServiceImpl(soloRepository);
+        
+        Artist otherArtist = new Artist();
+        otherArtist.setArtistId(UUID.randomUUID());
+        otherArtist.setArtistName("Other Artist");
+        otherArtist.setType(ArtistType.Solo);
+
+        Solo result = soloServiceImpl.convertToSolo(otherArtist);
+
+        assertNotNull(result);
+        assertEquals(otherArtist.getArtistId(), result.getArtistId());
+        assertEquals(otherArtist, result.getArtist());
+        assertNull(result.getBirthDate());
+        assertNull(result.getGender());
+    }
+
+    @Test
+    void testConvertToSoloWithNullArtistName() {
+        SoloServiceImpl soloServiceImpl = new SoloServiceImpl(soloRepository);
+        
+        Artist artistWithNullName = new Artist();
+        artistWithNullName.setArtistId(UUID.randomUUID());
+        artistWithNullName.setArtistName(null);
+        artistWithNullName.setType(ArtistType.Solo);
+
+        Solo result = soloServiceImpl.convertToSolo(artistWithNullName);
+
+        assertNotNull(result);
+        assertEquals(artistWithNullName.getArtistId(), result.getArtistId());
+        assertEquals(artistWithNullName, result.getArtist());
+        assertNull(result.getBirthDate());
+        assertNull(result.getGender());
     }
 
     private Artist createSoloArtist(String name, LocalDate birthDate, LocalDate deathDate, ArtistGender gender) {

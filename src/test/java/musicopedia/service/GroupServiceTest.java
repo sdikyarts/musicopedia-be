@@ -91,6 +91,31 @@ public class GroupServiceTest {
     }
 
     @Test
+    void testFindByIdNotFound() {
+        when(groupRepository.findById(testId)).thenReturn(Optional.empty());
+
+        Optional<Groups> result = groupService.findById(testId);
+
+        assertFalse(result.isPresent());
+        verify(groupRepository, times(1)).findById(testId);
+    }
+
+    @Test
+    void testFindByIdWrongType() {
+        Artist soloArtist = new Artist();
+        soloArtist.setArtistId(testId);
+        soloArtist.setArtistName("Solo Artist");
+        soloArtist.setType(ArtistType.Solo);
+        
+        when(groupRepository.findById(testId)).thenReturn(Optional.of(soloArtist));
+
+        Optional<Groups> result = groupService.findById(testId);
+
+        assertFalse(result.isPresent());
+        verify(groupRepository, times(1)).findById(testId);
+    }
+
+    @Test
     void testFindByFormationDateBetween() {
         // Create test data
         Artist artist1 = new Artist();
@@ -108,8 +133,13 @@ public class GroupServiceTest {
         artist3.setArtistName("Group 3");
         artist3.setType(ArtistType.Group);
 
+        Artist artistWithNullDate = new Artist();
+        artistWithNullDate.setArtistId(UUID.randomUUID());
+        artistWithNullDate.setArtistName("Group Null Date");
+        artistWithNullDate.setType(ArtistType.Group);
+
         when(groupRepository.findByType(ArtistType.Group))
-            .thenReturn(Arrays.asList(artist1, artist2, artist3));
+            .thenReturn(Arrays.asList(artist1, artist2, artist3, artistWithNullDate));
             
         // Create a spy of GroupServiceImpl to override convertToGroup
         GroupServiceImpl groupServiceSpy = spy((GroupServiceImpl)groupService);
@@ -128,11 +158,17 @@ public class GroupServiceTest {
         group3.setArtistId(artist3.getArtistId());
         group3.setArtist(artist3);
         group3.setFormationDate(LocalDate.of(2018, 1, 1));
+
+        Groups groupWithNullDate = new Groups();
+        groupWithNullDate.setArtistId(artistWithNullDate.getArtistId());
+        groupWithNullDate.setArtist(artistWithNullDate);
+        groupWithNullDate.setFormationDate(null);
         
         // Mock convertToGroup for each artist
         doReturn(group1).when(groupServiceSpy).convertToGroup(artist1);
         doReturn(group2).when(groupServiceSpy).convertToGroup(artist2);
         doReturn(group3).when(groupServiceSpy).convertToGroup(artist3);
+        doReturn(groupWithNullDate).when(groupServiceSpy).convertToGroup(artistWithNullDate);
 
         List<Groups> result = groupServiceSpy.findByFormationDateBetween(
             LocalDate.of(2014, 1, 1), 
@@ -288,6 +324,32 @@ public class GroupServiceTest {
         assertNotNull(updatedGroup);
         verify(groupRepository, times(1)).existsById(testId);
         verify(groupRepository, times(1)).save(testArtist);
+    }
+
+    @Test
+    void testUpdateNotFound() {
+        when(groupRepository.existsById(testId)).thenReturn(false);
+
+        Groups updatedGroup = groupService.update(testGroup);
+
+        assertNull(updatedGroup);
+        verify(groupRepository, times(1)).existsById(testId);
+        verify(groupRepository, never()).save(any());
+    }
+
+    @Test
+    void testUpdateWithNullArtist() {
+        Groups groupWithNullArtist = new Groups();
+        groupWithNullArtist.setArtistId(testId);
+        groupWithNullArtist.setArtist(null);
+
+        when(groupRepository.existsById(testId)).thenReturn(true);
+
+        Groups updatedGroup = groupService.update(groupWithNullArtist);
+
+        assertNotNull(updatedGroup);
+        verify(groupRepository, times(1)).existsById(testId);
+        verify(groupRepository, never()).save(any());
     }
 
     @Test
