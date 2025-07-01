@@ -91,3 +91,8 @@ tasks.jacocoTestReport {
         html.required.set(true)
     }
 }
+
+tasks.register<Copy>("copyRuntimeLibs") {
+    from(configurations.runtimeClasspath)
+    into("build/libs/dependencies")
+}
