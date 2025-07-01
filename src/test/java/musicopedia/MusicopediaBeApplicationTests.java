@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.SpringApplication;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 @SpringBootTest(properties = {
     "spring.jpa.hibernate.ddl-auto=create-drop",
@@ -20,5 +23,16 @@ class MusicopediaBeApplicationTests {
     @Test
     void contextLoads() {
         // The test will pass if the application context loads successfully with our test database settings
+    }
+
+    @Test
+    void mainMethodShouldStartApplication() {
+        try (MockedStatic<SpringApplication> springApplicationMock = Mockito.mockStatic(SpringApplication.class)) {
+            // When
+            MusicopediaBeApplication.main(new String[]{});
+            
+            // Then
+            springApplicationMock.verify(() -> SpringApplication.run(MusicopediaBeApplication.class, new String[]{}));
+        }
     }
 }
