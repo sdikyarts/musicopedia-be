@@ -244,20 +244,20 @@ public class GroupMembershipServiceTest {
     }
     
     private GroupMembership createMembership(MembershipStatus status) {
-        UUID groupId = UUID.randomUUID();
-        UUID memberId = UUID.randomUUID();
+        UUID testGroupId = UUID.randomUUID();
+        UUID testMemberId = UUID.randomUUID();
         
         Artist group = new Artist();
-        group.setArtistId(groupId);
+        group.setArtistId(testGroupId);
         group.setArtistName("Test Group");
         
         Member member = new Member();
-        member.setMemberId(memberId);
+        member.setMemberId(testMemberId);
         member.setFullName("Test Member");
         
         GroupMembershipId id = new GroupMembershipId();
-        id.setGroupId(groupId);
-        id.setMemberId(memberId);
+        id.setGroupId(testGroupId);
+        id.setMemberId(testMemberId);
         
         GroupMembership membership = new GroupMembership();
         membership.setId(id);
