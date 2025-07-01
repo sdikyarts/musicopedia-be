@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,7 +30,7 @@ public class SoloServiceImpl implements SoloService {
         List<Artist> artists = soloRepository.findByType(ArtistType.SOLO);
         return artists.stream()
                 .map(this::convertToSolo)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -52,7 +51,7 @@ public class SoloServiceImpl implements SoloService {
                            !birthDate.isBefore(startDate) && 
                            !birthDate.isAfter(endDate);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -60,7 +59,7 @@ public class SoloServiceImpl implements SoloService {
     public List<Solo> findByGender(ArtistGender gender) {
         return findAll().stream()
                 .filter(solo -> solo.getGender() == gender)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -68,7 +67,7 @@ public class SoloServiceImpl implements SoloService {
     public List<Solo> findActiveSoloArtists() {
         return findAll().stream()
                 .filter(solo -> solo.getDeathDate() == null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -76,7 +75,7 @@ public class SoloServiceImpl implements SoloService {
     public List<Solo> findDeceasedSoloArtists() {
         return findAll().stream()
                 .filter(solo -> solo.getDeathDate() != null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
