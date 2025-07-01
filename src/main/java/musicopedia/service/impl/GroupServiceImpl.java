@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,7 +30,7 @@ public class GroupServiceImpl implements GroupService {
         List<Artist> artists = groupRepository.findByType(ArtistType.GROUP);
         return artists.stream()
                 .map(this::convertToGroup)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -52,7 +51,7 @@ public class GroupServiceImpl implements GroupService {
                            !formationDate.isBefore(startDate) && 
                            !formationDate.isAfter(endDate);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -60,7 +59,7 @@ public class GroupServiceImpl implements GroupService {
     public List<Groups> findActiveGroups() {
         return findAll().stream()
                 .filter(group -> group.getDisbandDate() == null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -68,7 +67,7 @@ public class GroupServiceImpl implements GroupService {
     public List<Groups> findDisbandedGroups() {
         return findAll().stream()
                 .filter(group -> group.getDisbandDate() != null)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -76,7 +75,7 @@ public class GroupServiceImpl implements GroupService {
     public List<Groups> findByGroupGender(ArtistGender gender) {
         return findAll().stream()
                 .filter(group -> group.getGroupGender() == gender)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
