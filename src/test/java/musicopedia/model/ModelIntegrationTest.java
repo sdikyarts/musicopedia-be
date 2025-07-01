@@ -56,7 +56,7 @@ public class ModelIntegrationTest {
         membership.setId(membershipId);
         membership.setGroup(groupArtist);
         membership.setMember(member);
-        membership.setStatus(MembershipStatus.Current);
+        membership.setStatus(MembershipStatus.CURRENT);
         membership.setJoinDate(LocalDate.of(2020, 1, 1));
         
         assertEquals(groupArtistId, membership.getId().getGroupId());
@@ -65,7 +65,7 @@ public class ModelIntegrationTest {
         assertEquals(groupArtist, membership.getGroup());
         assertEquals(member, membership.getMember());
         
-        assertEquals(MembershipStatus.Current, membership.getStatus());
+        assertEquals(MembershipStatus.CURRENT, membership.getStatus());
         
         assertEquals("Test Group", membership.getGroup().getArtistName());
         assertEquals("Test Member", membership.getMember().getFullName());
@@ -97,11 +97,11 @@ public class ModelIntegrationTest {
         membership.setId(membershipId);
         membership.setGroup(groupArtist);
         membership.setMember(member);
-        membership.setStatus(MembershipStatus.Former);
+        membership.setStatus(MembershipStatus.FORMER);
         membership.setJoinDate(joinDate);
         membership.setLeaveDate(leaveDate);
         
-        assertEquals(MembershipStatus.Former, membership.getStatus());
+        assertEquals(MembershipStatus.FORMER, membership.getStatus());
         assertEquals(joinDate, membership.getJoinDate());
         assertEquals(leaveDate, membership.getLeaveDate());
         
@@ -127,10 +127,10 @@ public class ModelIntegrationTest {
         membership.setId(membershipId);
         membership.setGroup(groupArtist);
         membership.setMember(member);
-        membership.setStatus(MembershipStatus.Inactive);
+        membership.setStatus(MembershipStatus.INACTIVE);
         membership.setJoinDate(LocalDate.of(2018, 5, 10));
         
-        assertEquals(MembershipStatus.Inactive, membership.getStatus());
+        assertEquals(MembershipStatus.INACTIVE, membership.getStatus());
         assertNotNull(membership.getJoinDate());
         assertNull(membership.getLeaveDate());
     }

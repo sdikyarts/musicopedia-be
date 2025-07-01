@@ -26,7 +26,7 @@ public class GroupMembershipTest {
         member.setMemberId(id.getMemberId());
         member.setFullName("Test Member");
         
-        MembershipStatus status = MembershipStatus.Current;
+        MembershipStatus status = MembershipStatus.CURRENT;
         LocalDate joinDate = LocalDate.of(2020, 1, 1);
         LocalDate leaveDate = null; // Current member
         
@@ -54,12 +54,12 @@ public class GroupMembershipTest {
         
         GroupMembership membership1 = new GroupMembership();
         membership1.setId(id1);
-        membership1.setStatus(MembershipStatus.Current);
+        membership1.setStatus(MembershipStatus.CURRENT);
         membership1.setJoinDate(LocalDate.of(2020, 1, 1));
         
         GroupMembership membership2 = new GroupMembership();
         membership2.setId(id1);
-        membership2.setStatus(MembershipStatus.Current);
+        membership2.setStatus(MembershipStatus.CURRENT);
         membership2.setJoinDate(LocalDate.of(2020, 1, 1));
         
         GroupMembershipId id2 = new GroupMembershipId();
@@ -80,11 +80,11 @@ public class GroupMembershipTest {
         LocalDate joinDate = LocalDate.of(2020, 1, 1);
         LocalDate leaveDate = LocalDate.of(2023, 12, 31);
         
-        membership.setStatus(MembershipStatus.Former);
+        membership.setStatus(MembershipStatus.FORMER);
         membership.setJoinDate(joinDate);
         membership.setLeaveDate(leaveDate);
         
-        assertEquals(MembershipStatus.Former, membership.getStatus());
+        assertEquals(MembershipStatus.FORMER, membership.getStatus());
         assertEquals(joinDate, membership.getJoinDate());
         assertEquals(leaveDate, membership.getLeaveDate());
     }
@@ -94,10 +94,10 @@ public class GroupMembershipTest {
         GroupMembership membership = new GroupMembership();
         LocalDate joinDate = LocalDate.of(2020, 1, 1);
         
-        membership.setStatus(MembershipStatus.Inactive);
+        membership.setStatus(MembershipStatus.INACTIVE);
         membership.setJoinDate(joinDate);
         
-        assertEquals(MembershipStatus.Inactive, membership.getStatus());
+        assertEquals(MembershipStatus.INACTIVE, membership.getStatus());
         assertEquals(joinDate, membership.getJoinDate());
         assertNull(membership.getLeaveDate());
     }
@@ -112,12 +112,12 @@ public class GroupMembershipTest {
         
         GroupMembership membership = new GroupMembership();
         membership.setId(id);
-        membership.setStatus(MembershipStatus.Current);
+        membership.setStatus(MembershipStatus.CURRENT);
         
         String toString = membership.toString();
         
         assertTrue(toString.contains(groupId.toString()));
         assertTrue(toString.contains(memberId.toString()));
-        assertTrue(toString.contains(MembershipStatus.Current.toString()));
+        assertTrue(toString.contains(MembershipStatus.CURRENT.toString()));
     }
 }

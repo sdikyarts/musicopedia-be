@@ -72,7 +72,7 @@ public class GroupMembershipControllerTest {
         testMembership.setId(membershipId);
         testMembership.setGroup(testGroup);
         testMembership.setMember(testMember);
-        testMembership.setStatus(MembershipStatus.Current);
+        testMembership.setStatus(MembershipStatus.CURRENT);
         testMembership.setJoinDate(LocalDate.of(2016, 8, 8));
     }
 
@@ -105,15 +105,15 @@ public class GroupMembershipControllerTest {
     @Test
     void testGetMembershipsByGroupIdAndStatus() throws Exception {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
-        when(groupMembershipService.findByGroupIdAndStatus(testGroupId, MembershipStatus.Current))
+        when(groupMembershipService.findByGroupIdAndStatus(testGroupId, MembershipStatus.CURRENT))
                 .thenReturn(memberships);
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/status/{status}", testGroupId, "Current"))
+        mockMvc.perform(get("/api/memberships/group/{groupId}/status/{status}", testGroupId, "CURRENT"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].status").value("Current"));
+                .andExpect(jsonPath("$[0].status").value("CURRENT"));
 
-        verify(groupMembershipService, times(1)).findByGroupIdAndStatus(testGroupId, MembershipStatus.Current);
+        verify(groupMembershipService, times(1)).findByGroupIdAndStatus(testGroupId, MembershipStatus.CURRENT);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class GroupMembershipControllerTest {
         formerMembershipId.setGroupId(testGroupId);
         formerMembershipId.setMemberId(UUID.randomUUID());
         formerMember.setId(formerMembershipId);
-        formerMember.setStatus(MembershipStatus.Former);
+        formerMember.setStatus(MembershipStatus.FORMER);
 
         List<GroupMembership> formerMemberships = Arrays.asList(formerMember);
         when(groupMembershipService.findFormerMembersByGroupId(testGroupId)).thenReturn(formerMemberships);
@@ -131,7 +131,7 @@ public class GroupMembershipControllerTest {
         mockMvc.perform(get("/api/memberships/group/{groupId}/former-members", testGroupId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].status").value("Former"));
+                .andExpect(jsonPath("$[0].status").value("FORMER"));
 
         verify(groupMembershipService, times(1)).findFormerMembersByGroupId(testGroupId);
     }
@@ -181,13 +181,13 @@ public class GroupMembershipControllerTest {
 
     @Test
     void testCountMembersByGroupIdAndStatus() throws Exception {
-        when(groupMembershipService.countByGroupIdAndStatus(testGroupId, MembershipStatus.Current)).thenReturn(3L);
+        when(groupMembershipService.countByGroupIdAndStatus(testGroupId, MembershipStatus.CURRENT)).thenReturn(3L);
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/count/{status}", testGroupId, "Current"))
+        mockMvc.perform(get("/api/memberships/group/{groupId}/count/{status}", testGroupId, "CURRENT"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("3"));
 
-        verify(groupMembershipService, times(1)).countByGroupIdAndStatus(testGroupId, MembershipStatus.Current);
+        verify(groupMembershipService, times(1)).countByGroupIdAndStatus(testGroupId, MembershipStatus.CURRENT);
     }
 
     @Test

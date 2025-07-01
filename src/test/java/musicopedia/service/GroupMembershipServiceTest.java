@@ -64,7 +64,7 @@ public class GroupMembershipServiceTest {
         testMembership.setId(membershipId);
         testMembership.setGroup(testGroup);
         testMembership.setMember(testMember);
-        testMembership.setStatus(MembershipStatus.Current);
+        testMembership.setStatus(MembershipStatus.CURRENT);
         testMembership.setJoinDate(LocalDate.of(2013, 6, 13));
     }
 
@@ -120,21 +120,21 @@ public class GroupMembershipServiceTest {
     @Test
     void testFindByGroupIdAndStatus() {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
-        when(groupMembershipRepository.findByGroupIdAndStatus(groupId, MembershipStatus.Current))
+        when(groupMembershipRepository.findByGroupIdAndStatus(groupId, MembershipStatus.CURRENT))
             .thenReturn(memberships);
 
         List<GroupMembership> result = groupMembershipService.findByGroupIdAndStatus(
-            groupId, MembershipStatus.Current);
+            groupId, MembershipStatus.CURRENT);
 
         assertEquals(1, result.size());
-        assertEquals(MembershipStatus.Current, result.get(0).getStatus());
+        assertEquals(MembershipStatus.CURRENT, result.get(0).getStatus());
         verify(groupMembershipRepository, times(1))
-            .findByGroupIdAndStatus(groupId, MembershipStatus.Current);
+            .findByGroupIdAndStatus(groupId, MembershipStatus.CURRENT);
     }
 
     @Test
     void testFindFormerMembersByGroupId() {
-        GroupMembership formerMembership = createMembership(MembershipStatus.Former);
+        GroupMembership formerMembership = createMembership(MembershipStatus.FORMER);
         List<GroupMembership> memberships = Arrays.asList(formerMembership);
         
         when(groupMembershipRepository.findFormerMembersByGroupId(groupId)).thenReturn(memberships);
@@ -162,7 +162,7 @@ public class GroupMembershipServiceTest {
     @Test
     void testFindByGroupIdAndLeaveDateBefore() {
         LocalDate date = LocalDate.of(2020, 1, 1);
-        GroupMembership formerMembership = createMembership(MembershipStatus.Former);
+        GroupMembership formerMembership = createMembership(MembershipStatus.FORMER);
         formerMembership.setLeaveDate(LocalDate.of(2019, 1, 1));
         
         List<GroupMembership> memberships = Arrays.asList(formerMembership);
@@ -188,14 +188,14 @@ public class GroupMembershipServiceTest {
 
     @Test
     void testCountByGroupIdAndStatus() {
-        when(groupMembershipRepository.countByGroupIdAndStatus(groupId, MembershipStatus.Current))
+        when(groupMembershipRepository.countByGroupIdAndStatus(groupId, MembershipStatus.CURRENT))
             .thenReturn(3L);
 
-        long result = groupMembershipService.countByGroupIdAndStatus(groupId, MembershipStatus.Current);
+        long result = groupMembershipService.countByGroupIdAndStatus(groupId, MembershipStatus.CURRENT);
 
         assertEquals(3, result);
         verify(groupMembershipRepository, times(1))
-            .countByGroupIdAndStatus(groupId, MembershipStatus.Current);
+            .countByGroupIdAndStatus(groupId, MembershipStatus.CURRENT);
     }
 
     @Test
@@ -222,14 +222,14 @@ public class GroupMembershipServiceTest {
 
     @Test
     void testUpdate() {
-        testMembership.setStatus(MembershipStatus.Former);
+        testMembership.setStatus(MembershipStatus.FORMER);
         testMembership.setLeaveDate(LocalDate.now());
         
         when(groupMembershipRepository.save(any(GroupMembership.class))).thenReturn(testMembership);
 
         GroupMembership updatedMembership = groupMembershipService.update(testMembership);
 
-        assertEquals(MembershipStatus.Former, updatedMembership.getStatus());
+        assertEquals(MembershipStatus.FORMER, updatedMembership.getStatus());
         assertNotNull(updatedMembership.getLeaveDate());
         verify(groupMembershipRepository, times(1)).save(testMembership);
     }
@@ -266,7 +266,7 @@ public class GroupMembershipServiceTest {
         membership.setStatus(status);
         membership.setJoinDate(LocalDate.of(2015, 1, 1));
         
-        if (status == MembershipStatus.Former) {
+        if (status == MembershipStatus.FORMER) {
             membership.setLeaveDate(LocalDate.of(2020, 1, 1));
         }
         
