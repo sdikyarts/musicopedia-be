@@ -143,6 +143,7 @@ public class GroupServiceTest {
             
         // Create a spy of GroupServiceImpl to override convertToGroup
         GroupServiceImpl groupServiceSpy = spy((GroupServiceImpl)groupService);
+        groupServiceSpy.setSelf(groupServiceSpy);  // Set self reference for proxy calls
         
         Groups group1 = new Groups();
         group1.setArtistId(artist1.getArtistId());
@@ -197,6 +198,7 @@ public class GroupServiceTest {
             
         // Create a spy of GroupServiceImpl to override convertToGroup
         GroupServiceImpl groupServiceSpy = spy((GroupServiceImpl)groupService);
+        groupServiceSpy.setSelf(groupServiceSpy);  // Set self reference for proxy calls
         
         Groups active = new Groups();
         active.setArtistId(activeGroup.getArtistId());
@@ -238,6 +240,7 @@ public class GroupServiceTest {
             
         // Create a spy of GroupServiceImpl to override convertToGroup
         GroupServiceImpl groupServiceSpy = spy((GroupServiceImpl)groupService);
+        groupServiceSpy.setSelf(groupServiceSpy);  // Set self reference for proxy calls
         
         Groups active = new Groups();
         active.setArtistId(activeGroup.getArtistId());
@@ -279,6 +282,7 @@ public class GroupServiceTest {
             
         // Create a spy of GroupServiceImpl to override convertToGroup
         GroupServiceImpl groupServiceSpy = spy((GroupServiceImpl)groupService);
+        groupServiceSpy.setSelf(groupServiceSpy);  // Set self reference for proxy calls
         
         Groups maleGroup = new Groups();
         maleGroup.setArtistId(maleGroupArtist.getArtistId());

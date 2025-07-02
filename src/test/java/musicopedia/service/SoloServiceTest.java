@@ -154,6 +154,7 @@ public class SoloServiceTest {
         
         // Create a spy of SoloServiceImpl to override convertToSolo
         SoloServiceImpl soloServiceSpy = spy((SoloServiceImpl)soloService);
+        soloServiceSpy.setSelf(soloServiceSpy);  // Set self reference for proxy calls
         
         Solo solo1 = new Solo();
         solo1.setArtistId(artist1.getArtistId());
@@ -212,6 +213,7 @@ public class SoloServiceTest {
 
         // Create a spy of SoloServiceImpl to override convertToSolo
         SoloServiceImpl soloServiceSpy = spy((SoloServiceImpl)soloService);
+        soloServiceSpy.setSelf(soloServiceSpy);  // Set self reference for proxy calls
         
         Solo solo1 = new Solo();
         solo1.setArtistId(artist1.getArtistId());
@@ -253,6 +255,7 @@ public class SoloServiceTest {
 
         // Create a spy of SoloServiceImpl to override convertToSolo
         SoloServiceImpl soloServiceSpy = spy((SoloServiceImpl)soloService);
+        soloServiceSpy.setSelf(soloServiceSpy);  // Set self reference for proxy calls
         
         Solo active = new Solo();
         active.setArtistId(activeArtist.getArtistId());
@@ -296,6 +299,7 @@ public class SoloServiceTest {
 
         // Create a spy of SoloServiceImpl to override convertToSolo
         SoloServiceImpl soloServiceSpy = spy((SoloServiceImpl)soloService);
+        soloServiceSpy.setSelf(soloServiceSpy);  // Set self reference for proxy calls
         
         Solo active = new Solo();
         active.setArtistId(activeArtist.getArtistId());
