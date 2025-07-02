@@ -53,7 +53,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional(readOnly = true)
     public List<Groups> findByFormationDateBetween(LocalDate startDate, LocalDate endDate) {
-        List<Groups> allGroups = (self != null) ? self.findAll() : findAll();
+        List<Groups> allGroups = self.findAll();
         return allGroups.stream()
                 .filter(group -> {
                     LocalDate formationDate = group.getFormationDate();
@@ -67,7 +67,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional(readOnly = true)
     public List<Groups> findActiveGroups() {
-        List<Groups> allGroups = (self != null) ? self.findAll() : findAll();
+        List<Groups> allGroups = self.findAll();
         return allGroups.stream()
                 .filter(group -> group.getDisbandDate() == null)
                 .toList();
@@ -76,7 +76,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional(readOnly = true)
     public List<Groups> findDisbandedGroups() {
-        List<Groups> allGroups = (self != null) ? self.findAll() : findAll();
+        List<Groups> allGroups = self.findAll();
         return allGroups.stream()
                 .filter(group -> group.getDisbandDate() != null)
                 .toList();
@@ -85,7 +85,7 @@ public class GroupServiceImpl implements GroupService {
     @Override
     @Transactional(readOnly = true)
     public List<Groups> findByGroupGender(ArtistGender gender) {
-        List<Groups> allGroups = (self != null) ? self.findAll() : findAll();
+        List<Groups> allGroups = self.findAll();
         return allGroups.stream()
                 .filter(group -> group.getGroupGender() == gender)
                 .toList();
