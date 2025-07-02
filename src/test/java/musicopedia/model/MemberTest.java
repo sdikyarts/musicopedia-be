@@ -11,6 +11,7 @@ public class MemberTest {
     public void testConstructorAndGetters() {
         UUID memberId = UUID.randomUUID();
         String fullName = "Test Member";
+        String description = "This is a test member description";
         String image = "base64encodedimage";
         LocalDate birthDate = LocalDate.of(1995, 5, 15);
         
@@ -20,12 +21,14 @@ public class MemberTest {
         Member member = new Member();
         member.setMemberId(memberId);
         member.setFullName(fullName);
+        member.setDescription(description);
         member.setImage(image);
         member.setBirthDate(birthDate);
         member.setSoloArtist(soloArtist);
         
         assertEquals(memberId, member.getMemberId());
         assertEquals(fullName, member.getFullName());
+        assertEquals(description, member.getDescription());
         assertEquals(image, member.getImage());
         assertEquals(birthDate, member.getBirthDate());
         assertEquals(soloArtist, member.getSoloArtist());
@@ -74,5 +77,23 @@ public class MemberTest {
         
         assertTrue(toString.contains(memberId.toString()));
         assertTrue(toString.contains(fullName));
+    }
+    
+    @Test
+    public void testDescriptionField() {
+        Member member = new Member();
+        String description = "A talented member with years of experience in the music industry";
+        
+        member.setDescription(description);
+        
+        assertEquals(description, member.getDescription());
+    }
+    
+    @Test
+    public void testDescriptionCanBeNull() {
+        Member member = new Member();
+        member.setDescription(null);
+        
+        assertNull(member.getDescription());
     }
 }
