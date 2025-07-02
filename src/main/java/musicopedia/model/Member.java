@@ -16,8 +16,11 @@ public class Member {
 
     @Column(nullable = false)
     private String fullName;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
     
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     private LocalDate birthDate;
