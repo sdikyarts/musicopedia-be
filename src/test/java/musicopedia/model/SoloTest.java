@@ -2,6 +2,7 @@ package musicopedia.model;
 
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.model.enums.GroupAffiliationStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class SoloTest {
         LocalDate birthDate = LocalDate.of(1990, 3, 15);
         LocalDate deathDate = null;
         ArtistGender gender = ArtistGender.MALE;
+        GroupAffiliationStatus groupAffiliationStatus = GroupAffiliationStatus.NEVER_IN_A_GROUP;
         
         Solo solo = new Solo();
         solo.setArtistId(artistId);
@@ -30,12 +32,14 @@ public class SoloTest {
         solo.setBirthDate(birthDate);
         solo.setDeathDate(deathDate);
         solo.setGender(gender);
+        solo.setGroupAffiliationStatus(groupAffiliationStatus);
         
         assertEquals(artistId, solo.getArtistId());
         assertEquals(artist, solo.getArtist());
         assertEquals(birthDate, solo.getBirthDate());
         assertNull(solo.getDeathDate());
         assertEquals(gender, solo.getGender());
+        assertEquals(groupAffiliationStatus, solo.getGroupAffiliationStatus());
     }
     
     @Test
@@ -77,11 +81,13 @@ public class SoloTest {
         solo.setArtistId(artistId);
         solo.setBirthDate(birthDate);
         solo.setGender(ArtistGender.FEMALE);
+        solo.setGroupAffiliationStatus(GroupAffiliationStatus.WAS_IN_A_GROUP);
         
         String toString = solo.toString();
         
         assertTrue(toString.contains(artistId.toString()));
         assertTrue(toString.contains(birthDate.toString()));
         assertTrue(toString.contains(ArtistGender.FEMALE.toString()));
+        assertTrue(toString.contains(GroupAffiliationStatus.WAS_IN_A_GROUP.toString()));
     }
 }

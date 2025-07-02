@@ -2,6 +2,8 @@ package musicopedia.dto.response;
 
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.model.enums.GroupActivityStatus;
+import musicopedia.model.enums.GroupAffiliationStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -32,6 +34,7 @@ class ArtistResponseDTOTest {
         dto.setBirthDate(LocalDate.of(1980, 4, 20));
         dto.setDeathDate(LocalDate.of(2010, 11, 15));
         dto.setSoloGender(ArtistGender.MALE);
+        dto.setGroupAffiliationStatus(GroupAffiliationStatus.WAS_IN_A_GROUP);
         
         // Then
         assertEquals(artistId, dto.getArtistId());
@@ -46,6 +49,7 @@ class ArtistResponseDTOTest {
         assertEquals(LocalDate.of(1980, 4, 20), dto.getBirthDate());
         assertEquals(LocalDate.of(2010, 11, 15), dto.getDeathDate());
         assertEquals(ArtistGender.MALE, dto.getSoloGender());
+        assertEquals(GroupAffiliationStatus.WAS_IN_A_GROUP, dto.getGroupAffiliationStatus());
     }
 
     @Test
@@ -63,6 +67,7 @@ class ArtistResponseDTOTest {
         dto.setFormationDate(LocalDate.of(2000, 1, 1));
         dto.setDisbandDate(LocalDate.of(2010, 12, 31));
         dto.setGroupGender(ArtistGender.MIXED);
+        dto.setActivityStatus(GroupActivityStatus.DISBANDED);
         
         // Then
         assertEquals(artistId, dto.getArtistId());
@@ -71,6 +76,7 @@ class ArtistResponseDTOTest {
         assertEquals(LocalDate.of(2000, 1, 1), dto.getFormationDate());
         assertEquals(LocalDate.of(2010, 12, 31), dto.getDisbandDate());
         assertEquals(ArtistGender.MIXED, dto.getGroupGender());
+        assertEquals(GroupActivityStatus.DISBANDED, dto.getActivityStatus());
     }
 
     @Test

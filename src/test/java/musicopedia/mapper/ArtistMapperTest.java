@@ -9,6 +9,8 @@ import musicopedia.model.Groups;
 import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.model.enums.GroupActivityStatus;
+import musicopedia.model.enums.GroupAffiliationStatus;
 import musicopedia.factory.ArtistFactoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -139,9 +141,11 @@ class ArtistMapperTest {
         assertEquals(solo.getBirthDate(), responseDto.getBirthDate());
         assertEquals(solo.getDeathDate(), responseDto.getDeathDate());
         assertEquals(solo.getGender(), responseDto.getSoloGender());
+        assertEquals(solo.getGroupAffiliationStatus(), responseDto.getGroupAffiliationStatus());
         assertNull(responseDto.getFormationDate());
         assertNull(responseDto.getDisbandDate());
         assertNull(responseDto.getGroupGender());
+        assertNull(responseDto.getActivityStatus());
     }
 
     @Test
@@ -162,9 +166,11 @@ class ArtistMapperTest {
         assertEquals(group.getFormationDate(), responseDto.getFormationDate());
         assertEquals(group.getDisbandDate(), responseDto.getDisbandDate());
         assertEquals(group.getGroupGender(), responseDto.getGroupGender());
+        assertEquals(group.getActivityStatus(), responseDto.getActivityStatus());
         assertNull(responseDto.getBirthDate());
         assertNull(responseDto.getDeathDate());
         assertNull(responseDto.getSoloGender());
+        assertNull(responseDto.getGroupAffiliationStatus());
     }
 
     @Test
@@ -210,6 +216,7 @@ class ArtistMapperTest {
         dto.setBirthDate(LocalDate.of(1990, 5, 15));
         dto.setDeathDate(LocalDate.of(2020, 10, 20));
         dto.setSoloGender(ArtistGender.MALE);
+        dto.setGroupAffiliationStatus(GroupAffiliationStatus.WAS_IN_A_GROUP);
 
         Artist artist = createTestArtist();
 
@@ -222,6 +229,7 @@ class ArtistMapperTest {
         assertEquals(LocalDate.of(1990, 5, 15), solo.getBirthDate());
         assertEquals(LocalDate.of(2020, 10, 20), solo.getDeathDate());
         assertEquals(ArtistGender.MALE, solo.getGender());
+        assertEquals(GroupAffiliationStatus.WAS_IN_A_GROUP, solo.getGroupAffiliationStatus());
     }
 
     @Test
@@ -249,6 +257,7 @@ class ArtistMapperTest {
         dto.setFormationDate(LocalDate.of(2000, 1, 1));
         dto.setDisbandDate(LocalDate.of(2010, 12, 31));
         dto.setGroupGender(ArtistGender.MIXED);
+        dto.setActivityStatus(GroupActivityStatus.DISBANDED);
 
         Artist artist = createTestArtist();
 
@@ -261,6 +270,7 @@ class ArtistMapperTest {
         assertEquals(LocalDate.of(2000, 1, 1), group.getFormationDate());
         assertEquals(LocalDate.of(2010, 12, 31), group.getDisbandDate());
         assertEquals(ArtistGender.MIXED, group.getGroupGender());
+        assertEquals(GroupActivityStatus.DISBANDED, group.getActivityStatus());
     }
 
     @Test
@@ -302,6 +312,7 @@ class ArtistMapperTest {
         solo.setBirthDate(LocalDate.of(1990, 5, 15));
         solo.setDeathDate(LocalDate.of(2020, 10, 20));
         solo.setGender(ArtistGender.MALE);
+        solo.setGroupAffiliationStatus(GroupAffiliationStatus.NEVER_IN_A_GROUP);
         return solo;
     }
 
@@ -311,6 +322,7 @@ class ArtistMapperTest {
         group.setFormationDate(LocalDate.of(2000, 1, 1));
         group.setDisbandDate(LocalDate.of(2010, 12, 31));
         group.setGroupGender(ArtistGender.MIXED);
+        group.setActivityStatus(GroupActivityStatus.DISBANDED);
         return group;
     }
 
