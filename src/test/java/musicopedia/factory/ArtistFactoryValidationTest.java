@@ -399,4 +399,171 @@ class ArtistFactoryValidationTest {
             factoryManager.createArtist(dto);
         });
     }
+
+    @Test
+    void franchiseArtistNameCannotExceed200Characters() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("A".repeat(201)); // 201 characters - exceeds limit
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry("Japan");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Franchise artist name cannot exceed 200 characters", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistNameCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName(""); // Empty name
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry("Japan");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Franchise artist name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistNameCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName(null); // Null name
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry("Japan");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Franchise artist name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistNameCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("   "); // Whitespace only
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry("Japan");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Franchise artist name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistDescriptionCannotBeTooShort() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("Valid Franchise");
+        dto.setDescription("Short description"); // Less than 50 characters
+        dto.setOriginCountry("Japan");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Franchise artists require detailed description (minimum 50 characters)", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistDescriptionCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("Valid Franchise");
+        dto.setDescription(null); // Null description
+        dto.setOriginCountry("Japan");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Franchise artists require detailed description (minimum 50 characters)", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistOriginCountryCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("Valid Franchise");
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry(""); // Empty origin country
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Origin country is required for franchise artists", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistOriginCountryCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("Valid Franchise");
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry(null); // Null origin country
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Origin country is required for franchise artists", exception.getMessage());
+    }
+
+    @Test
+    void franchiseArtistOriginCountryCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("Valid Franchise");
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry("   "); // Whitespace only
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Origin country is required for franchise artists", exception.getMessage());
+    }
+
+    @Test
+    void validFranchiseArtistWithMaxLengthName() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("A".repeat(200)); // Exactly 200 characters - should be valid
+        dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
+        dto.setOriginCountry("Japan");
+        dto.setGenre("Virtual");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
+
+    @Test
+    void validFranchiseArtistWithMinimumDescription() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.FRANCHISE);
+        dto.setArtistName("Virtual Singer");
+        dto.setDescription("A".repeat(50)); // Exactly 50 characters - minimum requirement
+        dto.setOriginCountry("Japan");
+        dto.setGenre("Virtual");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
 }
