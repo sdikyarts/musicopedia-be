@@ -1,0 +1,49 @@
+services:
+  - type: web
+    name: musicopedia-be
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    region: oregon
+    branch: main
+    buildCommand: echo "Building with Docker"
+    startCommand: echo "Starting with Docker"
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: SPRING_PROFILES_ACTIVE
+        value: production
+      - key: DB_URL
+        fromDatabase:
+          name: musicopedia-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: musicopedia-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: musicopedia-db
+          property: password
+      - key: DB_MAX_POOL_SIZE
+        value: "10"
+      - key: DB_MIN_IDLE
+        value: "5"
+      - key: DB_CONNECTION_TIMEOUT
+        value: "20000"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "*"
+      - key: CORS_ALLOWED_METHODS
+        value: "GET,POST,PUT,DELETE,OPTIONS"
+      - key: CORS_ALLOWED_HEADERS
+        value: "Content-Type,Authorization,X-Requested-With,Accept,Origin"
+      - key: CORS_ALLOW_CREDENTIALS
+        value: "false"
+      - key: CORS_MAX_AGE
+        value: "3600"
+
+databases:
+  - name: musicopedia-db
+    databaseName: musicopedia
+    plan: starter
+    region: oregon
