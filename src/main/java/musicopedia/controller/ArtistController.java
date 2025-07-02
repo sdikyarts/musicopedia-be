@@ -3,6 +3,7 @@ package musicopedia.controller;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.service.ArtistService;
+import musicopedia.dto.request.CreateArtistRequestDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,7 +52,19 @@ public class ArtistController {
     }
 
     @PostMapping
-    public ResponseEntity<Artist> createArtist(@RequestBody Artist artist) {
+    public ResponseEntity<Artist> createArtist(@RequestBody CreateArtistRequestDTO createRequest) {
+        try {
+            // Using factory pattern through service layer for type-specific creation and validation
+            Artist savedArtist = artistService.createArtist(createRequest);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedArtist);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/legacy")
+    public ResponseEntity<Artist> createArtistLegacy(@RequestBody Artist artist) {
+        // Legacy endpoint for direct artist creation (deprecated in favor of factory pattern)
         Artist savedArtist = artistService.save(artist);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedArtist);
     }

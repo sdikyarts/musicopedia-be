@@ -8,22 +8,21 @@ import musicopedia.model.Artist;
 import musicopedia.model.Groups;
 import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.factory.ArtistFactoryManager;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ArtistMapper {
 
+    private final ArtistFactoryManager artistFactoryManager;
+
+    public ArtistMapper(ArtistFactoryManager artistFactoryManager) {
+        this.artistFactoryManager = artistFactoryManager;
+    }
+
     public Artist toEntity(CreateArtistRequestDTO dto) {
-        Artist artist = new Artist();
-        artist.setArtistName(dto.getArtistName());
-        artist.setType(dto.getType());
-        artist.setSpotifyId(dto.getSpotifyId());
-        artist.setDescription(dto.getDescription());
-        artist.setImage(dto.getImage());
-        artist.setPrimaryLanguage(dto.getPrimaryLanguage());
-        artist.setGenre(dto.getGenre());
-        artist.setOriginCountry(dto.getOriginCountry());
-        return artist;
+        // Use the factory pattern to create artist with type-specific logic
+        return artistFactoryManager.createArtist(dto);
     }
 
     public void updateEntityFromDto(Artist artist, UpdateArtistRequestDTO dto) {
