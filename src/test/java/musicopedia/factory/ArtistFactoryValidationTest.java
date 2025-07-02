@@ -87,6 +87,122 @@ class ArtistFactoryValidationTest {
     }
 
     @Test
+    void soloArtistNameCannotExceed100Characters() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName("A".repeat(101)); // 101 characters - exceeds limit
+        dto.setPrimaryLanguage("English");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Solo artist name cannot exceed 100 characters", exception.getMessage());
+    }
+
+    @Test
+    void soloArtistNameCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName(""); // Empty name
+        dto.setPrimaryLanguage("English");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Solo artist name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void soloArtistNameCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName(null); // Null name
+        dto.setPrimaryLanguage("English");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Solo artist name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void soloArtistNameCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName("   "); // Whitespace only
+        dto.setPrimaryLanguage("English");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Solo artist name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void soloArtistPrimaryLanguageCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName("Valid Artist");
+        dto.setPrimaryLanguage(""); // Empty primary language
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Primary language is required for solo artists", exception.getMessage());
+    }
+
+    @Test
+    void soloArtistPrimaryLanguageCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName("Valid Artist");
+        dto.setPrimaryLanguage("   "); // Whitespace only
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Primary language is required for solo artists", exception.getMessage());
+    }
+
+    @Test
+    void validSoloArtistWithMaxLengthName() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName("A".repeat(100)); // Exactly 100 characters - should be valid
+        dto.setPrimaryLanguage("English");
+        dto.setGenre("Pop");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
+
+    @Test
+    void validSoloArtistPassesValidation() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setArtistName("Taylor Swift");
+        dto.setPrimaryLanguage("English");
+        dto.setGenre("Pop");
+        dto.setOriginCountry("USA");
+        dto.setDescription("American singer-songwriter");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
+
+    @Test
     void validFranchiseArtistPassesValidation() {
         CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
