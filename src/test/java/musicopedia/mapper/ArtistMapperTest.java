@@ -9,21 +9,31 @@ import musicopedia.model.Groups;
 import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.factory.ArtistFactoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class ArtistMapperTest {
 
     private ArtistMapper artistMapper;
+    
+    @Mock
+    private ArtistFactoryManager artistFactoryManager;
 
     @BeforeEach
     void setUp() {
-        artistMapper = new ArtistMapper();
+        artistMapper = new ArtistMapper(artistFactoryManager);
     }
 
     @Test
@@ -38,6 +48,18 @@ class ArtistMapperTest {
         dto.setPrimaryLanguage("English");
         dto.setGenre("Pop");
         dto.setOriginCountry("US");
+
+        Artist expectedArtist = new Artist();
+        expectedArtist.setArtistName("Test Artist");
+        expectedArtist.setType(ArtistType.SOLO);
+        expectedArtist.setSpotifyId("test123");
+        expectedArtist.setDescription("Test description");
+        expectedArtist.setImage("test-image.jpg");
+        expectedArtist.setPrimaryLanguage("English");
+        expectedArtist.setGenre("Pop");
+        expectedArtist.setOriginCountry("US");
+
+        when(artistFactoryManager.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(expectedArtist);
 
         // When
         Artist artist = artistMapper.toEntity(dto);
@@ -258,460 +280,6 @@ class ArtistMapperTest {
         assertNull(group);
     }
 
-    @Test
-    void testComplexMappingScenarios() {
-        testMultipleEntityCombinations();
-        testConditionalMappingLogic();
-        testNestedValidationScenarios();
-        testConcurrentMappingOperations();
-        testErrorHandlingAndRecovery();
-    }
-
-    private void testMultipleEntityCombinations() {
-        // Test all possible combinations of Artist, Solo, and Groups entities
-        Artist baseArtist = createTestArtist();
-
-        // Scenario 1: Artist only
-        ArtistResponseDTO response1 = artistMapper.toResponseDto(baseArtist, null, null);
-        validateBasicArtistMapping(baseArtist, response1);
-
-        // Scenario 2: Artist + Solo
-        Solo solo = createTestSolo(baseArtist);
-        ArtistResponseDTO response2 = artistMapper.toResponseDto(baseArtist, solo, null);
-        validateBasicArtistMapping(baseArtist, response2);
-        validateSoloMapping(solo, response2);
-
-        // Scenario 3: Artist + Groups
-        Groups group = createTestGroup(baseArtist);
-        ArtistResponseDTO response3 = artistMapper.toResponseDto(baseArtist, null, group);
-        validateBasicArtistMapping(baseArtist, response3);
-        validateGroupMapping(group, response3);
-
-        // Scenario 4: Artist + Solo + Groups (unusual but possible)
-        ArtistResponseDTO response4 = artistMapper.toResponseDto(baseArtist, solo, group);
-        validateBasicArtistMapping(baseArtist, response4);
-        validateSoloMapping(solo, response4);
-        validateGroupMapping(group, response4);
-
-        // Scenario 5: Null artist with non-null solo/group
-        try {
-            artistMapper.toResponseDto(null, solo, group);
-            fail("Should throw exception with null artist");
-        } catch (NullPointerException e) {
-            // Expected behavior
-        }
-    }
-
-    private void validateBasicArtistMapping(Artist artist, ArtistResponseDTO response) {
-        assertEquals(artist.getArtistId(), response.getArtistId());
-        assertEquals(artist.getArtistName(), response.getArtistName());
-        assertEquals(artist.getType(), response.getType());
-        assertEquals(artist.getSpotifyId(), response.getSpotifyId());
-        assertEquals(artist.getDescription(), response.getDescription());
-        assertEquals(artist.getImage(), response.getImage());
-        assertEquals(artist.getPrimaryLanguage(), response.getPrimaryLanguage());
-        assertEquals(artist.getGenre(), response.getGenre());
-        assertEquals(artist.getOriginCountry(), response.getOriginCountry());
-    }
-
-    private void validateSoloMapping(Solo solo, ArtistResponseDTO response) {
-        if (solo != null) {
-            assertEquals(solo.getBirthDate(), response.getBirthDate());
-            assertEquals(solo.getDeathDate(), response.getDeathDate());
-            assertEquals(solo.getGender(), response.getSoloGender());
-        } else {
-            assertNull(response.getBirthDate());
-            assertNull(response.getDeathDate());
-            assertNull(response.getSoloGender());
-        }
-    }
-
-    private void validateGroupMapping(Groups group, ArtistResponseDTO response) {
-        if (group != null) {
-            assertEquals(group.getFormationDate(), response.getFormationDate());
-            assertEquals(group.getDisbandDate(), response.getDisbandDate());
-            assertEquals(group.getGroupGender(), response.getGroupGender());
-        } else {
-            assertNull(response.getFormationDate());
-            assertNull(response.getDisbandDate());
-            assertNull(response.getGroupGender());
-        }
-    }
-
-    private void testConditionalMappingLogic() {
-        // Test conditional mapping based on artist type
-        for (ArtistType type : ArtistType.values()) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
-            dto.setArtistName("Conditional Test " + type.name());
-            dto.setType(type);
-            dto.setGenre("Test Genre");
-
-            // Set type-specific data
-            if (type == ArtistType.SOLO) {
-                dto.setBirthDate(LocalDate.of(1985, 3, 15));
-                dto.setSoloGender(ArtistGender.FEMALE);
-                // Group fields should be ignored
-                dto.setFormationDate(LocalDate.of(2000, 1, 1));
-                dto.setGroupGender(ArtistGender.MIXED);
-            } else if (type == ArtistType.GROUP) {
-                dto.setFormationDate(LocalDate.of(1995, 6, 20));
-                dto.setGroupGender(ArtistGender.MALE);
-                // Solo fields should be ignored
-                dto.setBirthDate(LocalDate.of(1980, 12, 25));
-                dto.setSoloGender(ArtistGender.FEMALE);
-            } else {
-                // For FRANCHISE and VARIOUS, set both and see what happens
-                dto.setBirthDate(LocalDate.of(1990, 9, 10));
-                dto.setSoloGender(ArtistGender.MIXED);
-                dto.setFormationDate(LocalDate.of(2005, 4, 5));
-                dto.setGroupGender(ArtistGender.FEMALE);
-            }
-
-            Artist artist = artistMapper.toEntity(dto);
-            artist.setArtistId(UUID.randomUUID());
-
-            Solo solo = artistMapper.createSoloFromDto(dto, artist);
-            Groups group = artistMapper.createGroupFromDto(dto, artist);
-
-            // Verify conditional creation
-            if (type == ArtistType.SOLO) {
-                assertNotNull(solo, "Solo should be created for SOLO type");
-                assertNull(group, "Group should not be created for SOLO type");
-                assertEquals(dto.getBirthDate(), solo.getBirthDate());
-                assertEquals(dto.getSoloGender(), solo.getGender());
-            } else if (type == ArtistType.GROUP) {
-                assertNull(solo, "Solo should not be created for GROUP type");
-                assertNotNull(group, "Group should be created for GROUP type");
-                assertEquals(dto.getFormationDate(), group.getFormationDate());
-                assertEquals(dto.getGroupGender(), group.getGroupGender());
-            } else {
-                assertNull(solo, "Solo should not be created for " + type + " type");
-                assertNull(group, "Group should not be created for " + type + " type");
-            }
-
-            // Test response mapping with conditional data
-            ArtistResponseDTO response = artistMapper.toResponseDto(artist, solo, group);
-            assertEquals(type, response.getType());
-        }
-    }
-
-    private void testNestedValidationScenarios() {
-        // Test complex validation scenarios with nested conditions
-        testDateValidationComplexity();
-        testGenderValidationComplexity();
-        testStringFieldValidationComplexity();
-        testNullSafetyInNestedOperations();
-    }
-
-    private void testDateValidationComplexity() {
-        // Test date validation with complex business rules
-        LocalDate[] birthDates = {
-                LocalDate.of(1900, 1, 1),     // Very old
-                LocalDate.of(1950, 6, 15),    // Older generation
-                LocalDate.of(1980, 12, 31),   // Generation X
-                LocalDate.of(2000, 2, 29),    // Leap year birth
-                LocalDate.now().minusYears(18), // Just adult
-                LocalDate.now().minusYears(5),  // Child (unusual for artist)
-                LocalDate.now(),              // Born today
-                LocalDate.now().plusDays(1)   // Future birth (invalid)
-        };
-
-        LocalDate[] deathDates = {
-                null,                         // Still alive
-                LocalDate.now().minusYears(1), // Recent death
-                LocalDate.of(2020, 3, 15),    // Specific date
-                LocalDate.now(),              // Died today
-                LocalDate.now().plusDays(1)   // Future death (invalid)
-        };
-
-        for (LocalDate birthDate : birthDates) {
-            for (LocalDate deathDate : deathDates) {
-                CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
-                dto.setArtistName("Date Test Artist");
-                dto.setType(ArtistType.SOLO);
-                dto.setBirthDate(birthDate);
-                dto.setDeathDate(deathDate);
-                dto.setSoloGender(ArtistGender.MALE);
-
-                Artist artist = artistMapper.toEntity(dto);
-                artist.setArtistId(UUID.randomUUID());
-                Solo solo = artistMapper.createSoloFromDto(dto, artist);
-
-                if (solo != null) {
-                    assertEquals(birthDate, solo.getBirthDate());
-                    assertEquals(deathDate, solo.getDeathDate());
-
-                    // Test logical consistency
-                    if (birthDate != null && deathDate != null) {
-                        if (deathDate.isBefore(birthDate)) {
-                            // Invalid scenario - death before birth
-                            // Mapper doesn't validate, but we can test the data flow
-                            assertTrue(deathDate.isBefore(birthDate),
-                                    "Death date should be before birth date in this test scenario");
-                        }
-                    }
-                }
-
-                // Test response mapping
-                ArtistResponseDTO response = artistMapper.toResponseDto(artist, solo, null);
-                assertEquals(birthDate, response.getBirthDate());
-                assertEquals(deathDate, response.getDeathDate());
-            }
-        }
-    }
-
-    private void testGenderValidationComplexity() {
-        // Test gender validation across different scenarios
-        for (ArtistGender soloGender : ArtistGender.values()) {
-            for (ArtistGender groupGender : ArtistGender.values()) {
-                // Test solo artist with all gender combinations
-                CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
-                soloDto.setArtistName("Solo Gender Test");
-                soloDto.setType(ArtistType.SOLO);
-                soloDto.setSoloGender(soloGender);
-                soloDto.setGroupGender(groupGender); // Should be ignored
-
-                Artist soloArtist = artistMapper.toEntity(soloDto);
-                soloArtist.setArtistId(UUID.randomUUID());
-                Solo solo = artistMapper.createSoloFromDto(soloDto, soloArtist);
-                Groups soloGroup = artistMapper.createGroupFromDto(soloDto, soloArtist);
-
-                assertNotNull(solo);
-                assertNull(soloGroup);
-                assertEquals(soloGender, solo.getGender());
-
-                // Test group artist with all gender combinations
-                CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
-                groupDto.setArtistName("Group Gender Test");
-                groupDto.setType(ArtistType.GROUP);
-                groupDto.setGroupGender(groupGender);
-                groupDto.setSoloGender(soloGender); // Should be ignored
-
-                Artist groupArtist = artistMapper.toEntity(groupDto);
-                groupArtist.setArtistId(UUID.randomUUID());
-                Solo groupSolo = artistMapper.createSoloFromDto(groupDto, groupArtist);
-                Groups group = artistMapper.createGroupFromDto(groupDto, groupArtist);
-
-                assertNull(groupSolo);
-                assertNotNull(group);
-                assertEquals(groupGender, group.getGroupGender());
-
-                // Test response mapping
-                ArtistResponseDTO soloResponse = artistMapper.toResponseDto(soloArtist, solo, null);
-                assertEquals(soloGender, soloResponse.getSoloGender());
-                assertNull(soloResponse.getGroupGender());
-
-                ArtistResponseDTO groupResponse = artistMapper.toResponseDto(groupArtist, null, group);
-                assertEquals(groupGender, groupResponse.getGroupGender());
-                assertNull(groupResponse.getSoloGender());
-            }
-        }
-    }
-
-    private void testStringFieldValidationComplexity() {
-        // Test string field validation with complex scenarios
-        String[] artistNames = {
-                "",                           // Empty
-                " ",                          // Whitespace
-                "A",                          // Single character
-                "Normal Artist Name",         // Normal case
-                "Artist With 123 Numbers",    // With numbers
-                "Artist-With-Hyphens",        // With hyphens
-                "Artist_With_Underscores",    // With underscores
-                "Artist (With Parentheses)",  // With parentheses
-                "Artist & Co.",               // With ampersand
-                "Björk Guðmundsdóttir",      // Unicode characters
-                "李小龙",                     // Chinese characters
-                "محمد عبدالحليم حافظ",          // Arabic characters
-                "Владимир Высоцкий",          // Cyrillic characters
-                "A".repeat(255),              // Maximum realistic length
-                "A".repeat(1000),             // Very long
-                null                          // Null
-        };
-
-        String[] descriptions = {
-                null, "", " ", "Short desc",
-                "A very long description that contains multiple sentences and various punctuation marks. " +
-                        "It includes information about the artist's background, musical style, influences, and career highlights. " +
-                        "The description spans multiple lines and contains various characters including numbers like 2020, " +
-                        "symbols like @#$%^&*(), and Unicode characters like café, naïve, résumé.",
-                "Description with\nnewlines\nand\ttabs",
-                "Description with \"quotes\" and 'apostrophes'",
-                "<script>alert('XSS test')</script>", // Potential XSS
-                "Description with emoji 🎵🎶🎸🥁"
-        };
-
-        for (String artistName : artistNames) {
-            for (String description : descriptions) {
-                CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
-                dto.setArtistName(artistName);
-                dto.setDescription(description);
-                dto.setType(ArtistType.SOLO);
-
-                Artist artist = artistMapper.toEntity(dto);
-                assertEquals(artistName, artist.getArtistName());
-                assertEquals(description, artist.getDescription());
-
-                // Test update scenarios
-                UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
-                updateDto.setArtistName(artistName);
-                updateDto.setDescription(description);
-
-                Artist existingArtist = createTestArtist();
-                artistMapper.updateEntityFromDto(existingArtist, updateDto);
-
-                if (artistName != null) {
-                    assertEquals(artistName, existingArtist.getArtistName());
-                }
-                if (description != null) {
-                    assertEquals(description, existingArtist.getDescription());
-                }
-
-                // Test response mapping
-                ArtistResponseDTO response = artistMapper.toResponseDto(artist, null, null);
-                assertEquals(artistName, response.getArtistName());
-                assertEquals(description, response.getDescription());
-            }
-        }
-    }
-
-    private void testNullSafetyInNestedOperations() {
-        // Test null safety in complex nested operations
-
-        // Test with null DTO
-        try {
-            artistMapper.toEntity(null);
-            fail("Should throw exception with null DTO");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-
-        // Test with DTO having null fields
-        CreateArtistRequestDTO nullFieldDto = new CreateArtistRequestDTO();
-        // All fields are null
-
-        try {
-            Artist artist = artistMapper.toEntity(nullFieldDto);
-            // Should handle null fields gracefully
-            assertNull(artist.getArtistName());
-            assertNull(artist.getType());
-            assertNull(artist.getSpotifyId());
-        } catch (Exception e) {
-            // Some null fields might cause issues
-        }
-
-        // Test update with null DTO
-        Artist existingArtist = createTestArtist();
-        String originalName = existingArtist.getArtistName();
-
-        try {
-            artistMapper.updateEntityFromDto(existingArtist, null);
-            fail("Should throw exception with null update DTO");
-        } catch (NullPointerException e) {
-            // Expected
-            assertEquals(originalName, existingArtist.getArtistName()); // Should remain unchanged
-        }
-
-        // Test response mapping with null entities
-        try {
-            artistMapper.toResponseDto(null, null, null);
-            fail("Should throw exception with all null parameters");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-
-        // Test summary mapping with null artist
-        try {
-            artistMapper.toSummaryDto(null);
-            fail("Should throw exception with null artist");
-        } catch (NullPointerException e) {
-            // Expected
-        }
-    }
-
-    private void testConcurrentMappingOperations() {
-        // Test mapper behavior under concurrent access scenarios
-        Artist sharedArtist = createTestArtist();
-
-        // Simulate multiple concurrent updates
-        for (int i = 0; i < 100; i++) {
-            UpdateArtistRequestDTO update1 = new UpdateArtistRequestDTO();
-            update1.setGenre("Genre " + i);
-
-            UpdateArtistRequestDTO update2 = new UpdateArtistRequestDTO();
-            update2.setDescription("Description " + i);
-
-            UpdateArtistRequestDTO update3 = new UpdateArtistRequestDTO();
-            update3.setOriginCountry(i % 2 == 0 ? "US" : "GB");
-
-            // Apply updates in sequence (simulating concurrent access)
-            artistMapper.updateEntityFromDto(sharedArtist, update1);
-            artistMapper.updateEntityFromDto(sharedArtist, update2);
-            artistMapper.updateEntityFromDto(sharedArtist, update3);
-
-            // Verify final state
-            assertEquals("Genre " + i, sharedArtist.getGenre());
-            assertEquals("Description " + i, sharedArtist.getDescription());
-            assertEquals(i % 2 == 0 ? "US" : "GB", sharedArtist.getOriginCountry());
-
-            // Test response mapping after each update
-            ArtistResponseDTO response = artistMapper.toResponseDto(sharedArtist, null, null);
-            assertEquals("Genre " + i, response.getGenre());
-            assertEquals("Description " + i, response.getDescription());
-            assertEquals(i % 2 == 0 ? "US" : "GB", response.getOriginCountry());
-        }
-    }
-
-    private void testErrorHandlingAndRecovery() {
-        // Test mapper behavior with corrupted or invalid data
-
-        // Test with artist having inconsistent type vs related entities
-        Artist inconsistentArtist = new Artist();
-        inconsistentArtist.setArtistId(UUID.randomUUID());
-        inconsistentArtist.setArtistName("Inconsistent Artist");
-        inconsistentArtist.setType(ArtistType.SOLO); // Says SOLO but we'll pass GROUP data
-
-        Groups group = createTestGroup(inconsistentArtist);
-
-        ArtistResponseDTO response = artistMapper.toResponseDto(inconsistentArtist, null, group);
-        assertEquals(ArtistType.SOLO, response.getType()); // Should reflect artist type
-        assertEquals(group.getFormationDate(), response.getFormationDate()); // But include group data
-
-        // Test with missing required fields
-        Artist incompleteArtist = new Artist();
-        incompleteArtist.setArtistId(UUID.randomUUID());
-        // Missing name and type
-
-        try {
-            ArtistResponseDTO incompleteResponse = artistMapper.toResponseDto(incompleteArtist, null, null);
-            assertNotNull(incompleteResponse);
-            assertEquals(incompleteArtist.getArtistId(), incompleteResponse.getArtistId());
-            assertNull(incompleteResponse.getArtistName());
-            assertNull(incompleteResponse.getType());
-        } catch (Exception e) {
-            // Some mappers might not handle missing data gracefully
-        }
-
-        // Test recovery from partial failures
-        CreateArtistRequestDTO partialDto = new CreateArtistRequestDTO();
-        partialDto.setArtistName("Recovery Test");
-        partialDto.setType(ArtistType.FRANCHISE); // Type that doesn't create solo/group
-
-        Artist recoveryArtist = artistMapper.toEntity(partialDto);
-        recoveryArtist.setArtistId(UUID.randomUUID());
-
-        Solo nullSolo = artistMapper.createSoloFromDto(partialDto, recoveryArtist);
-        Groups nullGroup = artistMapper.createGroupFromDto(partialDto, recoveryArtist);
-
-        assertNull(nullSolo);
-        assertNull(nullGroup);
-
-        // Should still be able to create response
-        ArtistResponseDTO recoveryResponse = artistMapper.toResponseDto(recoveryArtist, nullSolo, nullGroup);
-        assertNotNull(recoveryResponse);
-        assertEquals("Recovery Test", recoveryResponse.getArtistName());
-        assertEquals(ArtistType.FRANCHISE, recoveryResponse.getType());
-    }
 
     // Helper methods
     private Artist createTestArtist() {

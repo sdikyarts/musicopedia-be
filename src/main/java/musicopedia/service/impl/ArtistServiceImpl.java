@@ -62,9 +62,13 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public Artist createArtist(CreateArtistRequestDTO dto) {
-        // Use factory pattern for type-specific validation and creation
+        // Validate BEFORE creation using factory pattern
         artistFactoryManager.validateArtistData(dto);
+        
+        // Create using factory pattern (without validation since we already validated)
         Artist artist = artistFactoryManager.createArtist(dto);
+        
+        // Save and return
         return artistRepository.save(artist);
     }
 

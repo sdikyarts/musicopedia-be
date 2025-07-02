@@ -15,7 +15,8 @@ public class VariousArtistFactory implements ArtistFactory {
 
     @Override
     public Artist createArtist(CreateArtistRequestDTO dto) {
-        validateArtistData(dto);
+        // Note: Validation is done separately via validateArtistData()
+        // This method focuses only on object creation
         
         Artist artist = new Artist();
         artist.setArtistName(dto.getArtistName());

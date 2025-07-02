@@ -5,6 +5,7 @@ import musicopedia.dto.request.UpdateArtistRequestDTO;
 import musicopedia.dto.response.ArtistResponseDTO;
 import musicopedia.dto.response.ArtistSummaryDTO;
 import musicopedia.mapper.ArtistMapper;
+import musicopedia.factory.ArtistFactoryManager;
 import musicopedia.model.Artist;
 import musicopedia.model.Groups;
 import musicopedia.model.Solo;
@@ -12,23 +13,32 @@ import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration test for the complete DTO flow:
  * CreateRequestDTO -> Entity -> ResponseDTO -> SummaryDTO
  */
+@ExtendWith(MockitoExtension.class)
 class DTOIntegrationTest {
 
     private ArtistMapper artistMapper;
+    
+    @Mock
+    private ArtistFactoryManager artistFactoryManager;
 
     @BeforeEach
     void setUp() {
-        artistMapper = new ArtistMapper();
+        artistMapper = new ArtistMapper(artistFactoryManager);
     }
 
     @Test
@@ -46,6 +56,19 @@ class DTOIntegrationTest {
         createDto.setBirthDate(LocalDate.of(1980, 3, 15));
         createDto.setDeathDate(null);
         createDto.setSoloGender(ArtistGender.MALE);
+
+        // Mock the factory to return a proper artist
+        Artist expectedArtist = new Artist();
+        expectedArtist.setArtistName("John Doe");
+        expectedArtist.setType(ArtistType.SOLO);
+        expectedArtist.setSpotifyId("johndoe123");
+        expectedArtist.setDescription("A talented solo artist");
+        expectedArtist.setImage("john-doe.jpg");
+        expectedArtist.setPrimaryLanguage("English");
+        expectedArtist.setGenre("Rock");
+        expectedArtist.setOriginCountry("US");
+
+        when(artistFactoryManager.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(expectedArtist);
 
         // When - Map to entities
         Artist artist = artistMapper.toEntity(createDto);
