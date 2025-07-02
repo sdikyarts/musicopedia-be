@@ -3,13 +3,13 @@ package musicopedia.service;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.repository.ArtistRepository;
-import musicopedia.service.config.ServiceTestConfig;
 import musicopedia.service.impl.ArtistServiceImpl;
+import musicopedia.factory.ArtistFactoryManager;
+import musicopedia.dto.request.CreateArtistRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.context.annotation.Import;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,11 +19,13 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@Import(ServiceTestConfig.class)
 public class ArtistServiceTest {
 
     @Mock
     private ArtistRepository artistRepository;
+    
+    @Mock
+    private ArtistFactoryManager artistFactoryManager;
 
     private ArtistService artistService;
 
@@ -33,7 +35,7 @@ public class ArtistServiceTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        artistService = new ArtistServiceImpl(artistRepository);
+        artistService = new ArtistServiceImpl(artistRepository, artistFactoryManager);
 
         testId = UUID.randomUUID();
         testArtist = new Artist();
@@ -138,5 +140,25 @@ public class ArtistServiceTest {
         assertTrue(exists);
         assertFalse(notExists);
         verify(artistRepository, times(2)).existsById(any()); // Changed to expect 2 calls
+    }
+
+    @Test
+    void testCreateArtist() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setArtistName("New Artist");
+        dto.setType(ArtistType.SOLO);
+        dto.setGenre("Pop");
+        dto.setPrimaryLanguage("English");
+
+        when(artistFactoryManager.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(testArtist);
+        when(artistRepository.save(any(Artist.class))).thenReturn(testArtist);
+
+        Artist result = artistService.createArtist(dto);
+
+        assertEquals(testId, result.getArtistId());
+        assertEquals("Test Artist", result.getArtistName());
+        verify(artistFactoryManager, times(1)).validateArtistData(dto);
+        verify(artistFactoryManager, times(1)).createArtist(dto);
+        verify(artistRepository, times(1)).save(testArtist);
     }
 }

@@ -1,5 +1,10 @@
 package musicopedia.controller;
 
+import musicopedia.dto.request.CreateMemberRequestDTO;
+import musicopedia.dto.request.UpdateMemberRequestDTO;
+import musicopedia.dto.response.MemberResponseDTO;
+import musicopedia.dto.response.MemberSummaryDTO;
+import musicopedia.mapper.MemberMapper;
 import musicopedia.model.Member;
 import musicopedia.service.MemberService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,57 +22,68 @@ import java.util.UUID;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberMapper memberMapper;
 
-    public MemberController(MemberService memberService) {
+    public MemberController(MemberService memberService, MemberMapper memberMapper) {
         this.memberService = memberService;
+        this.memberMapper = memberMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<Member>> getAllMembers() {
-        return ResponseEntity.ok(memberService.findAll());
+    public ResponseEntity<List<MemberSummaryDTO>> getAllMembers() {
+        List<Member> members = memberService.findAll();
+        return ResponseEntity.ok(memberMapper.toSummaryDTOList(members));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Member> getMemberById(@PathVariable("id") UUID memberId) {
+    public ResponseEntity<MemberResponseDTO> getMemberById(@PathVariable("id") UUID memberId) {
         Optional<Member> member = memberService.findById(memberId);
-        return member.map(ResponseEntity::ok)
+        return member.map(m -> ResponseEntity.ok(memberMapper.toResponseDTO(m)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Member>> searchMembersByName(@RequestParam("name") String name) {
-        return ResponseEntity.ok(memberService.findByNameContaining(name));
+    public ResponseEntity<List<MemberSummaryDTO>> searchMembersByName(@RequestParam("name") String name) {
+        List<Member> members = memberService.findByNameContaining(name);
+        return ResponseEntity.ok(memberMapper.toSummaryDTOList(members));
     }
 
     @GetMapping("/birthdate")
-    public ResponseEntity<List<Member>> getMembersByBirthDateRange(
+    public ResponseEntity<List<MemberSummaryDTO>> getMembersByBirthDateRange(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(memberService.findByBirthDateBetween(startDate, endDate));
+        List<Member> members = memberService.findByBirthDateBetween(startDate, endDate);
+        return ResponseEntity.ok(memberMapper.toSummaryDTOList(members));
     }
 
     @GetMapping("/with-solo-career")
-    public ResponseEntity<List<Member>> getMembersWithSoloCareer() {
-        return ResponseEntity.ok(memberService.findBySoloArtistNotNull());
+    public ResponseEntity<List<MemberSummaryDTO>> getMembersWithSoloCareer() {
+        List<Member> members = memberService.findBySoloArtistNotNull();
+        return ResponseEntity.ok(memberMapper.toSummaryDTOList(members));
     }
 
     @PostMapping
-    public ResponseEntity<Member> createMember(@RequestBody Member member) {
+    public ResponseEntity<MemberResponseDTO> createMember(@RequestBody CreateMemberRequestDTO createMemberRequestDTO) {
+        Member member = memberMapper.toEntity(createMemberRequestDTO);
         Member savedMember = memberService.save(member);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMember);
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberMapper.toResponseDTO(savedMember));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable("id") UUID memberId, @RequestBody Member member) {
-        if (!member.getMemberId().equals(memberId)) {
+    public ResponseEntity<MemberResponseDTO> updateMember(@PathVariable("id") UUID memberId, @RequestBody UpdateMemberRequestDTO updateMemberRequestDTO) {
+        if (!updateMemberRequestDTO.getMemberId().equals(memberId)) {
             return ResponseEntity.badRequest().build();
         }
         
-        Member updatedMember = memberService.update(member);
-        if (updatedMember == null) {
+        Optional<Member> existingMember = memberService.findById(memberId);
+        if (existingMember.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(updatedMember);
+        
+        Member member = existingMember.get();
+        memberMapper.updateEntityFromDto(member, updateMemberRequestDTO);
+        Member updatedMember = memberService.update(member);
+        return ResponseEntity.ok(memberMapper.toResponseDTO(updatedMember));
     }
 
     @DeleteMapping("/{id}")

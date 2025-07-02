@@ -4,13 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.dto.request.CreateArtistRequestDTO;
 import musicopedia.service.ArtistService;
-import musicopedia.service.config.ServiceTestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.context.annotation.Import;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Import(ServiceTestConfig.class)
+@ExtendWith(MockitoExtension.class)
 public class ArtistControllerTest {
 
     @Mock
@@ -38,7 +38,6 @@ public class ArtistControllerTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
         ArtistController artistController = new ArtistController(artistService);
         mockMvc = MockMvcBuilders.standaloneSetup(artistController).build();
         objectMapper = new ObjectMapper();
@@ -140,11 +139,57 @@ public class ArtistControllerTest {
 
     @Test
     void testCreateArtist() throws Exception {
+        // Create a proper DTO for the new factory-based endpoint
+        CreateArtistRequestDTO createRequest = new CreateArtistRequestDTO();
+        createRequest.setArtistName("IU");
+        createRequest.setType(ArtistType.SOLO);
+        createRequest.setGenre("K-Pop");
+        createRequest.setPrimaryLanguage("Korean");
+        createRequest.setOriginCountry("KR");
+
+        when(artistService.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(testArtist);
+
+        String jsonContent = objectMapper.writeValueAsString(createRequest);
+
+        mockMvc.perform(post("/api/artists")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent))
+                .andDo(result -> {
+                    System.out.println("Status: " + result.getResponse().getStatus());
+                    System.out.println("Content: " + result.getResponse().getContentAsString());
+                });
+
+        verify(artistService, times(1)).createArtist(any(CreateArtistRequestDTO.class));
+    }
+
+    @Test
+    void testCreateArtistValidationError() throws Exception {
+        // Test error handling
+        CreateArtistRequestDTO createRequest = new CreateArtistRequestDTO();
+        createRequest.setArtistName("IU");
+        createRequest.setType(ArtistType.SOLO);
+
+        when(artistService.createArtist(any(CreateArtistRequestDTO.class)))
+                .thenThrow(new IllegalArgumentException("Validation failed"));
+
+        String jsonContent = objectMapper.writeValueAsString(createRequest);
+
+        mockMvc.perform(post("/api/artists")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent))
+                .andExpect(status().isBadRequest());
+
+        verify(artistService, times(1)).createArtist(any(CreateArtistRequestDTO.class));
+    }
+
+    @Test
+    void testCreateArtistLegacy() throws Exception {
+        // Test the legacy endpoint
         when(artistService.save(any(Artist.class))).thenReturn(testArtist);
 
         String jsonContent = objectMapper.writeValueAsString(testArtist);
 
-        mockMvc.perform(post("/api/artists")
+        mockMvc.perform(post("/api/artists/legacy")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
                 .andExpect(status().isCreated())

@@ -3,6 +3,7 @@ package musicopedia.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import musicopedia.model.enums.ArtistGender;
+import musicopedia.model.enums.GroupAffiliationStatus;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -24,4 +25,7 @@ public class Solo {
 
     @Enumerated(EnumType.STRING)
     private ArtistGender gender;
+
+    @Enumerated(EnumType.STRING)
+    private GroupAffiliationStatus groupAffiliationStatus;
 }

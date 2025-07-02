@@ -3,6 +3,7 @@ package musicopedia.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import musicopedia.model.enums.ArtistGender;
+import musicopedia.model.enums.GroupActivityStatus;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -24,4 +25,7 @@ public class Groups {
 
     @Enumerated(EnumType.STRING)
     private ArtistGender groupGender;
+
+    @Enumerated(EnumType.STRING)
+    private GroupActivityStatus activityStatus;
 }

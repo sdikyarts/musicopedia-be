@@ -2,6 +2,7 @@ package musicopedia.model;
 
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.model.enums.GroupActivityStatus;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ public class GroupsTest {
         LocalDate formationDate = LocalDate.of(2015, 1, 1);
         LocalDate disbandDate = null;
         ArtistGender groupGender = ArtistGender.MIXED;
+        GroupActivityStatus activityStatus = GroupActivityStatus.ACTIVE;
         
         Groups group = new Groups();
         group.setArtistId(artistId);
@@ -30,12 +32,14 @@ public class GroupsTest {
         group.setFormationDate(formationDate);
         group.setDisbandDate(disbandDate);
         group.setGroupGender(groupGender);
+        group.setActivityStatus(activityStatus);
         
         assertEquals(artistId, group.getArtistId());
         assertEquals(artist, group.getArtist());
         assertEquals(formationDate, group.getFormationDate());
         assertNull(group.getDisbandDate());
         assertEquals(groupGender, group.getGroupGender());
+        assertEquals(activityStatus, group.getActivityStatus());
     }
     
     @Test
@@ -64,8 +68,11 @@ public class GroupsTest {
         
         group.setFormationDate(formationDate);
         group.setDisbandDate(disbandDate);
+        group.setActivityStatus(GroupActivityStatus.DISBANDED);
+        
         assertEquals(formationDate, group.getFormationDate());
         assertEquals(disbandDate, group.getDisbandDate());
+        assertEquals(GroupActivityStatus.DISBANDED, group.getActivityStatus());
     }
     
     @Test
@@ -77,11 +84,13 @@ public class GroupsTest {
         group.setArtistId(artistId);
         group.setFormationDate(formationDate);
         group.setGroupGender(ArtistGender.MIXED);
+        group.setActivityStatus(GroupActivityStatus.ACTIVE);
         
         String toString = group.toString();
         
         assertTrue(toString.contains(artistId.toString()));
         assertTrue(toString.contains(formationDate.toString()));
         assertTrue(toString.contains(ArtistGender.MIXED.toString()));
+        assertTrue(toString.contains(GroupActivityStatus.ACTIVE.toString()));
     }
 }

@@ -4,6 +4,8 @@ import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.repository.ArtistRepository;
 import musicopedia.service.ArtistService;
+import musicopedia.factory.ArtistFactoryManager;
+import musicopedia.dto.request.CreateArtistRequestDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +18,11 @@ import java.util.UUID;
 public class ArtistServiceImpl implements ArtistService {
 
     private final ArtistRepository artistRepository;
+    private final ArtistFactoryManager artistFactoryManager;
 
-    public ArtistServiceImpl(ArtistRepository artistRepository) {
+    public ArtistServiceImpl(ArtistRepository artistRepository, ArtistFactoryManager artistFactoryManager) {
         this.artistRepository = artistRepository;
+        this.artistFactoryManager = artistFactoryManager;
     }
 
     @Override
@@ -53,6 +57,18 @@ public class ArtistServiceImpl implements ArtistService {
 
     @Override
     public Artist save(Artist artist) {
+        return artistRepository.save(artist);
+    }
+
+    @Override
+    public Artist createArtist(CreateArtistRequestDTO dto) {
+        // Validate BEFORE creation using factory pattern
+        artistFactoryManager.validateArtistData(dto);
+        
+        // Create using factory pattern (without validation since we already validated)
+        Artist artist = artistFactoryManager.createArtist(dto);
+        
+        // Save and return
         return artistRepository.save(artist);
     }
 
