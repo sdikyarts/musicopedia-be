@@ -6,6 +6,8 @@ import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.repository.SoloRepository;
 import musicopedia.service.SoloService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,9 +21,16 @@ import java.util.UUID;
 public class SoloServiceImpl implements SoloService {
 
     private final SoloRepository soloRepository;
+    private SoloService self;
 
     public SoloServiceImpl(SoloRepository soloRepository) {
         this.soloRepository = soloRepository;
+    }
+
+    @Autowired
+    @Lazy
+    public void setSelf(SoloService self) {
+        this.self = self;
     }
 
     @Override
@@ -44,7 +53,7 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findByBirthDateBetween(LocalDate startDate, LocalDate endDate) {
-        return findAll().stream()
+        return self.findAll().stream()
                 .filter(solo -> {
                     LocalDate birthDate = solo.getBirthDate();
                     return birthDate != null && 
@@ -57,7 +66,7 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findByGender(ArtistGender gender) {
-        return findAll().stream()
+        return self.findAll().stream()
                 .filter(solo -> solo.getGender() == gender)
                 .toList();
     }
@@ -65,7 +74,7 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findActiveSoloArtists() {
-        return findAll().stream()
+        return self.findAll().stream()
                 .filter(solo -> solo.getDeathDate() == null)
                 .toList();
     }
@@ -73,7 +82,7 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findDeceasedSoloArtists() {
-        return findAll().stream()
+        return self.findAll().stream()
                 .filter(solo -> solo.getDeathDate() != null)
                 .toList();
     }
