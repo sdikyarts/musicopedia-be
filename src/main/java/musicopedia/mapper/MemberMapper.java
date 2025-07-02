@@ -1,0 +1,127 @@
+package musicopedia.mapper;
+
+import musicopedia.dto.request.CreateMemberRequestDTO;
+import musicopedia.dto.request.UpdateMemberRequestDTO;
+import musicopedia.dto.response.MemberResponseDTO;
+import musicopedia.dto.response.MemberSummaryDTO;
+import musicopedia.model.Artist;
+import musicopedia.model.Member;
+import musicopedia.model.enums.ArtistType;
+import musicopedia.service.ArtistService;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Component
+public class MemberMapper {
+
+    private final ArtistService artistService;
+
+    public MemberMapper(ArtistService artistService) {
+        this.artistService = artistService;
+    }
+
+    public Member toEntity(CreateMemberRequestDTO dto) {
+        Member member = new Member();
+        member.setFullName(dto.getFullName());
+        member.setDescription(dto.getDescription());
+        member.setImage(dto.getImage());
+        member.setBirthDate(dto.getBirthDate());
+        
+        // Set solo artist reference if provided
+        if (dto.getSoloArtistId() != null) {
+            Artist soloArtist = artistService.findById(dto.getSoloArtistId())
+                .orElseThrow(() -> new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
+            
+            // Validate that the referenced artist is actually a solo artist
+            if (soloArtist.getType() != ArtistType.SOLO) {
+                throw new IllegalArgumentException("Referenced artist must be of type SOLO, but was: " + soloArtist.getType());
+            }
+            
+            member.setSoloArtist(soloArtist);
+        }
+        
+        return member;
+    }
+
+    public void updateEntityFromDto(Member member, UpdateMemberRequestDTO dto) {
+        if (dto.getFullName() != null) {
+            member.setFullName(dto.getFullName());
+        }
+        if (dto.getDescription() != null) {
+            member.setDescription(dto.getDescription());
+        }
+        if (dto.getImage() != null) {
+            member.setImage(dto.getImage());
+        }
+        if (dto.getBirthDate() != null) {
+            member.setBirthDate(dto.getBirthDate());
+        }
+        
+        // Handle solo artist update
+        if (dto.getSoloArtistId() != null) {
+            Artist soloArtist = artistService.findById(dto.getSoloArtistId())
+                .orElseThrow(() -> new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
+            
+            // Validate that the referenced artist is actually a solo artist
+            if (soloArtist.getType() != ArtistType.SOLO) {
+                throw new IllegalArgumentException("Referenced artist must be of type SOLO, but was: " + soloArtist.getType());
+            }
+            
+            member.setSoloArtist(soloArtist);
+        } else {
+            // If soloArtistId is explicitly null in the update, remove the reference
+            member.setSoloArtist(null);
+        }
+    }
+
+    public MemberResponseDTO toResponseDTO(Member member) {
+        MemberResponseDTO dto = new MemberResponseDTO();
+        dto.setMemberId(member.getMemberId());
+        dto.setFullName(member.getFullName());
+        dto.setDescription(member.getDescription());
+        dto.setImage(member.getImage());
+        dto.setBirthDate(member.getBirthDate());
+        
+        // Set solo artist information if available
+        if (member.getSoloArtist() != null) {
+            dto.setSoloArtistId(member.getSoloArtist().getArtistId());
+            dto.setSoloArtistName(member.getSoloArtist().getArtistName());
+            dto.setHasOfficialSoloDebut(true);
+        } else {
+            dto.setHasOfficialSoloDebut(false);
+        }
+        
+        return dto;
+    }
+
+    public MemberSummaryDTO toSummaryDTO(Member member) {
+        MemberSummaryDTO dto = new MemberSummaryDTO();
+        dto.setMemberId(member.getMemberId());
+        dto.setFullName(member.getFullName());
+        dto.setImage(member.getImage());
+        
+        // Set solo career information
+        if (member.getSoloArtist() != null) {
+            dto.setHasOfficialSoloDebut(true);
+            dto.setSoloArtistName(member.getSoloArtist().getArtistName());
+        } else {
+            dto.setHasOfficialSoloDebut(false);
+        }
+        
+        return dto;
+    }
+
+    public List<MemberResponseDTO> toResponseDTOList(List<Member> members) {
+        return members.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<MemberSummaryDTO> toSummaryDTOList(List<Member> members) {
+        return members.stream()
+                .map(this::toSummaryDTO)
+                .collect(Collectors.toList());
+    }
+}
