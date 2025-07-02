@@ -53,7 +53,8 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findByBirthDateBetween(LocalDate startDate, LocalDate endDate) {
-        return self.findAll().stream()
+        List<Solo> allSolos = (self != null) ? self.findAll() : findAll();
+        return allSolos.stream()
                 .filter(solo -> {
                     LocalDate birthDate = solo.getBirthDate();
                     return birthDate != null && 
@@ -66,7 +67,8 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findByGender(ArtistGender gender) {
-        return self.findAll().stream()
+        List<Solo> allSolos = (self != null) ? self.findAll() : findAll();
+        return allSolos.stream()
                 .filter(solo -> solo.getGender() == gender)
                 .toList();
     }
@@ -74,7 +76,8 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findActiveSoloArtists() {
-        return self.findAll().stream()
+        List<Solo> allSolos = (self != null) ? self.findAll() : findAll();
+        return allSolos.stream()
                 .filter(solo -> solo.getDeathDate() == null)
                 .toList();
     }
@@ -82,7 +85,8 @@ public class SoloServiceImpl implements SoloService {
     @Override
     @Transactional(readOnly = true)
     public List<Solo> findDeceasedSoloArtists() {
-        return self.findAll().stream()
+        List<Solo> allSolos = (self != null) ? self.findAll() : findAll();
+        return allSolos.stream()
                 .filter(solo -> solo.getDeathDate() != null)
                 .toList();
     }
