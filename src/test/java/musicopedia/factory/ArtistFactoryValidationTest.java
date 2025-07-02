@@ -217,4 +217,186 @@ class ArtistFactoryValidationTest {
             factoryManager.createArtist(dto);
         });
     }
+
+    @Test
+    void groupArtistNameCannotExceed150Characters() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("A".repeat(151)); // 151 characters - exceeds limit
+        dto.setGenre("Rock");
+        dto.setDescription("Valid description");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Group name cannot exceed 150 characters", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistNameCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName(""); // Empty name
+        dto.setGenre("Rock");
+        dto.setDescription("Valid description");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Group name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistNameCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName(null); // Null name
+        dto.setGenre("Rock");
+        dto.setDescription("Valid description");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Group name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistNameCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("   "); // Whitespace only
+        dto.setGenre("Rock");
+        dto.setDescription("Valid description");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Group name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistGenreCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("Valid Group");
+        dto.setGenre(""); // Empty genre
+        dto.setDescription("Valid description");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Genre is required for groups", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistGenreCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("Valid Group");
+        dto.setGenre(null); // Null genre
+        dto.setDescription("Valid description");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Genre is required for groups", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistGenreCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("Valid Group");
+        dto.setGenre("   "); // Whitespace only
+        dto.setDescription("Valid description");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Genre is required for groups", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistDescriptionCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("Valid Group");
+        dto.setGenre("Rock");
+        dto.setDescription(""); // Empty description
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Description is required for groups to explain their concept", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistDescriptionCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("Valid Group");
+        dto.setGenre("Rock");
+        dto.setDescription(null); // Null description
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Description is required for groups to explain their concept", exception.getMessage());
+    }
+
+    @Test
+    void groupArtistDescriptionCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("Valid Group");
+        dto.setGenre("Rock");
+        dto.setDescription("   "); // Whitespace only
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Description is required for groups to explain their concept", exception.getMessage());
+    }
+
+    @Test
+    void validGroupArtistWithMaxLengthName() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("A".repeat(150)); // Exactly 150 characters - should be valid
+        dto.setGenre("Rock");
+        dto.setDescription("A rock band formed to create amazing music together");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
+
+    @Test
+    void validGroupArtistPassesValidation() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setArtistName("The Beatles");
+        dto.setGenre("Rock");
+        dto.setDescription("Legendary British rock band from Liverpool");
+        dto.setPrimaryLanguage("English");
+        dto.setOriginCountry("UK");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
 }
