@@ -4,6 +4,7 @@ import musicopedia.dto.request.CreateMemberRequestDTO;
 import musicopedia.dto.request.UpdateMemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
 import musicopedia.dto.response.MemberSummaryDTO;
+import musicopedia.factory.MemberFactory;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
 import musicopedia.model.enums.ArtistType;
@@ -17,32 +18,16 @@ import java.util.stream.Collectors;
 public class MemberMapper {
 
     private final ArtistService artistService;
+    private final MemberFactory memberFactory;
 
-    public MemberMapper(ArtistService artistService) {
+    public MemberMapper(ArtistService artistService, MemberFactory memberFactory) {
         this.artistService = artistService;
+        this.memberFactory = memberFactory;
     }
 
     public Member toEntity(CreateMemberRequestDTO dto) {
-        Member member = new Member();
-        member.setFullName(dto.getFullName());
-        member.setDescription(dto.getDescription());
-        member.setImage(dto.getImage());
-        member.setBirthDate(dto.getBirthDate());
-        
-        // Set solo artist reference if provided
-        if (dto.getSoloArtistId() != null) {
-            Artist soloArtist = artistService.findById(dto.getSoloArtistId())
-                .orElseThrow(() -> new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
-            
-            // Validate that the referenced artist is actually a solo artist
-            if (soloArtist.getType() != ArtistType.SOLO) {
-                throw new IllegalArgumentException("Referenced artist must be of type SOLO, but was: " + soloArtist.getType());
-            }
-            
-            member.setSoloArtist(soloArtist);
-        }
-        
-        return member;
+        // Use the factory to create member with validation
+        return memberFactory.createMember(dto);
     }
 
     public void updateEntityFromDto(Member member, UpdateMemberRequestDTO dto) {
