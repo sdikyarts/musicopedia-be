@@ -566,4 +566,255 @@ class ArtistFactoryValidationTest {
             factoryManager.createArtist(dto);
         });
     }
+
+    @Test
+    void variousArtistNameCannotExceed300Characters() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("A".repeat(301)); // 301 characters - exceeds limit
+        dto.setGenre("Mixed");
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Various artist compilation name cannot exceed 300 characters", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistNameCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName(""); // Empty name
+        dto.setGenre("Mixed");
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Various artist compilation name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistNameCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName(null); // Null name
+        dto.setGenre("Mixed");
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Various artist compilation name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistNameCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("   "); // Whitespace only
+        dto.setGenre("Mixed");
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Various artist compilation name cannot be empty", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistDescriptionCannotBeTooShort() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("Various Artists Compilation");
+        dto.setGenre("Mixed");
+        dto.setDescription("Short"); // Less than 30 characters
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Various artist compilations require description (minimum 30 characters) to explain the collection", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistDescriptionCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("Various Artists Compilation");
+        dto.setGenre("Mixed");
+        dto.setDescription(null); // Null description
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Various artist compilations require description (minimum 30 characters) to explain the collection", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistGenreCannotBeEmpty() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("Various Artists Compilation");
+        dto.setGenre(""); // Empty genre
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Genre classification is required for various artist compilations", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistGenreCannotBeNull() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("Various Artists Compilation");
+        dto.setGenre(null); // Null genre
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Genre classification is required for various artist compilations", exception.getMessage());
+    }
+
+    @Test
+    void variousArtistGenreCannotBeWhitespaceOnly() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("Various Artists Compilation");
+        dto.setGenre("   "); // Whitespace only
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            factoryManager.validateArtistData(dto);
+        });
+        
+        assertEquals("Genre classification is required for various artist compilations", exception.getMessage());
+    }
+
+    @Test
+    void validVariousArtistWithMaxLengthName() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("A".repeat(300)); // Exactly 300 characters - should be valid
+        dto.setGenre("Mixed");
+        dto.setDescription("A compilation of various artists from different genres and backgrounds");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
+
+    @Test
+    void validVariousArtistWithMinimumDescription() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("Various Artists Compilation");
+        dto.setGenre("Mixed");
+        dto.setDescription("A".repeat(30)); // Exactly 30 characters - minimum requirement
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
+
+    @Test
+    void validVariousArtistPassesValidation() {
+        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        dto.setType(ArtistType.VARIOUS);
+        dto.setArtistName("Now That's What I Call Music!");
+        dto.setGenre("Pop/Rock/Dance");
+        dto.setDescription("A compilation featuring the biggest hits from various popular artists across different genres");
+        dto.setPrimaryLanguage("English");
+        dto.setOriginCountry("UK");
+
+        // Should not throw any exception
+        assertDoesNotThrow(() -> {
+            factoryManager.validateArtistData(dto);
+            factoryManager.createArtist(dto);
+        });
+    }
+
+    // Test to cover the false branch in supports() method for all factories
+    @Test
+    void variousArtistFactoryDoesNotSupportOtherTypes() {
+        VariousArtistFactory factory = new VariousArtistFactory();
+        
+        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        soloDto.setType(ArtistType.SOLO);
+        assertFalse(factory.supports(soloDto));
+        
+        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        groupDto.setType(ArtistType.GROUP);
+        assertFalse(factory.supports(groupDto));
+        
+        CreateArtistRequestDTO franchiseDto = new CreateArtistRequestDTO();
+        franchiseDto.setType(ArtistType.FRANCHISE);
+        assertFalse(factory.supports(franchiseDto));
+    }
+
+    @Test
+    void soloArtistFactoryDoesNotSupportOtherTypes() {
+        SoloArtistFactory factory = new SoloArtistFactory();
+        
+        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        groupDto.setType(ArtistType.GROUP);
+        assertFalse(factory.supports(groupDto));
+        
+        CreateArtistRequestDTO variousDto = new CreateArtistRequestDTO();
+        variousDto.setType(ArtistType.VARIOUS);
+        assertFalse(factory.supports(variousDto));
+        
+        CreateArtistRequestDTO franchiseDto = new CreateArtistRequestDTO();
+        franchiseDto.setType(ArtistType.FRANCHISE);
+        assertFalse(factory.supports(franchiseDto));
+    }
+
+    @Test
+    void groupArtistFactoryDoesNotSupportOtherTypes() {
+        GroupArtistFactory factory = new GroupArtistFactory();
+        
+        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        soloDto.setType(ArtistType.SOLO);
+        assertFalse(factory.supports(soloDto));
+        
+        CreateArtistRequestDTO variousDto = new CreateArtistRequestDTO();
+        variousDto.setType(ArtistType.VARIOUS);
+        assertFalse(factory.supports(variousDto));
+        
+        CreateArtistRequestDTO franchiseDto = new CreateArtistRequestDTO();
+        franchiseDto.setType(ArtistType.FRANCHISE);
+        assertFalse(factory.supports(franchiseDto));
+    }
+
+    @Test
+    void franchiseArtistFactoryDoesNotSupportOtherTypes() {
+        FranchiseArtistFactory factory = new FranchiseArtistFactory();
+        
+        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        soloDto.setType(ArtistType.SOLO);
+        assertFalse(factory.supports(soloDto));
+        
+        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        groupDto.setType(ArtistType.GROUP);
+        assertFalse(factory.supports(groupDto));
+        
+        CreateArtistRequestDTO variousDto = new CreateArtistRequestDTO();
+        variousDto.setType(ArtistType.VARIOUS);
+        assertFalse(factory.supports(variousDto));
+    }
 }
