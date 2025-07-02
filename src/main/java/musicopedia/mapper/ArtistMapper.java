@@ -69,6 +69,7 @@ public class ArtistMapper {
             dto.setBirthDate(solo.getBirthDate());
             dto.setDeathDate(solo.getDeathDate());
             dto.setSoloGender(solo.getGender());
+            dto.setGroupAffiliationStatus(solo.getGroupAffiliationStatus());
         }
 
         // Add group-specific data if available
@@ -76,6 +77,7 @@ public class ArtistMapper {
             dto.setFormationDate(group.getFormationDate());
             dto.setDisbandDate(group.getDisbandDate());
             dto.setGroupGender(group.getGroupGender());
+            dto.setActivityStatus(group.getActivityStatus());
         }
 
         return dto;
@@ -102,6 +104,7 @@ public class ArtistMapper {
         solo.setBirthDate(dto.getBirthDate());
         solo.setDeathDate(dto.getDeathDate());
         solo.setGender(dto.getSoloGender());
+        solo.setGroupAffiliationStatus(dto.getGroupAffiliationStatus());
         return solo;
     }
 
@@ -115,6 +118,7 @@ public class ArtistMapper {
         group.setFormationDate(dto.getFormationDate());
         group.setDisbandDate(dto.getDisbandDate());
         group.setGroupGender(dto.getGroupGender());
+        group.setActivityStatus(dto.getActivityStatus());
         return group;
     }
 }

@@ -3,6 +3,8 @@ package musicopedia.dto.request;
 import lombok.Data;
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
+import musicopedia.model.enums.GroupActivityStatus;
+import musicopedia.model.enums.GroupAffiliationStatus;
 
 import java.time.LocalDate;
 
@@ -23,9 +25,11 @@ public class UpdateArtistRequestDTO {
     private LocalDate birthDate;
     private LocalDate deathDate;
     private ArtistGender soloGender;
+    private GroupAffiliationStatus groupAffiliationStatus;
 
     // Group-specific fields
     private LocalDate formationDate;
     private LocalDate disbandDate;
     private ArtistGender groupGender;
+    private GroupActivityStatus activityStatus;
 }
