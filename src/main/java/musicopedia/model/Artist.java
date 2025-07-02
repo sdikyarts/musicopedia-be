@@ -20,10 +20,10 @@ public class Artist {
     @Column(nullable = false)
     private String artistName;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String image;
 
     @Enumerated(EnumType.STRING)

@@ -48,6 +48,7 @@ public class MemberServiceTest {
         testMember = new Member();
         testMember.setMemberId(testId);
         testMember.setFullName("Lee Ji-eun");
+        testMember.setDescription("A talented South Korean singer-songwriter and actress");
         testMember.setBirthDate(LocalDate.of(1993, 5, 16));
         testMember.setSoloArtist(testSoloArtist);
     }
