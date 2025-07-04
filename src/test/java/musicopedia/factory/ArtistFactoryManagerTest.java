@@ -1,6 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class ArtistFactoryManagerTest {
         );
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("John Doe");
         dto.setType(ArtistType.SOLO);
         dto.setPrimaryLanguage("English");
@@ -57,7 +57,7 @@ class ArtistFactoryManagerTest {
         );
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("The Beatles");
         dto.setType(ArtistType.GROUP);
         dto.setGenre("Rock");
@@ -79,7 +79,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new SoloArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO invalidDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO invalidDto = new ArtistRequestDTO();
         invalidDto.setType(ArtistType.SOLO);
         // Missing required fields
 
@@ -95,7 +95,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(); // Empty list
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
 
         // When & Then
@@ -110,7 +110,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new SoloArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(null); // Null type
 
         // When & Then
@@ -126,7 +126,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new SoloArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(null); // Null type
 
         // When & Then
@@ -142,7 +142,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(); // Empty list
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
 
         // When & Then
@@ -163,7 +163,7 @@ class ArtistFactoryManagerTest {
         );
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("Disney");
         dto.setType(ArtistType.FRANCHISE);
         dto.setGenre("Various");
@@ -190,7 +190,7 @@ class ArtistFactoryManagerTest {
         );
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("Various Artists");
         dto.setType(ArtistType.VARIOUS);
         dto.setGenre("Mixed");
@@ -212,7 +212,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new GroupArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO validDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO validDto = new ArtistRequestDTO();
         validDto.setType(ArtistType.GROUP);
         validDto.setArtistName("Valid Group");
         validDto.setGenre("Rock");
@@ -230,7 +230,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new FranchiseArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO validDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO validDto = new ArtistRequestDTO();
         validDto.setType(ArtistType.FRANCHISE);
         validDto.setArtistName("Valid Franchise");
         validDto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -248,7 +248,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new VariousArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO validDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO validDto = new ArtistRequestDTO();
         validDto.setType(ArtistType.VARIOUS);
         validDto.setArtistName("Valid Various");
         validDto.setDescription("This compilation includes various artists from different genres and backgrounds");
@@ -266,7 +266,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new SoloArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO validDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO validDto = new ArtistRequestDTO();
         validDto.setType(ArtistType.SOLO);
         validDto.setArtistName("Valid Solo Artist");
         validDto.setPrimaryLanguage("English");
@@ -286,7 +286,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new GroupArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO invalidDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO invalidDto = new ArtistRequestDTO();
         invalidDto.setType(ArtistType.GROUP);
         invalidDto.setArtistName("Valid Group");
         // Missing genre - should fail validation first
@@ -304,7 +304,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new GroupArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO invalidDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO invalidDto = new ArtistRequestDTO();
         invalidDto.setType(ArtistType.GROUP);
         invalidDto.setArtistName("Valid Group");
         invalidDto.setGenre("Rock"); // Genre is provided
@@ -323,7 +323,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new FranchiseArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO invalidDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO invalidDto = new ArtistRequestDTO();
         invalidDto.setType(ArtistType.FRANCHISE);
         invalidDto.setArtistName("Valid Franchise");
         invalidDto.setDescription("Short description"); // Too short - should fail validation
@@ -341,7 +341,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new VariousArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO invalidDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO invalidDto = new ArtistRequestDTO();
         invalidDto.setType(ArtistType.VARIOUS);
         invalidDto.setArtistName("Valid Various");
         invalidDto.setDescription("This compilation includes various artists from different genres and backgrounds");
@@ -360,7 +360,7 @@ class ArtistFactoryManagerTest {
         List<ArtistFactory> factories = Arrays.asList(new SoloArtistFactory());
         artistFactoryManager = new ArtistFactoryManager(factories);
 
-        CreateArtistRequestDTO invalidDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO invalidDto = new ArtistRequestDTO();
         invalidDto.setType(ArtistType.SOLO);
         invalidDto.setArtistName(""); // Empty name
         invalidDto.setPrimaryLanguage("English");

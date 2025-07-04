@@ -1,9 +1,8 @@
 package musicopedia.controller;
 
-import musicopedia.dto.request.CreateMemberRequestDTO;
-import musicopedia.dto.request.UpdateMemberRequestDTO;
+import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
-import musicopedia.dto.response.MemberSummaryDTO;
+
 import musicopedia.mapper.MemberMapper;
 import musicopedia.model.Member;
 import musicopedia.service.MemberService;
@@ -30,7 +29,7 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MemberSummaryDTO>> getAllMembers() {
+    public ResponseEntity<List<MemberResponseDTO>> getAllMembers() {
         List<Member> members = memberService.findAll();
         return ResponseEntity.ok(memberMapper.toSummaryDTOList(members));
     }
@@ -43,13 +42,13 @@ public class MemberController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<MemberSummaryDTO>> searchMembersByName(@RequestParam("name") String name) {
+    public ResponseEntity<List<MemberResponseDTO>> searchMembersByName(@RequestParam("name") String name) {
         List<Member> members = memberService.findByNameContaining(name);
         return ResponseEntity.ok(memberMapper.toSummaryDTOList(members));
     }
 
     @GetMapping("/birthdate")
-    public ResponseEntity<List<MemberSummaryDTO>> getMembersByBirthDateRange(
+    public ResponseEntity<List<MemberResponseDTO>> getMembersByBirthDateRange(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         List<Member> members = memberService.findByBirthDateBetween(startDate, endDate);
@@ -57,22 +56,28 @@ public class MemberController {
     }
 
     @GetMapping("/with-solo-career")
-    public ResponseEntity<List<MemberSummaryDTO>> getMembersWithSoloCareer() {
+    public ResponseEntity<List<MemberResponseDTO>> getMembersWithSoloCareer() {
         List<Member> members = memberService.findBySoloArtistNotNull();
         return ResponseEntity.ok(memberMapper.toSummaryDTOList(members));
     }
 
     @PostMapping
-    public ResponseEntity<MemberResponseDTO> createMember(@RequestBody CreateMemberRequestDTO createMemberRequestDTO) {
+    public ResponseEntity<MemberResponseDTO> createMember(@RequestBody MemberRequestDTO createMemberRequestDTO) {
         Member member = memberMapper.toEntity(createMemberRequestDTO);
         Member savedMember = memberService.save(member);
         return ResponseEntity.status(HttpStatus.CREATED).body(memberMapper.toResponseDTO(savedMember));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MemberResponseDTO> updateMember(@PathVariable("id") UUID memberId, @RequestBody UpdateMemberRequestDTO updateMemberRequestDTO) {
-        if (!updateMemberRequestDTO.getMemberId().equals(memberId)) {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<MemberResponseDTO> updateMember(@PathVariable("id") UUID memberId, @RequestBody MemberRequestDTO updateMemberRequestDTO) {
+        // If memberId is provided in the request body, it must match the path variable
+        if (updateMemberRequestDTO.getMemberId() != null) {
+            if (!updateMemberRequestDTO.getMemberId().equals(memberId)) {
+                return ResponseEntity.badRequest().build();
+            }
+        } else {
+            // Set the memberId from the path variable if not provided in the request body
+            updateMemberRequestDTO.setMemberId(memberId);
         }
         
         Optional<Member> existingMember = memberService.findById(memberId);

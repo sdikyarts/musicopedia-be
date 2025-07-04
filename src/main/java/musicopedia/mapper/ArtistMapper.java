@@ -1,9 +1,8 @@
 package musicopedia.mapper;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
-import musicopedia.dto.request.UpdateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.dto.response.ArtistResponseDTO;
-import musicopedia.dto.response.ArtistSummaryDTO;
+
 import musicopedia.model.Artist;
 import musicopedia.model.Groups;
 import musicopedia.model.Solo;
@@ -20,12 +19,12 @@ public class ArtistMapper {
         this.artistFactoryManager = artistFactoryManager;
     }
 
-    public Artist toEntity(CreateArtistRequestDTO dto) {
+    public Artist toEntity(ArtistRequestDTO dto) {
         // Use the factory pattern to create artist with type-specific logic
         return artistFactoryManager.createArtist(dto);
     }
 
-    public void updateEntityFromDto(Artist artist, UpdateArtistRequestDTO dto) {
+    public void updateEntityFromDto(Artist artist, ArtistRequestDTO dto) {
         if (dto.getArtistName() != null) {
             artist.setArtistName(dto.getArtistName());
         }
@@ -83,8 +82,8 @@ public class ArtistMapper {
         return dto;
     }
 
-    public ArtistSummaryDTO toSummaryDto(Artist artist) {
-        ArtistSummaryDTO dto = new ArtistSummaryDTO();
+    public ArtistResponseDTO toSummaryDto(Artist artist) {
+        ArtistResponseDTO dto = new ArtistResponseDTO();
         dto.setArtistId(artist.getArtistId());
         dto.setArtistName(artist.getArtistName());
         dto.setType(artist.getType());
@@ -94,7 +93,7 @@ public class ArtistMapper {
         return dto;
     }
 
-    public Solo createSoloFromDto(CreateArtistRequestDTO dto, Artist artist) {
+    public Solo createSoloFromDto(ArtistRequestDTO dto, Artist artist) {
         if (dto.getType() != ArtistType.SOLO) {
             return null;
         }
@@ -108,7 +107,7 @@ public class ArtistMapper {
         return solo;
     }
 
-    public Groups createGroupFromDto(CreateArtistRequestDTO dto, Artist artist) {
+    public Groups createGroupFromDto(ArtistRequestDTO dto, Artist artist) {
         if (dto.getType() != ArtistType.GROUP) {
             return null;
         }

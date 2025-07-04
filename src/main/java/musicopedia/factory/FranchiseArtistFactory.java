@@ -1,7 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
-import musicopedia.model.Artist;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.model.enums.ArtistType;
 import org.springframework.stereotype.Component;
 
@@ -11,28 +10,15 @@ import org.springframework.stereotype.Component;
  * (like virtual idols, fictional characters, or brand-based artists).
  */
 @Component
-public class FranchiseArtistFactory implements ArtistFactory {
+public class FranchiseArtistFactory extends AbstractArtistFactory {
 
     @Override
-    public Artist createArtist(CreateArtistRequestDTO dto) {
-        // Note: Validation is done separately via validateArtistData()
-        // This method focuses only on object creation
-        
-        Artist artist = new Artist();
-        artist.setArtistName(dto.getArtistName());
-        artist.setType(ArtistType.FRANCHISE);
-        artist.setSpotifyId(dto.getSpotifyId());
-        artist.setDescription(dto.getDescription());
-        artist.setImage(dto.getImage());
-        artist.setPrimaryLanguage(dto.getPrimaryLanguage());
-        artist.setGenre(dto.getGenre());
-        artist.setOriginCountry(dto.getOriginCountry());
-        
-        return artist;
+    protected ArtistType getArtistType() {
+        return ArtistType.FRANCHISE;
     }
 
     @Override
-    public void validateArtistData(CreateArtistRequestDTO dto) {
+    public void validateArtistData(ArtistRequestDTO dto) {
         if (dto.getArtistName() == null || dto.getArtistName().trim().isEmpty()) {
             throw new IllegalArgumentException("Franchise artist name cannot be empty");
         }
@@ -51,10 +37,5 @@ public class FranchiseArtistFactory implements ArtistFactory {
         if (dto.getOriginCountry() == null || dto.getOriginCountry().trim().isEmpty()) {
             throw new IllegalArgumentException("Origin country is required for franchise artists");
         }
-    }
-
-    @Override
-    public boolean supports(CreateArtistRequestDTO dto) {
-        return dto.getType() == ArtistType.FRANCHISE;
     }
 }

@@ -3,7 +3,7 @@ package musicopedia.controller;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.service.ArtistService;
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +52,7 @@ public class ArtistController {
     }
 
     @PostMapping
-    public ResponseEntity<Artist> createArtist(@RequestBody CreateArtistRequestDTO createRequest) {
+    public ResponseEntity<Artist> createArtist(@RequestBody ArtistRequestDTO createRequest) {
         try {
             // Using factory pattern through service layer for type-specific creation and validation
             Artist savedArtist = artistService.createArtist(createRequest);

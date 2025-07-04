@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.service.ArtistService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,14 +47,14 @@ public class ArtistControllerSimpleTest {
         testArtist.setArtistName("IU");
         testArtist.setType(ArtistType.SOLO);
 
-        CreateArtistRequestDTO createRequest = new CreateArtistRequestDTO();
+        ArtistRequestDTO createRequest = new ArtistRequestDTO();
         createRequest.setArtistName("IU");
         createRequest.setType(ArtistType.SOLO);
         createRequest.setGenre("K-Pop");
         createRequest.setPrimaryLanguage("Korean");
         createRequest.setOriginCountry("KR");
 
-        when(artistService.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(testArtist);
+        when(artistService.createArtist(any(ArtistRequestDTO.class))).thenReturn(testArtist);
 
         String jsonContent = objectMapper.writeValueAsString(createRequest);
 
@@ -64,6 +64,6 @@ public class ArtistControllerSimpleTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()));
 
-        verify(artistService, times(1)).createArtist(any(CreateArtistRequestDTO.class));
+        verify(artistService, times(1)).createArtist(any(ArtistRequestDTO.class));
     }
 }

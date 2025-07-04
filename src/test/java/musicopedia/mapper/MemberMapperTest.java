@@ -1,9 +1,8 @@
 package musicopedia.mapper;
 
-import musicopedia.dto.request.CreateMemberRequestDTO;
-import musicopedia.dto.request.UpdateMemberRequestDTO;
+import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
-import musicopedia.dto.response.MemberSummaryDTO;
+
 import musicopedia.factory.MemberFactory;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
@@ -38,8 +37,8 @@ class MemberMapperTest {
     private Member testMember;
     private Artist soloArtist;
     private Artist groupArtist;
-    private CreateMemberRequestDTO createDto;
-    private UpdateMemberRequestDTO updateDto;
+    private MemberRequestDTO createDto;
+    private MemberRequestDTO updateDto;
 
     @BeforeEach
     void setUp() {
@@ -66,13 +65,13 @@ class MemberMapperTest {
         groupArtist.setType(ArtistType.GROUP);
 
         // Setup DTOs
-        createDto = new CreateMemberRequestDTO();
+        createDto = new MemberRequestDTO();
         createDto.setFullName("New Member");
         createDto.setDescription("New description");
         createDto.setImage("new-image.jpg");
         createDto.setBirthDate(LocalDate.of(1995, 5, 15));
 
-        updateDto = new UpdateMemberRequestDTO();
+        updateDto = new MemberRequestDTO();
         updateDto.setFullName("Updated Member");
         updateDto.setDescription("Updated description");
         updateDto.setImage("updated-image.jpg");
@@ -280,7 +279,7 @@ class MemberMapperTest {
     @Test
     void toSummaryDTO_WithoutSoloArtist_ShouldMapCorrectly() {
         // When
-        MemberSummaryDTO result = memberMapper.toSummaryDTO(testMember);
+        MemberResponseDTO result = memberMapper.toSummaryDTO(testMember);
 
         // Then
         assertNotNull(result);
@@ -297,7 +296,7 @@ class MemberMapperTest {
         testMember.setSoloArtist(soloArtist);
 
         // When
-        MemberSummaryDTO result = memberMapper.toSummaryDTO(testMember);
+        MemberResponseDTO result = memberMapper.toSummaryDTO(testMember);
 
         // Then
         assertNotNull(result);
@@ -362,7 +361,7 @@ class MemberMapperTest {
         List<Member> emptyList = List.of();
 
         // When
-        List<MemberSummaryDTO> result = memberMapper.toSummaryDTOList(emptyList);
+        List<MemberResponseDTO> result = memberMapper.toSummaryDTOList(emptyList);
 
         // Then
         assertNotNull(result);
@@ -387,20 +386,20 @@ class MemberMapperTest {
         List<Member> members = Arrays.asList(member1, member2);
 
         // When
-        List<MemberSummaryDTO> result = memberMapper.toSummaryDTOList(members);
+        List<MemberResponseDTO> result = memberMapper.toSummaryDTOList(members);
 
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
 
-        MemberSummaryDTO dto1 = result.get(0);
+        MemberResponseDTO dto1 = result.get(0);
         assertEquals(member1.getMemberId(), dto1.getMemberId());
         assertEquals("Member 1", dto1.getFullName());
         assertEquals("image1.jpg", dto1.getImage());
         assertTrue(dto1.getHasOfficialSoloDebut());
         assertEquals(soloArtist.getArtistName(), dto1.getSoloArtistName());
 
-        MemberSummaryDTO dto2 = result.get(1);
+        MemberResponseDTO dto2 = result.get(1);
         assertEquals(member2.getMemberId(), dto2.getMemberId());
         assertEquals("Member 2", dto2.getFullName());
         assertEquals("image2.jpg", dto2.getImage());
@@ -414,13 +413,13 @@ class MemberMapperTest {
         List<Member> singleMemberList = List.of(testMember);
 
         // When
-        List<MemberSummaryDTO> result = memberMapper.toSummaryDTOList(singleMemberList);
+        List<MemberResponseDTO> result = memberMapper.toSummaryDTOList(singleMemberList);
 
         // Then
         assertNotNull(result);
         assertEquals(1, result.size());
         
-        MemberSummaryDTO dto = result.get(0);
+        MemberResponseDTO dto = result.get(0);
         assertEquals(testMember.getMemberId(), dto.getMemberId());
         assertEquals(testMember.getFullName(), dto.getFullName());
         assertEquals(testMember.getImage(), dto.getImage());

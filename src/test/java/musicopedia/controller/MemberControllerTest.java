@@ -2,10 +2,9 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import musicopedia.dto.request.CreateMemberRequestDTO;
-import musicopedia.dto.request.UpdateMemberRequestDTO;
+import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
-import musicopedia.dto.response.MemberSummaryDTO;
+
 import musicopedia.mapper.MemberMapper;
 import musicopedia.model.Member;
 import musicopedia.service.MemberService;
@@ -44,7 +43,7 @@ public class MemberControllerTest {
     private UUID testId;
     private Member testMember;
     private MemberResponseDTO testMemberResponseDTO;
-    private MemberSummaryDTO testMemberSummaryDTO;
+    private MemberResponseDTO testMemberSummaryDTO;
 
     @BeforeEach
     void setup() {
@@ -67,7 +66,7 @@ public class MemberControllerTest {
         testMemberResponseDTO.setBirthDate(LocalDate.of(1995, 1, 3));
         testMemberResponseDTO.setHasOfficialSoloDebut(false);
         
-        testMemberSummaryDTO = new MemberSummaryDTO();
+        testMemberSummaryDTO = new MemberResponseDTO();
         testMemberSummaryDTO.setMemberId(testId);
         testMemberSummaryDTO.setFullName("Jisoo");
         testMemberSummaryDTO.setHasOfficialSoloDebut(false);
@@ -76,7 +75,7 @@ public class MemberControllerTest {
     @Test
     void testGetAllMembers() throws Exception {
         List<Member> members = Arrays.asList(testMember);
-        List<MemberSummaryDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
+        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         
         when(memberService.findAll()).thenReturn(members);
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
@@ -118,7 +117,7 @@ public class MemberControllerTest {
     @Test
     void testSearchMembersByName() throws Exception {
         List<Member> members = Arrays.asList(testMember);
-        List<MemberSummaryDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
+        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         
         when(memberService.findByNameContaining("Jisoo")).thenReturn(members);
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
@@ -136,7 +135,7 @@ public class MemberControllerTest {
     @Test
     void testGetMembersByBirthDateRange() throws Exception {
         List<Member> members = Arrays.asList(testMember);
-        List<MemberSummaryDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
+        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         LocalDate startDate = LocalDate.of(1990, 1, 1);
         LocalDate endDate = LocalDate.of(1996, 12, 31);
         
@@ -157,7 +156,7 @@ public class MemberControllerTest {
     @Test
     void testGetMembersWithSoloCareer() throws Exception {
         List<Member> members = Arrays.asList(testMember);
-        List<MemberSummaryDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
+        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         
         when(memberService.findBySoloArtistNotNull()).thenReturn(members);
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
@@ -173,11 +172,11 @@ public class MemberControllerTest {
 
     @Test
     void testCreateMember() throws Exception {
-        CreateMemberRequestDTO createDTO = new CreateMemberRequestDTO();
+        MemberRequestDTO createDTO = new MemberRequestDTO();
         createDTO.setFullName("Jisoo");
         createDTO.setBirthDate(LocalDate.of(1995, 1, 3));
         
-        when(memberMapper.toEntity(any(CreateMemberRequestDTO.class))).thenReturn(testMember);
+        when(memberMapper.toEntity(any(MemberRequestDTO.class))).thenReturn(testMember);
         when(memberService.save(any(Member.class))).thenReturn(testMember);
         when(memberMapper.toResponseDTO(testMember)).thenReturn(testMemberResponseDTO);
 
@@ -189,14 +188,14 @@ public class MemberControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.memberId").value(testId.toString()));
 
-        verify(memberMapper, times(1)).toEntity(any(CreateMemberRequestDTO.class));
+        verify(memberMapper, times(1)).toEntity(any(MemberRequestDTO.class));
         verify(memberService, times(1)).save(any(Member.class));
         verify(memberMapper, times(1)).toResponseDTO(testMember);
     }
 
     @Test
     void testUpdateMember() throws Exception {
-        UpdateMemberRequestDTO updateDTO = new UpdateMemberRequestDTO();
+        MemberRequestDTO updateDTO = new MemberRequestDTO();
         updateDTO.setMemberId(testId);
         updateDTO.setFullName("Jisoo");
         updateDTO.setBirthDate(LocalDate.of(1995, 1, 3));
@@ -214,7 +213,7 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$.memberId").value(testId.toString()));
 
         verify(memberService, times(1)).findById(testId);
-        verify(memberMapper, times(1)).updateEntityFromDto(any(Member.class), any(UpdateMemberRequestDTO.class));
+        verify(memberMapper, times(1)).updateEntityFromDto(any(Member.class), any(MemberRequestDTO.class));
         verify(memberService, times(1)).update(any(Member.class));
         verify(memberMapper, times(1)).toResponseDTO(testMember);
     }
@@ -222,7 +221,7 @@ public class MemberControllerTest {
     @Test
     void testUpdateMemberWithMismatchedId() throws Exception {
         UUID differentId = UUID.randomUUID();
-        UpdateMemberRequestDTO updateDTO = new UpdateMemberRequestDTO();
+        MemberRequestDTO updateDTO = new MemberRequestDTO();
         updateDTO.setMemberId(differentId);
 
         String jsonContent = objectMapper.writeValueAsString(updateDTO);
@@ -238,7 +237,7 @@ public class MemberControllerTest {
 
     @Test
     void testUpdateMemberNotFound() throws Exception {
-        UpdateMemberRequestDTO updateDTO = new UpdateMemberRequestDTO();
+        MemberRequestDTO updateDTO = new MemberRequestDTO();
         updateDTO.setMemberId(testId);
         
         when(memberService.findById(testId)).thenReturn(Optional.empty());
@@ -252,6 +251,31 @@ public class MemberControllerTest {
 
         verify(memberService, times(1)).findById(testId);
         verify(memberService, never()).update(any(Member.class));
+    }
+
+    @Test
+    void testUpdateMemberWithNullMemberIdInBody() throws Exception {
+        MemberRequestDTO updateDTO = new MemberRequestDTO();
+        updateDTO.setMemberId(null); // memberId is null in request body
+        updateDTO.setFullName("Updated Name");
+        updateDTO.setBirthDate(LocalDate.of(1995, 1, 3));
+        
+        when(memberService.findById(testId)).thenReturn(Optional.of(testMember));
+        when(memberService.update(any(Member.class))).thenReturn(testMember);
+        when(memberMapper.toResponseDTO(testMember)).thenReturn(testMemberResponseDTO);
+
+        String jsonContent = objectMapper.writeValueAsString(updateDTO);
+
+        mockMvc.perform(put("/api/members/{id}", testId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonContent))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.memberId").value(testId.toString()));
+
+        verify(memberService, times(1)).findById(testId);
+        verify(memberMapper, times(1)).updateEntityFromDto(any(Member.class), any(MemberRequestDTO.class));
+        verify(memberService, times(1)).update(any(Member.class));
+        verify(memberMapper, times(1)).toResponseDTO(testMember);
     }
 
     @Test

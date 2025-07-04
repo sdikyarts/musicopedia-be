@@ -1,6 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.model.enums.ArtistType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void soloArtistRequiresPrimaryLanguage() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName("Valid Name");
         // Missing primaryLanguage
@@ -43,7 +43,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistRequiresDescription() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("Valid Group Name");
         dto.setGenre("Rock");
@@ -58,7 +58,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistRequiresDetailedDescription() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Virtual Idol");
         dto.setDescription("Too short"); // Less than 50 characters
@@ -73,7 +73,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistRequiresGenre() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Various Artists Compilation");
         dto.setDescription("A compilation of various artists and songs");
@@ -88,7 +88,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void soloArtistNameCannotExceed100Characters() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName("A".repeat(101)); // 101 characters - exceeds limit
         dto.setPrimaryLanguage("English");
@@ -102,7 +102,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void soloArtistNameCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName(""); // Empty name
         dto.setPrimaryLanguage("English");
@@ -116,7 +116,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void soloArtistNameCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName(null); // Null name
         dto.setPrimaryLanguage("English");
@@ -130,7 +130,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void soloArtistNameCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName("   "); // Whitespace only
         dto.setPrimaryLanguage("English");
@@ -144,7 +144,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void soloArtistPrimaryLanguageCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName("Valid Artist");
         dto.setPrimaryLanguage(""); // Empty primary language
@@ -158,7 +158,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void soloArtistPrimaryLanguageCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName("Valid Artist");
         dto.setPrimaryLanguage("   "); // Whitespace only
@@ -172,7 +172,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validSoloArtistWithMaxLengthName() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName("A".repeat(100)); // Exactly 100 characters - should be valid
         dto.setPrimaryLanguage("English");
@@ -187,7 +187,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validSoloArtistPassesValidation() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setArtistName("Taylor Swift");
         dto.setPrimaryLanguage("English");
@@ -204,7 +204,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validFranchiseArtistPassesValidation() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Hatsune Miku");
         dto.setDescription("A virtual singer developed by Crypton Future Media using Yamaha's Vocaloid voice synthesis technology. Known for her distinctive turquoise twin-tails and digital concerts.");
@@ -220,7 +220,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistNameCannotExceed150Characters() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("A".repeat(151)); // 151 characters - exceeds limit
         dto.setGenre("Rock");
@@ -235,7 +235,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistNameCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName(""); // Empty name
         dto.setGenre("Rock");
@@ -250,7 +250,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistNameCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName(null); // Null name
         dto.setGenre("Rock");
@@ -265,7 +265,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistNameCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("   "); // Whitespace only
         dto.setGenre("Rock");
@@ -280,7 +280,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistGenreCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("Valid Group");
         dto.setGenre(""); // Empty genre
@@ -295,7 +295,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistGenreCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("Valid Group");
         dto.setGenre(null); // Null genre
@@ -310,7 +310,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistGenreCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("Valid Group");
         dto.setGenre("   "); // Whitespace only
@@ -325,7 +325,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistDescriptionCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("Valid Group");
         dto.setGenre("Rock");
@@ -340,7 +340,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistDescriptionCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("Valid Group");
         dto.setGenre("Rock");
@@ -355,7 +355,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void groupArtistDescriptionCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("Valid Group");
         dto.setGenre("Rock");
@@ -370,7 +370,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validGroupArtistWithMaxLengthName() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("A".repeat(150)); // Exactly 150 characters - should be valid
         dto.setGenre("Rock");
@@ -385,7 +385,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validGroupArtistPassesValidation() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setArtistName("The Beatles");
         dto.setGenre("Rock");
@@ -402,7 +402,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistNameCannotExceed200Characters() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("A".repeat(201)); // 201 characters - exceeds limit
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -417,7 +417,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistNameCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName(""); // Empty name
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -432,7 +432,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistNameCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName(null); // Null name
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -447,7 +447,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistNameCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("   "); // Whitespace only
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -462,7 +462,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistDescriptionCannotBeTooShort() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Valid Franchise");
         dto.setDescription("Short description"); // Less than 50 characters
@@ -477,7 +477,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistDescriptionCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Valid Franchise");
         dto.setDescription(null); // Null description
@@ -492,7 +492,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistOriginCountryCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Valid Franchise");
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -507,7 +507,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistOriginCountryCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Valid Franchise");
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -522,7 +522,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void franchiseArtistOriginCountryCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Valid Franchise");
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -537,7 +537,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validFranchiseArtistWithMaxLengthName() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("A".repeat(200)); // Exactly 200 characters - should be valid
         dto.setDescription("This is a detailed description of the franchise that contains more than fifty characters to meet validation requirements");
@@ -553,7 +553,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validFranchiseArtistWithMinimumDescription() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.FRANCHISE);
         dto.setArtistName("Virtual Singer");
         dto.setDescription("A".repeat(50)); // Exactly 50 characters - minimum requirement
@@ -569,7 +569,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistNameCannotExceed300Characters() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("A".repeat(301)); // 301 characters - exceeds limit
         dto.setGenre("Mixed");
@@ -584,7 +584,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistNameCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName(""); // Empty name
         dto.setGenre("Mixed");
@@ -599,7 +599,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistNameCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName(null); // Null name
         dto.setGenre("Mixed");
@@ -614,7 +614,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistNameCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("   "); // Whitespace only
         dto.setGenre("Mixed");
@@ -629,7 +629,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistDescriptionCannotBeTooShort() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Various Artists Compilation");
         dto.setGenre("Mixed");
@@ -644,7 +644,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistDescriptionCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Various Artists Compilation");
         dto.setGenre("Mixed");
@@ -659,7 +659,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistGenreCannotBeEmpty() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Various Artists Compilation");
         dto.setGenre(""); // Empty genre
@@ -674,7 +674,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistGenreCannotBeNull() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Various Artists Compilation");
         dto.setGenre(null); // Null genre
@@ -689,7 +689,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void variousArtistGenreCannotBeWhitespaceOnly() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Various Artists Compilation");
         dto.setGenre("   "); // Whitespace only
@@ -704,7 +704,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validVariousArtistWithMaxLengthName() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("A".repeat(300)); // Exactly 300 characters - should be valid
         dto.setGenre("Mixed");
@@ -719,7 +719,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validVariousArtistWithMinimumDescription() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Various Artists Compilation");
         dto.setGenre("Mixed");
@@ -734,7 +734,7 @@ class ArtistFactoryValidationTest {
 
     @Test
     void validVariousArtistPassesValidation() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.VARIOUS);
         dto.setArtistName("Now That's What I Call Music!");
         dto.setGenre("Pop/Rock/Dance");
@@ -754,15 +754,15 @@ class ArtistFactoryValidationTest {
     void variousArtistFactoryDoesNotSupportOtherTypes() {
         VariousArtistFactory factory = new VariousArtistFactory();
         
-        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO soloDto = new ArtistRequestDTO();
         soloDto.setType(ArtistType.SOLO);
         assertFalse(factory.supports(soloDto));
         
-        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO groupDto = new ArtistRequestDTO();
         groupDto.setType(ArtistType.GROUP);
         assertFalse(factory.supports(groupDto));
         
-        CreateArtistRequestDTO franchiseDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO franchiseDto = new ArtistRequestDTO();
         franchiseDto.setType(ArtistType.FRANCHISE);
         assertFalse(factory.supports(franchiseDto));
     }
@@ -771,15 +771,15 @@ class ArtistFactoryValidationTest {
     void soloArtistFactoryDoesNotSupportOtherTypes() {
         SoloArtistFactory factory = new SoloArtistFactory();
         
-        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO groupDto = new ArtistRequestDTO();
         groupDto.setType(ArtistType.GROUP);
         assertFalse(factory.supports(groupDto));
         
-        CreateArtistRequestDTO variousDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO variousDto = new ArtistRequestDTO();
         variousDto.setType(ArtistType.VARIOUS);
         assertFalse(factory.supports(variousDto));
         
-        CreateArtistRequestDTO franchiseDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO franchiseDto = new ArtistRequestDTO();
         franchiseDto.setType(ArtistType.FRANCHISE);
         assertFalse(factory.supports(franchiseDto));
     }
@@ -788,15 +788,15 @@ class ArtistFactoryValidationTest {
     void groupArtistFactoryDoesNotSupportOtherTypes() {
         GroupArtistFactory factory = new GroupArtistFactory();
         
-        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO soloDto = new ArtistRequestDTO();
         soloDto.setType(ArtistType.SOLO);
         assertFalse(factory.supports(soloDto));
         
-        CreateArtistRequestDTO variousDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO variousDto = new ArtistRequestDTO();
         variousDto.setType(ArtistType.VARIOUS);
         assertFalse(factory.supports(variousDto));
         
-        CreateArtistRequestDTO franchiseDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO franchiseDto = new ArtistRequestDTO();
         franchiseDto.setType(ArtistType.FRANCHISE);
         assertFalse(factory.supports(franchiseDto));
     }
@@ -805,15 +805,15 @@ class ArtistFactoryValidationTest {
     void franchiseArtistFactoryDoesNotSupportOtherTypes() {
         FranchiseArtistFactory factory = new FranchiseArtistFactory();
         
-        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO soloDto = new ArtistRequestDTO();
         soloDto.setType(ArtistType.SOLO);
         assertFalse(factory.supports(soloDto));
         
-        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO groupDto = new ArtistRequestDTO();
         groupDto.setType(ArtistType.GROUP);
         assertFalse(factory.supports(groupDto));
         
-        CreateArtistRequestDTO variousDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO variousDto = new ArtistRequestDTO();
         variousDto.setType(ArtistType.VARIOUS);
         assertFalse(factory.supports(variousDto));
     }

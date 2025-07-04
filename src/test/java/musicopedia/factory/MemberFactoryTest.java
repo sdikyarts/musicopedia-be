@@ -1,6 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateMemberRequestDTO;
+import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
 import musicopedia.model.enums.ArtistType;
@@ -26,7 +26,7 @@ class MemberFactoryTest {
 
     private MemberFactory memberFactory;
 
-    private CreateMemberRequestDTO validDto;
+    private MemberRequestDTO validDto;
     private Artist soloArtist;
     private Artist groupArtist;
 
@@ -35,7 +35,7 @@ class MemberFactoryTest {
         memberFactory = new MemberFactory(artistService);
         
         // Setup valid DTO
-        validDto = new CreateMemberRequestDTO();
+        validDto = new MemberRequestDTO();
         validDto.setFullName("John Doe");
         validDto.setDescription("A talented member");
         validDto.setImage("http://example.com/image.jpg");
@@ -329,7 +329,7 @@ class MemberFactoryTest {
     @Test
     void createMember_WithMinimalValidData_ShouldCreateMember() {
         // Given
-        CreateMemberRequestDTO minimalDto = new CreateMemberRequestDTO();
+        MemberRequestDTO minimalDto = new MemberRequestDTO();
         minimalDto.setFullName("Jane Doe");
         // All other fields are null
 
