@@ -1,21 +1,16 @@
 package musicopedia.dto.response;
 
 import lombok.Data;
-
-import java.time.LocalDate;
-import java.util.UUID;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import musicopedia.dto.common.BaseMemberDTO;
 
 @Data
-public class MemberResponseDTO {
-
-    private UUID memberId;
-    private String fullName;
-    private String description;
-    private String image;
-    private LocalDate birthDate;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class MemberResponseDTO extends BaseMemberDTO {
     
-    // Solo artist information if they have an official solo debut
-    private UUID soloArtistId;
+    // Response-specific fields only
     private String soloArtistName;
     private Boolean hasOfficialSoloDebut;
 }

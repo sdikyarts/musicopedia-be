@@ -1,20 +1,14 @@
 package musicopedia.dto.request;
 
 import lombok.Data;
-
-import java.time.LocalDate;
-import java.util.UUID;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import musicopedia.dto.common.BaseMemberDTO;
 
 @Data
-public class MemberRequestDTO {
-
-    // Required for updates, null for creates
-    private UUID memberId;
-    private String fullName;
-    private String description;
-    private String image;
-    private LocalDate birthDate;
-    
-    // Optional reference to solo artist if they have an official solo debut
-    private UUID soloArtistId;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class MemberRequestDTO extends BaseMemberDTO {
+    // All common fields are inherited from BaseMemberDTO
+    // No additional fields needed for this DTO
 }
