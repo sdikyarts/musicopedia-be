@@ -1,35 +1,14 @@
 package musicopedia.dto.request;
 
 import lombok.Data;
-import musicopedia.model.enums.ArtistGender;
-import musicopedia.model.enums.ArtistType;
-import musicopedia.model.enums.GroupActivityStatus;
-import musicopedia.model.enums.GroupAffiliationStatus;
-
-import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import musicopedia.dto.common.BaseArtistDTO;
 
 @Data
-public class ArtistRequestDTO {
-
-    private String artistName;
-    private ArtistType type;
-    private String spotifyId;
-
-    private String description;
-    private String image;
-    private String primaryLanguage;
-    private String genre;
-    private String originCountry;
-
-    // Solo-specific fields
-    private LocalDate birthDate;
-    private LocalDate deathDate;
-    private ArtistGender soloGender;
-    private GroupAffiliationStatus groupAffiliationStatus;
-
-    // Group-specific fields
-    private LocalDate formationDate;
-    private LocalDate disbandDate;
-    private ArtistGender groupGender;
-    private GroupActivityStatus activityStatus;
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class ArtistRequestDTO extends BaseArtistDTO {
+    // All common fields are inherited from BaseArtistDTO
+    // Add request-specific fields here if needed in the future
 }
