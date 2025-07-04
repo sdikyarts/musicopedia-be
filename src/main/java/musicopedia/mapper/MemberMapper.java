@@ -11,7 +11,6 @@ import musicopedia.service.ArtistService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class MemberMapper {
@@ -100,12 +99,12 @@ public class MemberMapper {
     public List<MemberResponseDTO> toResponseDTOList(List<Member> members) {
         return members.stream()
                 .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<MemberResponseDTO> toSummaryDTOList(List<Member> members) {
         return members.stream()
                 .map(this::toSummaryDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
