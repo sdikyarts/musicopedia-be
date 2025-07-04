@@ -1,9 +1,9 @@
 package musicopedia.mapper;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
-import musicopedia.dto.request.UpdateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.dto.response.ArtistResponseDTO;
-import musicopedia.dto.response.ArtistSummaryDTO;
+
 import musicopedia.model.Artist;
 import musicopedia.model.Groups;
 import musicopedia.model.Solo;
@@ -39,9 +39,9 @@ class ArtistMapperTest {
     }
 
     @Test
-    void testToEntity_FromCreateArtistRequestDTO() {
+    void testToEntity_FromArtistRequestDTO() {
         // Given
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("Test Artist");
         dto.setType(ArtistType.SOLO);
         dto.setSpotifyId("test123");
@@ -61,7 +61,7 @@ class ArtistMapperTest {
         expectedArtist.setGenre("Pop");
         expectedArtist.setOriginCountry("US");
 
-        when(artistFactoryManager.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(expectedArtist);
+        when(artistFactoryManager.createArtist(any(ArtistRequestDTO.class))).thenReturn(expectedArtist);
 
         // When
         Artist artist = artistMapper.toEntity(dto);
@@ -88,7 +88,7 @@ class ArtistMapperTest {
         existingArtist.setType(ArtistType.SOLO);
         existingArtist.setGenre("Rock");
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setArtistName("Updated Name");
         updateDto.setGenre("Jazz");
         updateDto.setOriginCountry("CA");
@@ -111,7 +111,7 @@ class ArtistMapperTest {
         existingArtist.setType(ArtistType.GROUP);
         existingArtist.setGenre("Rock");
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setGenre("Pop");
         // Other fields are null
 
@@ -196,7 +196,7 @@ class ArtistMapperTest {
         Artist artist = createTestArtist();
 
         // When
-        ArtistSummaryDTO summaryDto = artistMapper.toSummaryDto(artist);
+        ArtistResponseDTO summaryDto = artistMapper.toSummaryDto(artist);
 
         // Then
         assertNotNull(summaryDto);
@@ -211,7 +211,7 @@ class ArtistMapperTest {
     @Test
     void testCreateSoloFromDto_SoloType() {
         // Given
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setBirthDate(LocalDate.of(1990, 5, 15));
         dto.setDeathDate(LocalDate.of(2020, 10, 20));
@@ -235,7 +235,7 @@ class ArtistMapperTest {
     @Test
     void testCreateSoloFromDto_NonSoloType() {
         // Given
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setBirthDate(LocalDate.of(1990, 5, 15));
         dto.setSoloGender(ArtistGender.MALE);
@@ -252,7 +252,7 @@ class ArtistMapperTest {
     @Test
     void testCreateGroupFromDto_GroupType() {
         // Given
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.GROUP);
         dto.setFormationDate(LocalDate.of(2000, 1, 1));
         dto.setDisbandDate(LocalDate.of(2010, 12, 31));
@@ -276,7 +276,7 @@ class ArtistMapperTest {
     @Test
     void testCreateGroupFromDto_NonGroupType() {
         // Given
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setType(ArtistType.SOLO);
         dto.setFormationDate(LocalDate.of(2000, 1, 1));
         dto.setGroupGender(ArtistGender.MIXED);
@@ -340,7 +340,7 @@ class ArtistMapperTest {
         existingArtist.setGenre("Rock");
         existingArtist.setOriginCountry("ES");
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setArtistName("Updated Name");
         updateDto.setType(ArtistType.GROUP);
         updateDto.setSpotifyId("updated456");
@@ -379,7 +379,7 @@ class ArtistMapperTest {
         existingArtist.setOriginCountry("ES");
 
         // Test updating only artistName and genre
-        UpdateArtistRequestDTO updateDto1 = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto1 = new ArtistRequestDTO();
         updateDto1.setArtistName("New Name");
         updateDto1.setGenre("Pop");
 
@@ -404,7 +404,7 @@ class ArtistMapperTest {
         String originalName = existingArtist.getArtistName();
         ArtistType originalType = existingArtist.getType();
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setSpotifyId("new-spotify-id");
         updateDto.setDescription("New description");
 
@@ -425,7 +425,7 @@ class ArtistMapperTest {
         String originalGenre = existingArtist.getGenre();
         String originalCountry = existingArtist.getOriginCountry();
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setImage("new-image.png");
         updateDto.setPrimaryLanguage("French");
 
@@ -445,7 +445,7 @@ class ArtistMapperTest {
         Artist existingArtist = createTestArtist();
         String originalName = existingArtist.getArtistName();
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setType(ArtistType.FRANCHISE);
 
         // When
@@ -462,7 +462,7 @@ class ArtistMapperTest {
         Artist existingArtist = createTestArtist();
         String originalGenre = existingArtist.getGenre();
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setOriginCountry("CA");
 
         // When
@@ -478,7 +478,7 @@ class ArtistMapperTest {
         // Given
         Artist existingArtist = createTestArtist();
 
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setArtistName(""); // Empty string, not null
         updateDto.setDescription(""); // Empty string, not null
         updateDto.setGenre(""); // Empty string, not null

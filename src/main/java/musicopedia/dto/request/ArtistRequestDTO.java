@@ -9,7 +9,7 @@ import musicopedia.model.enums.GroupAffiliationStatus;
 import java.time.LocalDate;
 
 @Data
-public class CreateArtistRequestDTO {
+public class ArtistRequestDTO {
 
     private String artistName;
     private ArtistType type;

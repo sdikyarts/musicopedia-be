@@ -1,7 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
-import musicopedia.model.Artist;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.model.enums.ArtistType;
 import org.springframework.stereotype.Component;
 
@@ -10,28 +9,15 @@ import org.springframework.stereotype.Component;
  * Handles validation and creation logic specific to solo performers.
  */
 @Component
-public class SoloArtistFactory implements ArtistFactory {
+public class SoloArtistFactory extends AbstractArtistFactory {
 
     @Override
-    public Artist createArtist(CreateArtistRequestDTO dto) {
-        // Note: Validation is done separately via validateArtistData()
-        // This method focuses only on object creation
-        
-        Artist artist = new Artist();
-        artist.setArtistName(dto.getArtistName());
-        artist.setType(ArtistType.SOLO);
-        artist.setSpotifyId(dto.getSpotifyId());
-        artist.setDescription(dto.getDescription());
-        artist.setImage(dto.getImage());
-        artist.setPrimaryLanguage(dto.getPrimaryLanguage());
-        artist.setGenre(dto.getGenre());
-        artist.setOriginCountry(dto.getOriginCountry());
-        
-        return artist;
+    protected ArtistType getArtistType() {
+        return ArtistType.SOLO;
     }
 
     @Override
-    public void validateArtistData(CreateArtistRequestDTO dto) {
+    public void validateArtistData(ArtistRequestDTO dto) {
         if (dto.getArtistName() == null || dto.getArtistName().trim().isEmpty()) {
             throw new IllegalArgumentException("Solo artist name cannot be empty");
         }
@@ -45,10 +31,5 @@ public class SoloArtistFactory implements ArtistFactory {
         if (dto.getPrimaryLanguage() == null || dto.getPrimaryLanguage().trim().isEmpty()) {
             throw new IllegalArgumentException("Primary language is required for solo artists");
         }
-    }
-
-    @Override
-    public boolean supports(CreateArtistRequestDTO dto) {
-        return dto.getType() == ArtistType.SOLO;
     }
 }

@@ -2,7 +2,7 @@ package musicopedia.service;
 
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +33,7 @@ public interface ArtistService {
      * @param dto The creation request containing artist data
      * @return The created and saved Artist entity
      */
-    Artist createArtist(CreateArtistRequestDTO dto);
+    Artist createArtist(ArtistRequestDTO dto);
     
 
     void deleteById(UUID artistId);

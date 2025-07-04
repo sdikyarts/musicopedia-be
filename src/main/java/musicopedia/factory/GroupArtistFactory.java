@@ -1,7 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
-import musicopedia.model.Artist;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.model.enums.ArtistType;
 import org.springframework.stereotype.Component;
 
@@ -10,28 +9,15 @@ import org.springframework.stereotype.Component;
  * Handles validation and creation logic specific to musical groups.
  */
 @Component
-public class GroupArtistFactory implements ArtistFactory {
+public class GroupArtistFactory extends AbstractArtistFactory {
 
     @Override
-    public Artist createArtist(CreateArtistRequestDTO dto) {
-        // Note: Validation is done separately via validateArtistData()
-        // This method focuses only on object creation
-        
-        Artist artist = new Artist();
-        artist.setArtistName(dto.getArtistName());
-        artist.setType(ArtistType.GROUP);
-        artist.setSpotifyId(dto.getSpotifyId());
-        artist.setDescription(dto.getDescription());
-        artist.setImage(dto.getImage());
-        artist.setPrimaryLanguage(dto.getPrimaryLanguage());
-        artist.setGenre(dto.getGenre());
-        artist.setOriginCountry(dto.getOriginCountry());
-        
-        return artist;
+    protected ArtistType getArtistType() {
+        return ArtistType.GROUP;
     }
 
     @Override
-    public void validateArtistData(CreateArtistRequestDTO dto) {
+    public void validateArtistData(ArtistRequestDTO dto) {
         if (dto.getArtistName() == null || dto.getArtistName().trim().isEmpty()) {
             throw new IllegalArgumentException("Group name cannot be empty");
         }
@@ -50,10 +36,5 @@ public class GroupArtistFactory implements ArtistFactory {
         if (dto.getDescription() == null || dto.getDescription().trim().isEmpty()) {
             throw new IllegalArgumentException("Description is required for groups to explain their concept");
         }
-    }
-
-    @Override
-    public boolean supports(CreateArtistRequestDTO dto) {
-        return dto.getType() == ArtistType.GROUP;
     }
 }

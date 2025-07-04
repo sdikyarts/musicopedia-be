@@ -5,7 +5,7 @@ import musicopedia.model.enums.ArtistType;
 import musicopedia.repository.ArtistRepository;
 import musicopedia.service.impl.ArtistServiceImpl;
 import musicopedia.factory.ArtistFactoryManager;
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -144,13 +144,13 @@ public class ArtistServiceTest {
 
     @Test
     void testCreateArtist() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("New Artist");
         dto.setType(ArtistType.SOLO);
         dto.setGenre("Pop");
         dto.setPrimaryLanguage("English");
 
-        when(artistFactoryManager.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(testArtist);
+        when(artistFactoryManager.createArtist(any(ArtistRequestDTO.class))).thenReturn(testArtist);
         when(artistRepository.save(any(Artist.class))).thenReturn(testArtist);
 
         Artist result = artistService.createArtist(dto);

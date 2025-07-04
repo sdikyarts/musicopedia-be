@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.service.ArtistService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -140,14 +140,14 @@ public class ArtistControllerTest {
     @Test
     void testCreateArtist() throws Exception {
         // Create a proper DTO for the new factory-based endpoint
-        CreateArtistRequestDTO createRequest = new CreateArtistRequestDTO();
+        ArtistRequestDTO createRequest = new ArtistRequestDTO();
         createRequest.setArtistName("IU");
         createRequest.setType(ArtistType.SOLO);
         createRequest.setGenre("K-Pop");
         createRequest.setPrimaryLanguage("Korean");
         createRequest.setOriginCountry("KR");
 
-        when(artistService.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(testArtist);
+        when(artistService.createArtist(any(ArtistRequestDTO.class))).thenReturn(testArtist);
 
         String jsonContent = objectMapper.writeValueAsString(createRequest);
 
@@ -159,17 +159,17 @@ public class ArtistControllerTest {
                     System.out.println("Content: " + result.getResponse().getContentAsString());
                 });
 
-        verify(artistService, times(1)).createArtist(any(CreateArtistRequestDTO.class));
+        verify(artistService, times(1)).createArtist(any(ArtistRequestDTO.class));
     }
 
     @Test
     void testCreateArtistValidationError() throws Exception {
         // Test error handling
-        CreateArtistRequestDTO createRequest = new CreateArtistRequestDTO();
+        ArtistRequestDTO createRequest = new ArtistRequestDTO();
         createRequest.setArtistName("IU");
         createRequest.setType(ArtistType.SOLO);
 
-        when(artistService.createArtist(any(CreateArtistRequestDTO.class)))
+        when(artistService.createArtist(any(ArtistRequestDTO.class)))
                 .thenThrow(new IllegalArgumentException("Validation failed"));
 
         String jsonContent = objectMapper.writeValueAsString(createRequest);
@@ -179,7 +179,7 @@ public class ArtistControllerTest {
                         .content(jsonContent))
                 .andExpect(status().isBadRequest());
 
-        verify(artistService, times(1)).createArtist(any(CreateArtistRequestDTO.class));
+        verify(artistService, times(1)).createArtist(any(ArtistRequestDTO.class));
     }
 
     @Test

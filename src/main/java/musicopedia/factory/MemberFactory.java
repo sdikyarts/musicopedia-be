@@ -1,6 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateMemberRequestDTO;
+import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
 import musicopedia.model.enums.ArtistType;
@@ -17,10 +17,10 @@ public class MemberFactory {
     }
 
     /**
-     * Creates a new Member entity from a CreateMemberRequestDTO.
+     * Creates a new Member entity from a MemberRequestDTO.
      * Validates solo artist reference if provided.
      */
-    public Member createMember(CreateMemberRequestDTO dto) {
+    public Member createMember(MemberRequestDTO dto) {
         // Basic validation
         if (dto.getFullName() == null || dto.getFullName().trim().isEmpty()) {
             throw new IllegalArgumentException("Member full name is required");

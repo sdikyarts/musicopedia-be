@@ -1,6 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.model.Artist;
 
 /**
@@ -15,19 +15,19 @@ public interface ArtistFactory {
      * @param dto The creation request containing artist data
      * @return The created Artist entity
      */
-    Artist createArtist(CreateArtistRequestDTO dto);
+    Artist createArtist(ArtistRequestDTO dto);
     
     /**
      * Validates the artist data according to type-specific rules
      * @param dto The creation request to validate
      * @throws IllegalArgumentException if validation fails
      */
-    void validateArtistData(CreateArtistRequestDTO dto);
+    void validateArtistData(ArtistRequestDTO dto);
     
     /**
      * Checks if this factory can handle the given artist type
      * @param dto The creation request
      * @return true if this factory supports the artist type
      */
-    boolean supports(CreateArtistRequestDTO dto);
+    boolean supports(ArtistRequestDTO dto);
 }

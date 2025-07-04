@@ -6,8 +6,9 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-public class UpdateMemberRequestDTO {
+public class MemberRequestDTO {
 
+    // Required for updates, null for creates
     private UUID memberId;
     private String fullName;
     private String description;

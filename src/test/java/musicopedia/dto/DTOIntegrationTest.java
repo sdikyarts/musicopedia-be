@@ -1,9 +1,8 @@
 package musicopedia.dto;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
-import musicopedia.dto.request.UpdateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.dto.response.ArtistResponseDTO;
-import musicopedia.dto.response.ArtistSummaryDTO;
+
 import musicopedia.mapper.ArtistMapper;
 import musicopedia.factory.ArtistFactoryManager;
 import musicopedia.model.Artist;
@@ -44,7 +43,7 @@ class DTOIntegrationTest {
     @Test
     void testCompleteFlow_SoloArtist() {
         // Given - Create Request DTO
-        CreateArtistRequestDTO createDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO createDto = new ArtistRequestDTO();
         createDto.setArtistName("John Doe");
         createDto.setType(ArtistType.SOLO);
         createDto.setSpotifyId("johndoe123");
@@ -68,7 +67,7 @@ class DTOIntegrationTest {
         expectedArtist.setGenre("Rock");
         expectedArtist.setOriginCountry("US");
 
-        when(artistFactoryManager.createArtist(any(CreateArtistRequestDTO.class))).thenReturn(expectedArtist);
+        when(artistFactoryManager.createArtist(any(ArtistRequestDTO.class))).thenReturn(expectedArtist);
 
         // When - Map to entities
         Artist artist = artistMapper.toEntity(createDto);
@@ -99,7 +98,7 @@ class DTOIntegrationTest {
         assertNull(responseDto.getGroupGender());
 
         // Test summary DTO
-        ArtistSummaryDTO summaryDto = artistMapper.toSummaryDto(artist);
+        ArtistResponseDTO summaryDto = artistMapper.toSummaryDto(artist);
         assertEquals(artist.getArtistId(), summaryDto.getArtistId());
         assertEquals(createDto.getArtistName(), summaryDto.getArtistName());
         assertEquals(createDto.getType(), summaryDto.getType());
@@ -111,7 +110,7 @@ class DTOIntegrationTest {
     @Test
     void testCompleteFlow_GroupArtist() {
         // Given - Create Request DTO
-        CreateArtistRequestDTO createDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO createDto = new ArtistRequestDTO();
         createDto.setArtistName("The Beatles");
         createDto.setType(ArtistType.GROUP);
         createDto.setSpotifyId("beatles123");
@@ -164,7 +163,7 @@ class DTOIntegrationTest {
         existingArtist.setOriginCountry("US");
 
         // Update request
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         updateDto.setArtistName("Updated Name");
         updateDto.setGenre("Rock");
         updateDto.setDescription("Updated description");
@@ -191,7 +190,7 @@ class DTOIntegrationTest {
         // Test that all artist types work in the DTO flow
         for (ArtistType type : ArtistType.values()) {
             // Given
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Test " + type.name());
             dto.setType(type);
             dto.setGenre("Test Genre");
@@ -201,7 +200,7 @@ class DTOIntegrationTest {
             artist.setArtistId(UUID.randomUUID());
 
             ArtistResponseDTO responseDto = artistMapper.toResponseDto(artist, null, null);
-            ArtistSummaryDTO summaryDto = artistMapper.toSummaryDto(artist);
+            ArtistResponseDTO summaryDto = artistMapper.toSummaryDto(artist);
 
             // Then
             assertEquals(type, responseDto.getType());
@@ -216,7 +215,7 @@ class DTOIntegrationTest {
         // Test that all gender types work in the DTO flow
         for (ArtistGender gender : ArtistGender.values()) {
             // Test Solo gender
-            CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+            ArtistRequestDTO soloDto = new ArtistRequestDTO();
             soloDto.setArtistName("Solo " + gender.name());
             soloDto.setType(ArtistType.SOLO);
             soloDto.setSoloGender(gender);
@@ -229,7 +228,7 @@ class DTOIntegrationTest {
             assertEquals(gender, soloResponse.getSoloGender());
 
             // Test Group gender
-            CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+            ArtistRequestDTO groupDto = new ArtistRequestDTO();
             groupDto.setArtistName("Group " + gender.name());
             groupDto.setType(ArtistType.GROUP);
             groupDto.setGroupGender(gender);
@@ -246,7 +245,7 @@ class DTOIntegrationTest {
     @Test
     void testDTOFieldLimits() {
         // Test that DTOs handle edge cases correctly
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         
         // Test with very long strings (should be validated in controller layer)
         String longName = "A".repeat(300);
@@ -272,7 +271,7 @@ class DTOIntegrationTest {
         // Test various edge cases and validation scenarios
         
         // Scenario 1: Artist with minimal data
-        CreateArtistRequestDTO minimalDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO minimalDto = new ArtistRequestDTO();
         minimalDto.setArtistName("X");
         minimalDto.setType(ArtistType.VARIOUS);
         
@@ -281,7 +280,7 @@ class DTOIntegrationTest {
         assertEquals("X", minimalArtist.getArtistName());
         
         // Scenario 2: Artist with maximum realistic data
-        CreateArtistRequestDTO maximalDto = createMaximalArtistDto();
+        ArtistRequestDTO maximalDto = createMaximalArtistDto();
         Artist maximalArtist = artistMapper.toEntity(maximalDto);
         validateMaximalArtist(maximalArtist, maximalDto);
         
@@ -298,8 +297,8 @@ class DTOIntegrationTest {
         testNullAndEmptyStringHandling();
     }
 
-    private CreateArtistRequestDTO createMaximalArtistDto() {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+    private ArtistRequestDTO createMaximalArtistDto() {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("The Extremely Long Artist Name That Tests Maximum Length Boundaries");
         dto.setType(ArtistType.GROUP);
         dto.setSpotifyId("spotify1234567890abcdef");
@@ -317,7 +316,7 @@ class DTOIntegrationTest {
         return dto;
     }
 
-    private void validateMaximalArtist(Artist artist, CreateArtistRequestDTO dto) {
+    private void validateMaximalArtist(Artist artist, ArtistRequestDTO dto) {
         assertEquals(dto.getArtistName(), artist.getArtistName());
         assertEquals(dto.getType(), artist.getType());
         assertEquals(dto.getSpotifyId(), artist.getSpotifyId());
@@ -333,7 +332,7 @@ class DTOIntegrationTest {
             for (ArtistType targetType : ArtistType.values()) {
                 if (sourceType != targetType) {
                     // Create artist with source type
-                    CreateArtistRequestDTO createDto = new CreateArtistRequestDTO();
+                    ArtistRequestDTO createDto = new ArtistRequestDTO();
                     createDto.setArtistName("Transform Test");
                     createDto.setType(sourceType);
                     
@@ -341,7 +340,7 @@ class DTOIntegrationTest {
                     artist.setArtistId(UUID.randomUUID());
                     
                     // Update to target type
-                    UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+                    ArtistRequestDTO updateDto = new ArtistRequestDTO();
                     updateDto.setType(targetType);
                     
                     artistMapper.updateEntityFromDto(artist, updateDto);
@@ -365,7 +364,7 @@ class DTOIntegrationTest {
         for (LocalDate birthDate : testDates) {
             for (LocalDate deathDate : testDates) {
                 if (deathDate.isAfter(birthDate)) {
-                    CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+                    ArtistRequestDTO dto = new ArtistRequestDTO();
                     dto.setArtistName("Date Test Artist");
                     dto.setType(ArtistType.SOLO);
                     dto.setBirthDate(birthDate);
@@ -403,7 +402,7 @@ class DTOIntegrationTest {
         };
         
         for (String name : specialNames) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName(name);
             dto.setType(ArtistType.SOLO);
             dto.setPrimaryLanguage(determineLanguageFromName(name));
@@ -414,7 +413,7 @@ class DTOIntegrationTest {
             ArtistResponseDTO responseDto = artistMapper.toResponseDto(artist, null, null);
             assertEquals(name, responseDto.getArtistName());
             
-            ArtistSummaryDTO summaryDto = artistMapper.toSummaryDto(artist);
+            ArtistResponseDTO summaryDto = artistMapper.toSummaryDto(artist);
             assertEquals(name, summaryDto.getArtistName());
         }
     }
@@ -430,7 +429,7 @@ class DTOIntegrationTest {
     }
 
     private void testNullAndEmptyStringHandling() {
-        UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+        ArtistRequestDTO updateDto = new ArtistRequestDTO();
         
         // Test all combinations of null/empty/whitespace values
         String[] testValues = {null, "", " ", "  ", "\t", "\n", "valid"};
@@ -483,7 +482,7 @@ class DTOIntegrationTest {
 
     private void testSoloToGroupConversion() {
         // Create a solo artist first
-        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO soloDto = new ArtistRequestDTO();
         soloDto.setArtistName("Solo Artist");
         soloDto.setType(ArtistType.SOLO);
         soloDto.setBirthDate(LocalDate.of(1980, 5, 15));
@@ -494,7 +493,7 @@ class DTOIntegrationTest {
         Solo solo = artistMapper.createSoloFromDto(soloDto, artist);
         
         // Convert to group
-        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO groupDto = new ArtistRequestDTO();
         groupDto.setArtistName("Converted Group");
         groupDto.setType(ArtistType.GROUP);
         groupDto.setFormationDate(LocalDate.of(2000, 1, 1));
@@ -514,7 +513,7 @@ class DTOIntegrationTest {
 
     private void testGroupToSoloConversion() {
         // Similar but opposite conversion
-        CreateArtistRequestDTO groupDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO groupDto = new ArtistRequestDTO();
         groupDto.setArtistName("Group Artist");
         groupDto.setType(ArtistType.GROUP);
         groupDto.setFormationDate(LocalDate.of(1995, 6, 20));
@@ -526,7 +525,7 @@ class DTOIntegrationTest {
         Groups group = artistMapper.createGroupFromDto(groupDto, artist);
         
         // Add solo information later
-        CreateArtistRequestDTO soloDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO soloDto = new ArtistRequestDTO();
         soloDto.setType(ArtistType.SOLO);
         soloDto.setBirthDate(LocalDate.of(1970, 3, 10));
         soloDto.setSoloGender(ArtistGender.MALE);
@@ -546,7 +545,7 @@ class DTOIntegrationTest {
         
         // Test multiple partial updates
         for (int i = 0; i < 5; i++) {
-            UpdateArtistRequestDTO updateDto = createRandomUpdateDto(i);
+            ArtistRequestDTO updateDto = createRandomUpdateDto(i);
             artistMapper.updateEntityFromDto(originalArtist, updateDto);
             
             // Verify that non-updated fields remain unchanged
@@ -569,8 +568,8 @@ class DTOIntegrationTest {
         return artist;
     }
 
-    private UpdateArtistRequestDTO createRandomUpdateDto(int iteration) {
-        UpdateArtistRequestDTO dto = new UpdateArtistRequestDTO();
+    private ArtistRequestDTO createRandomUpdateDto(int iteration) {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         
         switch (iteration % 4) {
             case 0:
@@ -595,7 +594,7 @@ class DTOIntegrationTest {
 
     private void testConcurrentMappingOperations() {
         // Simulate concurrent operations on the same data
-        CreateArtistRequestDTO baseDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO baseDto = new ArtistRequestDTO();
         baseDto.setArtistName("Concurrent Test");
         baseDto.setType(ArtistType.SOLO);
         
@@ -605,10 +604,10 @@ class DTOIntegrationTest {
         // Perform multiple operations that might interfere with each other
         for (int i = 0; i < 10; i++) {
             // Create different update scenarios
-            UpdateArtistRequestDTO update1 = new UpdateArtistRequestDTO();
+            ArtistRequestDTO update1 = new ArtistRequestDTO();
             update1.setArtistName("Concurrent " + i);
             
-            UpdateArtistRequestDTO update2 = new UpdateArtistRequestDTO();
+            ArtistRequestDTO update2 = new ArtistRequestDTO();
             update2.setGenre("Genre " + i);
             
             artistMapper.updateEntityFromDto(sharedArtist, update1);
@@ -636,7 +635,7 @@ class DTOIntegrationTest {
         String[] edgeCases = {"us", "Gb", "DE ", " FR", "J P", "K-R"};
         
         for (String validCode : validCountryCodes) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Test Artist");
             dto.setType(ArtistType.SOLO);
             dto.setOriginCountry(validCode);
@@ -650,7 +649,7 @@ class DTOIntegrationTest {
         }
         
         for (String invalidCode : invalidCountryCodes) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Test Artist");
             dto.setType(ArtistType.SOLO);
             dto.setOriginCountry(invalidCode);
@@ -660,7 +659,7 @@ class DTOIntegrationTest {
         }
         
         for (String edgeCase : edgeCases) {
-            UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+            ArtistRequestDTO updateDto = new ArtistRequestDTO();
             updateDto.setOriginCountry(edgeCase);
             
             Artist artist = new Artist();
@@ -690,7 +689,7 @@ class DTOIntegrationTest {
         };
         
         for (String validId : validSpotifyIds) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Spotify Test");
             dto.setType(ArtistType.SOLO);
             dto.setSpotifyId(validId);
@@ -699,14 +698,14 @@ class DTOIntegrationTest {
             assertEquals(validId, artist.getSpotifyId());
             
             // Test update scenario
-            UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+            ArtistRequestDTO updateDto = new ArtistRequestDTO();
             updateDto.setSpotifyId(validId);
             artistMapper.updateEntityFromDto(artist, updateDto);
             assertEquals(validId, artist.getSpotifyId());
         }
         
         for (String invalidId : invalidSpotifyIds) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Spotify Test");
             dto.setType(ArtistType.SOLO);
             dto.setSpotifyId(invalidId);
@@ -764,7 +763,7 @@ class DTOIntegrationTest {
     }
 
     private void testGenreMapping(String genre) {
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("Genre Test");
         dto.setType(ArtistType.SOLO);
         dto.setGenre(genre);
@@ -775,7 +774,7 @@ class DTOIntegrationTest {
         ArtistResponseDTO response = artistMapper.toResponseDto(artist, null, null);
         assertEquals(genre, response.getGenre());
         
-        ArtistSummaryDTO summary = artistMapper.toSummaryDto(artist);
+        ArtistResponseDTO summary = artistMapper.toSummaryDto(artist);
         assertEquals(genre, summary.getGenre());
     }
 
@@ -789,7 +788,7 @@ class DTOIntegrationTest {
         };
         
         for (String newGenre : transformationGenres) {
-            UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+            ArtistRequestDTO updateDto = new ArtistRequestDTO();
             updateDto.setGenre(newGenre);
             
             artistMapper.updateEntityFromDto(artist, updateDto);
@@ -812,7 +811,7 @@ class DTOIntegrationTest {
         };
         
         for (String imageUrl : imageUrls) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Image Test");
             dto.setType(ArtistType.SOLO);
             dto.setImage(imageUrl);
@@ -838,7 +837,7 @@ class DTOIntegrationTest {
         };
         
         for (String language : languages) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Language Test");
             dto.setType(ArtistType.SOLO);
             dto.setPrimaryLanguage(language);
@@ -851,7 +850,7 @@ class DTOIntegrationTest {
             assertEquals(language, response.getPrimaryLanguage());
             
             // Test language updates
-            UpdateArtistRequestDTO updateDto = new UpdateArtistRequestDTO();
+            ArtistRequestDTO updateDto = new ArtistRequestDTO();
             updateDto.setPrimaryLanguage(language);
             artistMapper.updateEntityFromDto(artist, updateDto);
             assertEquals(language, artist.getPrimaryLanguage());
@@ -868,7 +867,7 @@ class DTOIntegrationTest {
 
     private void testArtistLifecycleManagement() {
         // Test complete artist lifecycle: creation -> updates -> final state
-        CreateArtistRequestDTO initialDto = new CreateArtistRequestDTO();
+        ArtistRequestDTO initialDto = new ArtistRequestDTO();
         initialDto.setArtistName("Lifecycle Artist");
         initialDto.setType(ArtistType.SOLO);
         initialDto.setBirthDate(LocalDate.of(1980, 1, 1));
@@ -879,20 +878,20 @@ class DTOIntegrationTest {
         Solo solo = artistMapper.createSoloFromDto(initialDto, artist);
         
         // Stage 1: Early career update
-        UpdateArtistRequestDTO earlyCareerUpdate = new UpdateArtistRequestDTO();
+        ArtistRequestDTO earlyCareerUpdate = new ArtistRequestDTO();
         earlyCareerUpdate.setGenre("Indie Rock");
         earlyCareerUpdate.setDescription("Emerging indie rock artist");
         artistMapper.updateEntityFromDto(artist, earlyCareerUpdate);
         
         // Stage 2: Mainstream success
-        UpdateArtistRequestDTO mainstreamUpdate = new UpdateArtistRequestDTO();
+        ArtistRequestDTO mainstreamUpdate = new ArtistRequestDTO();
         mainstreamUpdate.setGenre("Alternative Rock");
         mainstreamUpdate.setDescription("Mainstream alternative rock star");
         mainstreamUpdate.setSpotifyId("mainstream123");
         artistMapper.updateEntityFromDto(artist, mainstreamUpdate);
         
         // Stage 3: Genre evolution
-        UpdateArtistRequestDTO evolutionUpdate = new UpdateArtistRequestDTO();
+        ArtistRequestDTO evolutionUpdate = new ArtistRequestDTO();
         evolutionUpdate.setGenre("Electronic/Experimental");
         evolutionUpdate.setDescription("Experimental electronic musician");
         artistMapper.updateEntityFromDto(artist, evolutionUpdate);
@@ -911,7 +910,7 @@ class DTOIntegrationTest {
 
     private void testDataConsistencyAcrossMappings() {
         // Test that data remains consistent across multiple mapping operations
-        CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+        ArtistRequestDTO dto = new ArtistRequestDTO();
         dto.setArtistName("Consistency Test");
         dto.setType(ArtistType.GROUP);
         dto.setSpotifyId("consistent123");
@@ -926,7 +925,7 @@ class DTOIntegrationTest {
         // Perform multiple response mappings
         for (int i = 0; i < 10; i++) {
             ArtistResponseDTO response = artistMapper.toResponseDto(artist, null, group);
-            ArtistSummaryDTO summary = artistMapper.toSummaryDto(artist);
+            ArtistResponseDTO summary = artistMapper.toSummaryDto(artist);
             
             // Verify consistency
             assertEquals(dto.getArtistName(), response.getArtistName());
@@ -946,7 +945,7 @@ class DTOIntegrationTest {
         int testSize = 1000;
         
         for (int i = 0; i < testSize; i++) {
-            CreateArtistRequestDTO dto = new CreateArtistRequestDTO();
+            ArtistRequestDTO dto = new ArtistRequestDTO();
             dto.setArtistName("Performance Test Artist " + i);
             dto.setType(i % 2 == 0 ? ArtistType.SOLO : ArtistType.GROUP);
             dto.setDescription("Performance test description for artist number " + i + 
@@ -978,7 +977,7 @@ class DTOIntegrationTest {
                 assertEquals(dto.getArtistName(), response.getArtistName());
             }
             
-            ArtistSummaryDTO summary = artistMapper.toSummaryDto(artist);
+            ArtistResponseDTO summary = artistMapper.toSummaryDto(artist);
             assertNotNull(summary);
             assertEquals(dto.getArtistName(), summary.getArtistName());
         }
@@ -1002,7 +1001,7 @@ class DTOIntegrationTest {
         }
         
         try {
-            ArtistSummaryDTO summary = artistMapper.toSummaryDto(corruptedArtist);
+            ArtistResponseDTO summary = artistMapper.toSummaryDto(corruptedArtist);
             assertNotNull(summary);
             assertEquals("Corrupted Artist", summary.getArtistName());
             assertNull(summary.getType());

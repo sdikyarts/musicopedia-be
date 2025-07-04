@@ -1,9 +1,8 @@
 package musicopedia.mapper;
 
-import musicopedia.dto.request.CreateMemberRequestDTO;
-import musicopedia.dto.request.UpdateMemberRequestDTO;
+import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
-import musicopedia.dto.response.MemberSummaryDTO;
+
 import musicopedia.factory.MemberFactory;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
@@ -25,12 +24,12 @@ public class MemberMapper {
         this.memberFactory = memberFactory;
     }
 
-    public Member toEntity(CreateMemberRequestDTO dto) {
+    public Member toEntity(MemberRequestDTO dto) {
         // Use the factory to create member with validation
         return memberFactory.createMember(dto);
     }
 
-    public void updateEntityFromDto(Member member, UpdateMemberRequestDTO dto) {
+    public void updateEntityFromDto(Member member, MemberRequestDTO dto) {
         if (dto.getFullName() != null) {
             member.setFullName(dto.getFullName());
         }
@@ -81,8 +80,8 @@ public class MemberMapper {
         return dto;
     }
 
-    public MemberSummaryDTO toSummaryDTO(Member member) {
-        MemberSummaryDTO dto = new MemberSummaryDTO();
+    public MemberResponseDTO toSummaryDTO(Member member) {
+        MemberResponseDTO dto = new MemberResponseDTO();
         dto.setMemberId(member.getMemberId());
         dto.setFullName(member.getFullName());
         dto.setImage(member.getImage());
@@ -104,7 +103,7 @@ public class MemberMapper {
                 .collect(Collectors.toList());
     }
 
-    public List<MemberSummaryDTO> toSummaryDTOList(List<Member> members) {
+    public List<MemberResponseDTO> toSummaryDTOList(List<Member> members) {
         return members.stream()
                 .map(this::toSummaryDTO)
                 .collect(Collectors.toList());

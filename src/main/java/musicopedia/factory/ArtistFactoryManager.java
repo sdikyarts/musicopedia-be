@@ -1,6 +1,6 @@
 package musicopedia.factory;
 
-import musicopedia.dto.request.CreateArtistRequestDTO;
+import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.model.Artist;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +27,7 @@ public class ArtistFactoryManager {
      * @return The created Artist entity
      * @throws IllegalArgumentException if no factory supports the artist type
      */
-    public Artist createArtist(CreateArtistRequestDTO dto) {
+    public Artist createArtist(ArtistRequestDTO dto) {
         if (dto.getType() == null) {
             throw new IllegalArgumentException("Artist type cannot be null");
         }
@@ -42,7 +42,7 @@ public class ArtistFactoryManager {
      * @param dto The creation request to validate
      * @throws IllegalArgumentException if validation fails or no factory supports the type
      */
-    public void validateArtistData(CreateArtistRequestDTO dto) {
+    public void validateArtistData(ArtistRequestDTO dto) {
         if (dto.getType() == null) {
             throw new IllegalArgumentException("Artist type cannot be null");
         }
@@ -58,7 +58,7 @@ public class ArtistFactoryManager {
      * @return The factory that supports the artist type
      * @throws IllegalArgumentException if no factory supports the artist type
      */
-    private ArtistFactory findFactory(CreateArtistRequestDTO dto) {
+    private ArtistFactory findFactory(ArtistRequestDTO dto) {
         return artistFactories.stream()
                 .filter(factory -> factory.supports(dto))
                 .findFirst()
