@@ -1,5 +1,7 @@
 package musicopedia.mapper;
 
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.MemberBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
 
@@ -18,6 +20,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,24 +48,26 @@ class MemberMapperTest {
         memberMapper = new MemberMapper(artistService, memberFactory);
 
         // Setup test member
-        testMember = new Member();
+        testMember = new MemberBuilder()
+            .setFullName("Test Member")
+            .setDescription("Test description")
+            .setImage("test-image.jpg")
+            .setBirthDate(LocalDate.of(1990, 1, 1))
+            .build();
         testMember.setMemberId(UUID.randomUUID());
-        testMember.setFullName("Test Member");
-        testMember.setDescription("Test description");
-        testMember.setImage("test-image.jpg");
-        testMember.setBirthDate(LocalDate.of(1990, 1, 1));
 
         // Setup solo artist
-        soloArtist = new Artist();
+        soloArtist = new ArtistBuilder()
+            .setArtistName("Solo Artist")
+            .setType(ArtistType.SOLO)
+            .build();
         soloArtist.setArtistId(UUID.randomUUID());
-        soloArtist.setArtistName("Solo Artist");
-        soloArtist.setType(ArtistType.SOLO);
-
         // Setup group artist
-        groupArtist = new Artist();
+        groupArtist = new ArtistBuilder()
+            .setArtistName("Group Artist")
+            .setType(ArtistType.GROUP)
+            .build();
         groupArtist.setArtistId(UUID.randomUUID());
-        groupArtist.setArtistName("Group Artist");
-        groupArtist.setType(ArtistType.GROUP);
 
         // Setup DTOs
         createDto = new MemberRequestDTO();
@@ -81,11 +86,14 @@ class MemberMapperTest {
     @Test
     void toEntity_ShouldDelegateToMemberFactory() {
         // Given
-        Member expectedMember = new Member();
-        when(memberFactory.createMember(createDto)).thenReturn(expectedMember);
+        Member expectedMember = new MemberBuilder()
+            .setFullName("Expected Member")
+            .build();
+        when(memberFactory.createMember(createDto)).thenReturn(CompletableFuture.completedFuture(expectedMember));
 
         // When
-        Member result = memberMapper.toEntity(createDto);
+        CompletableFuture<Member> resultFuture = memberMapper.toEntity(createDto);
+        Member result = resultFuture.join();
 
         // Then
         assertEquals(expectedMember, result);
@@ -96,10 +104,11 @@ class MemberMapperTest {
     void updateEntityFromDto_WithAllFields_ShouldUpdateAllFields() {
         // Given
         updateDto.setSoloArtistId(soloArtist.getArtistId());
-        when(artistService.findById(soloArtist.getArtistId())).thenReturn(Optional.of(soloArtist));
+        when(artistService.findByIdAsync(soloArtist.getArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(soloArtist)));
 
         // When
-        memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        future.join(); // Wait for the async operation to complete
 
         // Then
         assertEquals("Updated Member", testMember.getFullName());
@@ -107,7 +116,7 @@ class MemberMapperTest {
         assertEquals("updated-image.jpg", testMember.getImage());
         assertEquals(LocalDate.of(1992, 3, 10), testMember.getBirthDate());
         assertEquals(soloArtist, testMember.getSoloArtist());
-        verify(artistService).findById(soloArtist.getArtistId());
+        verify(artistService).findByIdAsync(soloArtist.getArtistId());
     }
 
     @Test
@@ -117,7 +126,8 @@ class MemberMapperTest {
         updateDto.setFullName(null);
 
         // When
-        memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        future.join(); // Wait for the async operation to complete
 
         // Then
         assertEquals(originalFullName, testMember.getFullName());
@@ -130,7 +140,8 @@ class MemberMapperTest {
         updateDto.setDescription(null);
 
         // When
-        memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        future.join(); // Wait for the async operation to complete
 
         // Then
         assertEquals(originalDescription, testMember.getDescription());
@@ -143,7 +154,8 @@ class MemberMapperTest {
         updateDto.setImage(null);
 
         // When
-        memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        future.join(); // Wait for the async operation to complete
 
         // Then
         assertEquals(originalImage, testMember.getImage());
@@ -156,7 +168,8 @@ class MemberMapperTest {
         updateDto.setBirthDate(null);
 
         // When
-        memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        future.join(); // Wait for the async operation to complete
 
         // Then
         assertEquals(originalBirthDate, testMember.getBirthDate());
@@ -169,7 +182,8 @@ class MemberMapperTest {
         updateDto.setSoloArtistId(null);
 
         // When
-        memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        future.join(); // Wait for the async operation to complete
 
         // Then
         assertNull(testMember.getSoloArtist());
@@ -181,28 +195,38 @@ class MemberMapperTest {
         // Given
         UUID nonExistentId = UUID.randomUUID();
         updateDto.setSoloArtistId(nonExistentId);
-        when(artistService.findById(nonExistentId)).thenReturn(Optional.empty());
+        when(artistService.findByIdAsync(nonExistentId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            future.join(); // This will unwrap the CompletableFuture's exception
         });
-        assertEquals("Solo artist not found with ID: " + nonExistentId, exception.getMessage());
-        verify(artistService).findById(nonExistentId);
+        
+        // The real exception is wrapped as the cause of the CompletionException
+        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+        assertEquals("Solo artist not found with ID: " + nonExistentId, exception.getCause().getMessage());
+        verify(artistService).findByIdAsync(nonExistentId);
     }
 
     @Test
     void updateEntityFromDto_WithNonSoloArtist_ShouldThrowException() {
         // Given
         updateDto.setSoloArtistId(groupArtist.getArtistId());
-        when(artistService.findById(groupArtist.getArtistId())).thenReturn(Optional.of(groupArtist));
+        when(artistService.findByIdAsync(groupArtist.getArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(groupArtist)));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            future.join(); // This will unwrap the CompletableFuture's exception
         });
-        assertEquals("Referenced artist must be of type SOLO, but was: " + ArtistType.GROUP, exception.getMessage());
-        verify(artistService).findById(groupArtist.getArtistId());
+        
+        // The real exception is wrapped as the cause of the CompletionException
+        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+        assertEquals("Referenced artist must be of type SOLO, but was: " + ArtistType.GROUP, exception.getCause().getMessage());
+        verify(artistService).findByIdAsync(groupArtist.getArtistId());
     }
 
     @Test
@@ -213,13 +237,19 @@ class MemberMapperTest {
         franchiseArtist.setType(ArtistType.FRANCHISE);
         
         updateDto.setSoloArtistId(franchiseArtist.getArtistId());
-        when(artistService.findById(franchiseArtist.getArtistId())).thenReturn(Optional.of(franchiseArtist));
+        when(artistService.findByIdAsync(franchiseArtist.getArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(franchiseArtist)));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            future.join(); // This will unwrap the CompletableFuture's exception
         });
-        assertEquals("Referenced artist must be of type SOLO, but was: " + ArtistType.FRANCHISE, exception.getMessage());
+        
+        // The real exception is wrapped as the cause of the CompletionException
+        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+        assertEquals("Referenced artist must be of type SOLO, but was: " + ArtistType.FRANCHISE, exception.getCause().getMessage());
+        verify(artistService).findByIdAsync(franchiseArtist.getArtistId());
     }
 
     @Test
@@ -230,13 +260,19 @@ class MemberMapperTest {
         variousArtist.setType(ArtistType.VARIOUS);
         
         updateDto.setSoloArtistId(variousArtist.getArtistId());
-        when(artistService.findById(variousArtist.getArtistId())).thenReturn(Optional.of(variousArtist));
+        when(artistService.findByIdAsync(variousArtist.getArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(variousArtist)));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberMapper.updateEntityFromDto(testMember, updateDto);
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            future.join(); // This will unwrap the CompletableFuture's exception
         });
-        assertEquals("Referenced artist must be of type SOLO, but was: " + ArtistType.VARIOUS, exception.getMessage());
+        
+        // The real exception is wrapped as the cause of the CompletionException
+        assertTrue(exception.getCause() instanceof IllegalArgumentException);
+        assertEquals("Referenced artist must be of type SOLO, but was: " + ArtistType.VARIOUS, exception.getCause().getMessage());
+        verify(artistService).findByIdAsync(variousArtist.getArtistId());
     }
 
     @Test
@@ -445,5 +481,31 @@ class MemberMapperTest {
         assertEquals(testMember.getImage(), dto.getImage());
         assertEquals(testMember.getBirthDate(), dto.getBirthDate());
         assertFalse(dto.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void createMemberFromDto_ShouldMapAllFieldsCorrectly() {
+        // Given
+        MemberRequestDTO dto = new MemberRequestDTO();
+        dto.setFullName("Jane Doe");
+        dto.setDescription("A test member");
+        dto.setImage("jane.jpg");
+        dto.setBirthDate(LocalDate.of(1992, 2, 2));
+        Artist soloArtist = new ArtistBuilder()
+            .setArtistName("Solo Jane")
+            .setType(ArtistType.SOLO)
+            .build();
+        soloArtist.setArtistId(UUID.randomUUID());
+
+        // When
+        Member member = memberMapper.createMemberFromDto(dto, soloArtist);
+
+        // Then
+        assertNotNull(member);
+        assertEquals("Jane Doe", member.getFullName());
+        assertEquals("A test member", member.getDescription());
+        assertEquals("jane.jpg", member.getImage());
+        assertEquals(LocalDate.of(1992, 2, 2), member.getBirthDate());
+        assertEquals(soloArtist, member.getSoloArtist());
     }
 }

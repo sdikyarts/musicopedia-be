@@ -8,6 +8,7 @@ import musicopedia.repository.GroupRepository;
 import musicopedia.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional
@@ -34,87 +36,107 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Groups> findAll() {
+    public CompletableFuture<List<Groups>> findAll() {
         List<Artist> artists = groupRepository.findByType(ArtistType.GROUP);
-        return artists.stream()
+        List<Groups> groups = artists.stream()
                 .map(this::convertToGroup)
                 .toList();
+        return CompletableFuture.completedFuture(groups);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public Optional<Groups> findById(UUID groupId) {
-        return groupRepository.findById(groupId)
+    public CompletableFuture<Optional<Groups>> findById(UUID groupId) {
+        Optional<Groups> group = groupRepository.findById(groupId)
                 .filter(artist -> artist.getType() == ArtistType.GROUP)
                 .map(this::convertToGroup);
+        return CompletableFuture.completedFuture(group);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Groups> findByFormationDateBetween(LocalDate startDate, LocalDate endDate) {
-        List<Groups> allGroups = self.findAll();
-        return allGroups.stream()
-                .filter(group -> {
-                    LocalDate formationDate = group.getFormationDate();
-                    return formationDate != null && 
-                           !formationDate.isBefore(startDate) && 
-                           !formationDate.isAfter(endDate);
-                })
-                .toList();
+    public CompletableFuture<List<Groups>> findByFormationDateBetween(LocalDate startDate, LocalDate endDate) {
+        return self.findAll()
+                .thenApply(allGroups -> allGroups.stream()
+                        .filter(group -> {
+                            LocalDate formationDate = group.getFormationDate();
+                            return formationDate != null && 
+                                   !formationDate.isBefore(startDate) && 
+                                   !formationDate.isAfter(endDate);
+                        })
+                        .toList());
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Groups> findActiveGroups() {
-        List<Groups> allGroups = self.findAll();
-        return allGroups.stream()
-                .filter(group -> group.getDisbandDate() == null)
-                .toList();
+    public CompletableFuture<List<Groups>> findActiveGroups() {
+        return self.findAll()
+                .thenApply(allGroups -> allGroups.stream()
+                        .filter(group -> group.getDisbandDate() == null)
+                        .toList());
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Groups> findDisbandedGroups() {
-        List<Groups> allGroups = self.findAll();
-        return allGroups.stream()
-                .filter(group -> group.getDisbandDate() != null)
-                .toList();
+    public CompletableFuture<List<Groups>> findDisbandedGroups() {
+        return self.findAll()
+                .thenApply(allGroups -> allGroups.stream()
+                        .filter(group -> group.getDisbandDate() != null)
+                        .toList());
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Groups> findByGroupGender(ArtistGender gender) {
-        List<Groups> allGroups = self.findAll();
-        return allGroups.stream()
-                .filter(group -> group.getGroupGender() == gender)
-                .toList();
+    public CompletableFuture<List<Groups>> findByGroupGender(ArtistGender gender) {
+        return self.findAll()
+                .thenApply(allGroups -> allGroups.stream()
+                        .filter(group -> group.getGroupGender() == gender)
+                        .toList());
     }
 
     @Override
-    public Groups save(Groups group, Artist artist) {
+    @Async("taskExecutor")
+    public CompletableFuture<Groups> save(Groups group, Artist artist) {
         artist.setType(ArtistType.GROUP);
         Artist savedArtist = groupRepository.save(artist);
         group.setArtistId(savedArtist.getArtistId());
         group.setArtist(savedArtist);
-        return group;
+        return CompletableFuture.completedFuture(group);
     }
 
     @Override
-    public Groups update(Groups group) {
+    @Async("taskExecutor")
+    public CompletableFuture<Groups> update(Groups group) {
         if (groupRepository.existsById(group.getArtistId())) {
             Artist artist = group.getArtist();
             if (artist != null) {
                 groupRepository.save(artist);
             }
-            return group;
+            return CompletableFuture.completedFuture(group);
         }
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public void deleteById(UUID groupId) {
+    @Async("taskExecutor")
+    public CompletableFuture<Void> deleteById(UUID groupId) {
         groupRepository.deleteById(groupId);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    @Async("taskExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<Boolean> existsById(UUID groupId) {
+        boolean exists = groupRepository.existsById(groupId);
+        return CompletableFuture.completedFuture(exists);
     }
 
     // Changed to public for testing purposes

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +68,8 @@ public class SoloServiceTest {
         
         when(soloRepository.findByType(ArtistType.SOLO)).thenReturn(artists);
 
-        List<Solo> result = soloService.findAll();
+        CompletableFuture<List<Solo>> future = soloService.findAll();
+        List<Solo> result = future.join();
 
         assertEquals(2, result.size());
         assertEquals("Solo 1", result.get(0).getArtist().getArtistName());
@@ -93,7 +95,8 @@ public class SoloServiceTest {
         // Mock the convertToSolo method to return our mock Solo
         doReturn(mockSolo).when(soloServiceSpy).convertToSolo(testArtist);
 
-        Optional<Solo> result = soloServiceSpy.findById(testId);
+        CompletableFuture<Optional<Solo>> future = soloServiceSpy.findById(testId);
+        Optional<Solo> result = future.join();
 
         assertTrue(result.isPresent());
         assertEquals("IU", result.get().getArtist().getArtistName());
@@ -105,7 +108,8 @@ public class SoloServiceTest {
     void testFindByIdNotFound() {
         when(soloRepository.findById(testId)).thenReturn(Optional.empty());
 
-        Optional<Solo> result = soloService.findById(testId);
+        CompletableFuture<Optional<Solo>> future = soloService.findById(testId);
+        Optional<Solo> result = future.join();
 
         assertFalse(result.isPresent());
         verify(soloRepository, times(1)).findById(testId);
@@ -120,7 +124,8 @@ public class SoloServiceTest {
         
         when(soloRepository.findById(testId)).thenReturn(Optional.of(groupArtist));
 
-        Optional<Solo> result = soloService.findById(testId);
+        CompletableFuture<Optional<Solo>> future = soloService.findById(testId);
+        Optional<Solo> result = future.join();
 
         assertFalse(result.isPresent());
         verify(soloRepository, times(1)).findById(testId);
@@ -186,10 +191,11 @@ public class SoloServiceTest {
         doReturn(solo3).when(soloServiceSpy).convertToSolo(artist3);
         doReturn(soloWithNullBirthDate).when(soloServiceSpy).convertToSolo(artistWithNullBirthDate);
 
-        List<Solo> result = soloServiceSpy.findByBirthDateBetween(
+        CompletableFuture<List<Solo>> future = soloServiceSpy.findByBirthDateBetween(
             LocalDate.of(1994, 1, 1), 
             LocalDate.of(1996, 12, 31)
         );
+        List<Solo> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("Solo 2", result.get(0).getArtist().getArtistName());
@@ -231,7 +237,8 @@ public class SoloServiceTest {
         doReturn(solo1).when(soloServiceSpy).convertToSolo(artist1);
         doReturn(solo2).when(soloServiceSpy).convertToSolo(artist2);
 
-        List<Solo> result = soloServiceSpy.findByGender(ArtistGender.FEMALE);
+        CompletableFuture<List<Solo>> future = soloServiceSpy.findByGender(ArtistGender.FEMALE);
+        List<Solo> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("Female Solo", result.get(0).getArtist().getArtistName());
@@ -275,7 +282,8 @@ public class SoloServiceTest {
         doReturn(active).when(soloServiceSpy).convertToSolo(activeArtist);
         doReturn(deceased).when(soloServiceSpy).convertToSolo(deceasedArtist);
 
-        List<Solo> result = soloServiceSpy.findActiveSoloArtists();
+        CompletableFuture<List<Solo>> future = soloServiceSpy.findActiveSoloArtists();
+        List<Solo> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("Active", result.get(0).getArtist().getArtistName());
@@ -319,7 +327,8 @@ public class SoloServiceTest {
         doReturn(active).when(soloServiceSpy).convertToSolo(activeArtist);
         doReturn(deceased).when(soloServiceSpy).convertToSolo(deceasedArtist);
 
-        List<Solo> result = soloServiceSpy.findDeceasedSoloArtists();
+        CompletableFuture<List<Solo>> future = soloServiceSpy.findDeceasedSoloArtists();
+        List<Solo> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("Deceased", result.get(0).getArtist().getArtistName());
@@ -329,7 +338,8 @@ public class SoloServiceTest {
     void testSave() {
         when(soloRepository.save(any(Artist.class))).thenReturn(testArtist);
 
-        Solo savedSolo = soloService.save(testSolo, testArtist);
+        CompletableFuture<Solo> future = soloService.save(testSolo, testArtist);
+        Solo savedSolo = future.join();
 
         assertEquals(testId, savedSolo.getArtistId());
         assertEquals("IU", savedSolo.getArtist().getArtistName());
@@ -342,7 +352,8 @@ public class SoloServiceTest {
         when(soloRepository.existsById(testId)).thenReturn(true);
         when(soloRepository.save(testArtist)).thenReturn(testArtist);
 
-        Solo updatedSolo = soloService.update(testSolo);
+        CompletableFuture<Solo> future = soloService.update(testSolo);
+        Solo updatedSolo = future.join();
 
         assertNotNull(updatedSolo);
         verify(soloRepository, times(1)).existsById(testId);
@@ -353,7 +364,8 @@ public class SoloServiceTest {
     void testUpdateNotFound() {
         when(soloRepository.existsById(testId)).thenReturn(false);
 
-        Solo updatedSolo = soloService.update(testSolo);
+        CompletableFuture<Solo> future = soloService.update(testSolo);
+        Solo updatedSolo = future.join();
 
         assertNull(updatedSolo);
         verify(soloRepository, times(1)).existsById(testId);
@@ -368,7 +380,7 @@ public class SoloServiceTest {
 
         when(soloRepository.existsById(testId)).thenReturn(true);
 
-        Solo updatedSolo = soloService.update(soloWithNullArtist);
+        Solo updatedSolo = soloService.update(soloWithNullArtist).join();
 
         assertNotNull(updatedSolo);
         verify(soloRepository, times(1)).existsById(testId);
@@ -379,9 +391,31 @@ public class SoloServiceTest {
     void testDeleteById() {
         doNothing().when(soloRepository).deleteById(testId);
 
-        soloService.deleteById(testId);
+        soloService.deleteById(testId).join();
 
         verify(soloRepository, times(1)).deleteById(testId);
+    }
+
+    @Test
+    void testExistsById() {
+        when(soloRepository.existsById(testId)).thenReturn(true);
+
+        CompletableFuture<Boolean> future = soloService.existsById(testId);
+        Boolean exists = future.join();
+
+        assertTrue(exists);
+        verify(soloRepository, times(1)).existsById(testId);
+    }
+
+    @Test
+    void testExistsByIdNotFound() {
+        when(soloRepository.existsById(testId)).thenReturn(false);
+
+        CompletableFuture<Boolean> future = soloService.existsById(testId);
+        Boolean exists = future.join();
+
+        assertFalse(exists);
+        verify(soloRepository, times(1)).existsById(testId);
     }
 
     @Test

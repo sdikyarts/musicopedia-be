@@ -1,5 +1,7 @@
 package musicopedia.model;
 
+import musicopedia.builder.MemberBuilder;
+import musicopedia.builder.ArtistBuilder;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -15,16 +17,19 @@ public class MemberTest {
         String image = "base64encodedimage";
         LocalDate birthDate = LocalDate.of(1995, 5, 15);
         
-        Artist soloArtist = new Artist();
+        Artist soloArtist = new ArtistBuilder()
+            .setArtistName("Solo Artist")
+            .build();
         soloArtist.setArtistId(UUID.randomUUID());
         
-        Member member = new Member();
+        Member member = new MemberBuilder()
+            .setFullName(fullName)
+            .setDescription(description)
+            .setImage(image)
+            .setBirthDate(birthDate)
+            .setSoloArtist(soloArtist)
+            .build();
         member.setMemberId(memberId);
-        member.setFullName(fullName);
-        member.setDescription(description);
-        member.setImage(image);
-        member.setBirthDate(birthDate);
-        member.setSoloArtist(soloArtist);
         
         assertEquals(memberId, member.getMemberId());
         assertEquals(fullName, member.getFullName());

@@ -1,6 +1,7 @@
 package musicopedia.model;
 
 import musicopedia.model.enums.ArtistType;
+import musicopedia.builder.ArtistBuilder;
 import org.junit.jupiter.api.Test;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,16 +20,17 @@ public class ArtistTest {
         String genre = "Pop";
         String originCountry = "US";
         
-        Artist artist = new Artist();
+        Artist artist = new ArtistBuilder()
+            .setSpotifyId(spotifyId)
+            .setArtistName(artistName)
+            .setDescription(description)
+            .setImage(image)
+            .setType(type)
+            .setPrimaryLanguage(primaryLanguage)
+            .setGenre(genre)
+            .setOriginCountry(originCountry)
+            .build();
         artist.setArtistId(artistId);
-        artist.setSpotifyId(spotifyId);
-        artist.setArtistName(artistName);
-        artist.setDescription(description);
-        artist.setImage(image);
-        artist.setType(type);
-        artist.setPrimaryLanguage(primaryLanguage);
-        artist.setGenre(genre);
-        artist.setOriginCountry(originCountry);
         
         assertEquals(artistId, artist.getArtistId());
         assertEquals(spotifyId, artist.getSpotifyId());

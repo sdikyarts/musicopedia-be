@@ -2,6 +2,8 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.SoloBuilder;
 import musicopedia.model.Artist;
 import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistGender;
@@ -22,11 +24,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 
 @Import(ServiceTestConfig.class)
 public class SoloControllerTest {
@@ -49,26 +53,32 @@ public class SoloControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         testId = UUID.randomUUID();
-        testArtist = new Artist();
-        testArtist.setArtistId(testId);
-        testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.SOLO);
-        testArtist.setOriginCountry("KR");
-        testArtist.setPrimaryLanguage("Korean");
+        testArtist = new ArtistBuilder()
+            .setArtistId(testId)
+            .setArtistName("IU")
+            .setType(ArtistType.SOLO)
+            .setOriginCountry("KR")
+            .setPrimaryLanguage("Korean")
+            .build();
 
-        testSolo = new Solo();
-        testSolo.setArtistId(testId);
-        testSolo.setArtist(testArtist);
-        testSolo.setBirthDate(LocalDate.of(1993, 5, 16));
-        testSolo.setGender(ArtistGender.FEMALE);
+        testSolo = new SoloBuilder()
+            .setArtistId(testId)
+            .setArtist(testArtist)
+            .setBirthDate(LocalDate.of(1993, 5, 16))
+            .setGender(ArtistGender.FEMALE)
+            .buildSolo();
     }
 
     @Test
     void testGetAllSoloists() throws Exception {
         List<Solo> soloists = Arrays.asList(testSolo);
-        when(soloService.findAll()).thenReturn(soloists);
+        when(soloService.findAll()).thenReturn(CompletableFuture.completedFuture(soloists));
 
-        mockMvc.perform(get("/api/soloists"))
+        var mvcResult = mockMvc.perform(get("/api/soloists"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
@@ -78,9 +88,13 @@ public class SoloControllerTest {
 
     @Test
     void testGetSoloistById() throws Exception {
-        when(soloService.findById(testId)).thenReturn(Optional.of(testSolo));
+        when(soloService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.of(testSolo)));
 
-        mockMvc.perform(get("/api/soloists/{id}", testId))
+        var mvcResult = mockMvc.perform(get("/api/soloists/{id}", testId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()))
                 .andExpect(jsonPath("$.artist.artistName").value("IU"));
@@ -90,9 +104,13 @@ public class SoloControllerTest {
 
     @Test
     void testGetSoloistByIdNotFound() throws Exception {
-        when(soloService.findById(testId)).thenReturn(Optional.empty());
+        when(soloService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
 
-        mockMvc.perform(get("/api/soloists/{id}", testId))
+        var mvcResult = mockMvc.perform(get("/api/soloists/{id}", testId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNotFound());
 
         verify(soloService, times(1)).findById(testId);
@@ -103,11 +121,15 @@ public class SoloControllerTest {
         List<Solo> soloists = Arrays.asList(testSolo);
         LocalDate startDate = LocalDate.of(1990, 1, 1);
         LocalDate endDate = LocalDate.of(1995, 12, 31);
-        when(soloService.findByBirthDateBetween(startDate, endDate)).thenReturn(soloists);
+        when(soloService.findByBirthDateBetween(startDate, endDate)).thenReturn(CompletableFuture.completedFuture(soloists));
 
-        mockMvc.perform(get("/api/soloists/birthdate")
+        var mvcResult = mockMvc.perform(get("/api/soloists/birthdate")
                         .param("start", "1990-01-01")
                         .param("end", "1995-12-31"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
@@ -118,9 +140,13 @@ public class SoloControllerTest {
     @Test
     void testGetSoloistsByGender() throws Exception {
         List<Solo> soloists = Arrays.asList(testSolo);
-        when(soloService.findByGender(ArtistGender.FEMALE)).thenReturn(soloists);
+        when(soloService.findByGender(ArtistGender.FEMALE)).thenReturn(CompletableFuture.completedFuture(soloists));
 
-        mockMvc.perform(get("/api/soloists/gender/{gender}", "FEMALE"))
+        var mvcResult = mockMvc.perform(get("/api/soloists/gender/{gender}", "FEMALE"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
@@ -131,9 +157,13 @@ public class SoloControllerTest {
     @Test
     void testGetActiveSoloists() throws Exception {
         List<Solo> soloists = Arrays.asList(testSolo);
-        when(soloService.findActiveSoloArtists()).thenReturn(soloists);
+        when(soloService.findActiveSoloArtists()).thenReturn(CompletableFuture.completedFuture(soloists));
 
-        mockMvc.perform(get("/api/soloists/active"))
+        var mvcResult = mockMvc.perform(get("/api/soloists/active"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
@@ -144,9 +174,13 @@ public class SoloControllerTest {
     @Test
     void testGetDeceasedSoloists() throws Exception {
         List<Solo> soloists = Arrays.asList(testSolo);
-        when(soloService.findDeceasedSoloArtists()).thenReturn(soloists);
+        when(soloService.findDeceasedSoloArtists()).thenReturn(CompletableFuture.completedFuture(soloists));
 
-        mockMvc.perform(get("/api/soloists/deceased"))
+        var mvcResult = mockMvc.perform(get("/api/soloists/deceased"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
@@ -156,13 +190,17 @@ public class SoloControllerTest {
 
     @Test
     void testCreateSoloist() throws Exception {
-        when(soloService.save(any(Solo.class), any(Artist.class))).thenReturn(testSolo);
+        when(soloService.save(any(Solo.class), any(Artist.class))).thenReturn(CompletableFuture.completedFuture(testSolo));
 
         String jsonContent = objectMapper.writeValueAsString(testSolo);
 
-        mockMvc.perform(post("/api/soloists")
+        var mvcResult = mockMvc.perform(post("/api/soloists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()));
 
@@ -178,9 +216,13 @@ public class SoloControllerTest {
 
         String jsonContent = objectMapper.writeValueAsString(soloWithoutArtist);
 
-        mockMvc.perform(post("/api/soloists")
+        var mvcResult = mockMvc.perform(post("/api/soloists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isBadRequest());
 
         verify(soloService, never()).save(any(Solo.class), any(Artist.class));
@@ -188,13 +230,17 @@ public class SoloControllerTest {
 
     @Test
     void testUpdateSoloist() throws Exception {
-        when(soloService.update(any(Solo.class))).thenReturn(testSolo);
+        when(soloService.update(any(Solo.class))).thenReturn(CompletableFuture.completedFuture(testSolo));
 
         String jsonContent = objectMapper.writeValueAsString(testSolo);
 
-        mockMvc.perform(put("/api/soloists/{id}", testId)
+        var mvcResult = mockMvc.perform(put("/api/soloists/{id}", testId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()));
 
@@ -208,9 +254,13 @@ public class SoloControllerTest {
 
         String jsonContent = objectMapper.writeValueAsString(testSolo);
 
-        mockMvc.perform(put("/api/soloists/{id}", testId)
+        var mvcResult = mockMvc.perform(put("/api/soloists/{id}", testId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isBadRequest());
 
         verify(soloService, never()).update(any(Solo.class));
@@ -218,13 +268,17 @@ public class SoloControllerTest {
 
     @Test
     void testUpdateSoloistNotFound() throws Exception {
-        when(soloService.update(any(Solo.class))).thenReturn(null);
+        when(soloService.update(any(Solo.class))).thenReturn(CompletableFuture.completedFuture(null));
 
         String jsonContent = objectMapper.writeValueAsString(testSolo);
 
-        mockMvc.perform(put("/api/soloists/{id}", testId)
+        var mvcResult = mockMvc.perform(put("/api/soloists/{id}", testId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNotFound());
 
         verify(soloService, times(1)).update(any(Solo.class));
@@ -232,9 +286,13 @@ public class SoloControllerTest {
 
     @Test
     void testDeleteSoloist() throws Exception {
-        doNothing().when(soloService).deleteById(testId);
+        when(soloService.deleteById(testId)).thenReturn(CompletableFuture.completedFuture(null));
 
-        mockMvc.perform(delete("/api/soloists/{id}", testId))
+        var mvcResult = mockMvc.perform(delete("/api/soloists/{id}", testId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNoContent());
 
         verify(soloService, times(1)).deleteById(testId);

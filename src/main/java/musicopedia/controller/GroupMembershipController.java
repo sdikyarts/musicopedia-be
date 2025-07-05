@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/memberships")
@@ -23,73 +24,82 @@ public class GroupMembershipController {
     }
 
     @GetMapping("/group/{groupId}")
-    public ResponseEntity<List<GroupMembership>> getMembershipsByGroupId(@PathVariable("groupId") UUID groupId) {
-        return ResponseEntity.ok(groupMembershipService.findByGroupId(groupId));
+    public CompletableFuture<ResponseEntity<List<GroupMembership>>> getMembershipsByGroupId(@PathVariable("groupId") UUID groupId) {
+        return groupMembershipService.findByGroupId(groupId)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/member/{memberId}")
-    public ResponseEntity<List<GroupMembership>> getMembershipsByMemberId(@PathVariable("memberId") UUID memberId) {
-        return ResponseEntity.ok(groupMembershipService.findByMemberId(memberId));
+    public CompletableFuture<ResponseEntity<List<GroupMembership>>> getMembershipsByMemberId(@PathVariable("memberId") UUID memberId) {
+        return groupMembershipService.findByMemberId(memberId)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/group/{groupId}/status/{status}")
-    public ResponseEntity<List<GroupMembership>> getMembershipsByGroupIdAndStatus(
+    public CompletableFuture<ResponseEntity<List<GroupMembership>>> getMembershipsByGroupIdAndStatus(
             @PathVariable("groupId") UUID groupId,
             @PathVariable("status") MembershipStatus status) {
-        return ResponseEntity.ok(groupMembershipService.findByGroupIdAndStatus(groupId, status));
+        return groupMembershipService.findByGroupIdAndStatus(groupId, status)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/group/{groupId}/former-members")
-    public ResponseEntity<List<GroupMembership>> getFormerMembersByGroupId(@PathVariable("groupId") UUID groupId) {
-        return ResponseEntity.ok(groupMembershipService.findFormerMembersByGroupId(groupId));
+    public CompletableFuture<ResponseEntity<List<GroupMembership>>> getFormerMembersByGroupId(@PathVariable("groupId") UUID groupId) {
+        return groupMembershipService.findFormerMembersByGroupId(groupId)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/group/{groupId}/joined-after")
-    public ResponseEntity<List<GroupMembership>> getMembersJoinedAfter(
+    public CompletableFuture<ResponseEntity<List<GroupMembership>>> getMembersJoinedAfter(
             @PathVariable("groupId") UUID groupId,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(groupMembershipService.findByGroupIdAndJoinDateAfter(groupId, date));
+        return groupMembershipService.findByGroupIdAndJoinDateAfter(groupId, date)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/group/{groupId}/left-before")
-    public ResponseEntity<List<GroupMembership>> getMembersLeftBefore(
+    public CompletableFuture<ResponseEntity<List<GroupMembership>>> getMembersLeftBefore(
             @PathVariable("groupId") UUID groupId,
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ResponseEntity.ok(groupMembershipService.findByGroupIdAndLeaveDateBefore(groupId, date));
+        return groupMembershipService.findByGroupIdAndLeaveDateBefore(groupId, date)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/group/{groupId}/count")
-    public ResponseEntity<Long> countMembersByGroupId(@PathVariable("groupId") UUID groupId) {
-        return ResponseEntity.ok(groupMembershipService.countByGroupId(groupId));
+    public CompletableFuture<ResponseEntity<Long>> countMembersByGroupId(@PathVariable("groupId") UUID groupId) {
+        return groupMembershipService.countByGroupId(groupId)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/group/{groupId}/count/{status}")
-    public ResponseEntity<Long> countMembersByGroupIdAndStatus(
+    public CompletableFuture<ResponseEntity<Long>> countMembersByGroupIdAndStatus(
             @PathVariable("groupId") UUID groupId,
             @PathVariable("status") MembershipStatus status) {
-        return ResponseEntity.ok(groupMembershipService.countByGroupIdAndStatus(groupId, status));
+        return groupMembershipService.countByGroupIdAndStatus(groupId, status)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/member/{memberId}/groups")
-    public ResponseEntity<List<GroupMembership>> getGroupsForMember(@PathVariable("memberId") UUID memberId) {
-        return ResponseEntity.ok(groupMembershipService.findGroupsForMember(memberId));
+    public CompletableFuture<ResponseEntity<List<GroupMembership>>> getGroupsForMember(@PathVariable("memberId") UUID memberId) {
+        return groupMembershipService.findGroupsForMember(memberId)
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping
-    public ResponseEntity<GroupMembership> createMembership(@RequestBody GroupMembership membership) {
-        GroupMembership savedMembership = groupMembershipService.save(membership);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedMembership);
+    public CompletableFuture<ResponseEntity<GroupMembership>> createMembership(@RequestBody GroupMembership membership) {
+        return groupMembershipService.save(membership)
+                .thenApply(savedMembership -> ResponseEntity.status(HttpStatus.CREATED).body(savedMembership));
     }
 
     @PutMapping
-    public ResponseEntity<GroupMembership> updateMembership(@RequestBody GroupMembership membership) {
-        GroupMembership updatedMembership = groupMembershipService.update(membership);
-        return ResponseEntity.ok(updatedMembership);
+    public CompletableFuture<ResponseEntity<GroupMembership>> updateMembership(@RequestBody GroupMembership membership) {
+        return groupMembershipService.update(membership)
+                .thenApply(ResponseEntity::ok);
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteMembership(@RequestBody GroupMembership membership) {
-        groupMembershipService.delete(membership);
-        return ResponseEntity.noContent().build();
+    public CompletableFuture<ResponseEntity<Void>> deleteMembership(@RequestBody GroupMembership membership) {
+        return groupMembershipService.delete(membership)
+                .thenApply(v -> ResponseEntity.noContent().<Void>build());
     }
 }

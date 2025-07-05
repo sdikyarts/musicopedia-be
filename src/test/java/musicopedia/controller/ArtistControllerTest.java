@@ -13,17 +13,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import musicopedia.builder.ArtistBuilder;
 
 @ExtendWith(MockitoExtension.class)
 public class ArtistControllerTest {
@@ -44,97 +47,126 @@ public class ArtistControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         testId = UUID.randomUUID();
-        testArtist = new Artist();
+        testArtist = new ArtistBuilder()
+            .setArtistName("IU")
+            .setType(ArtistType.SOLO)
+            .setOriginCountry("KR")
+            .setPrimaryLanguage("Korean")
+            .setSpotifyId("spotify123")
+            .build();
         testArtist.setArtistId(testId);
-        testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.SOLO);
-        testArtist.setOriginCountry("KR");
-        testArtist.setPrimaryLanguage("Korean");
-        testArtist.setSpotifyId("spotify123");
     }
 
     @Test
     void testGetAllArtists() throws Exception {
         List<Artist> artists = Arrays.asList(testArtist);
-        when(artistService.findAll()).thenReturn(artists);
+        when(artistService.findAllAsync()).thenReturn(CompletableFuture.completedFuture(artists));
 
-        mockMvc.perform(get("/api/artists"))
+        MvcResult mvcResult = mockMvc.perform(get("/api/artists"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
 
-        verify(artistService, times(1)).findAll();
+        verify(artistService, times(1)).findAllAsync();
     }
 
     @Test
     void testGetArtistById() throws Exception {
-        when(artistService.findById(testId)).thenReturn(Optional.of(testArtist));
+        when(artistService.findByIdAsync(testId)).thenReturn(CompletableFuture.completedFuture(Optional.of(testArtist)));
 
-        mockMvc.perform(get("/api/artists/{id}", testId))
+        MvcResult mvcResult = mockMvc.perform(get("/api/artists/{id}", testId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()))
                 .andExpect(jsonPath("$.artistName").value("IU"));
 
-        verify(artistService, times(1)).findById(testId);
+        verify(artistService, times(1)).findByIdAsync(testId);
     }
 
     @Test
     void testGetArtistByIdNotFound() throws Exception {
-        when(artistService.findById(testId)).thenReturn(Optional.empty());
+        when(artistService.findByIdAsync(testId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
 
-        mockMvc.perform(get("/api/artists/{id}", testId))
+        MvcResult mvcResult = mockMvc.perform(get("/api/artists/{id}", testId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNotFound());
 
-        verify(artistService, times(1)).findById(testId);
+        verify(artistService, times(1)).findByIdAsync(testId);
     }
 
     @Test
     void testSearchArtistsByName() throws Exception {
         List<Artist> artists = Arrays.asList(testArtist);
-        when(artistService.findByNameContaining("IU")).thenReturn(artists);
+        when(artistService.findByNameContainingAsync("IU")).thenReturn(CompletableFuture.completedFuture(artists));
 
-        mockMvc.perform(get("/api/artists/search")
+        MvcResult mvcResult = mockMvc.perform(get("/api/artists/search")
                         .param("name", "IU"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].artistName").value("IU"));
 
-        verify(artistService, times(1)).findByNameContaining("IU");
+        verify(artistService, times(1)).findByNameContainingAsync("IU");
     }
 
     @Test
     void testGetArtistBySpotifyId() throws Exception {
-        when(artistService.findBySpotifyId("spotify123")).thenReturn(Optional.of(testArtist));
+        when(artistService.findBySpotifyIdAsync("spotify123")).thenReturn(CompletableFuture.completedFuture(Optional.of(testArtist)));
 
-        mockMvc.perform(get("/api/artists/spotify/{spotifyId}", "spotify123"))
+        MvcResult mvcResult = mockMvc.perform(get("/api/artists/spotify/{spotifyId}", "spotify123"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()))
                 .andExpect(jsonPath("$.spotifyId").value("spotify123"));
 
-        verify(artistService, times(1)).findBySpotifyId("spotify123");
+        verify(artistService, times(1)).findBySpotifyIdAsync("spotify123");
     }
 
     @Test
     void testGetArtistBySpotifyIdNotFound() throws Exception {
-        when(artistService.findBySpotifyId("spotify123")).thenReturn(Optional.empty());
+        when(artistService.findBySpotifyIdAsync("spotify123")).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
 
-        mockMvc.perform(get("/api/artists/spotify/{spotifyId}", "spotify123"))
+        MvcResult mvcResult = mockMvc.perform(get("/api/artists/spotify/{spotifyId}", "spotify123"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNotFound());
 
-        verify(artistService, times(1)).findBySpotifyId("spotify123");
+        verify(artistService, times(1)).findBySpotifyIdAsync("spotify123");
     }
 
     @Test
     void testGetArtistsByType() throws Exception {
         List<Artist> artists = Arrays.asList(testArtist);
-        when(artistService.findByType(ArtistType.SOLO)).thenReturn(artists);
+        when(artistService.findByTypeAsync(ArtistType.SOLO)).thenReturn(CompletableFuture.completedFuture(artists));
 
-        mockMvc.perform(get("/api/artists/type/{type}", "SOLO"))
+        MvcResult mvcResult = mockMvc.perform(get("/api/artists/type/{type}", "SOLO"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].type").value("SOLO"));
 
-        verify(artistService, times(1)).findByType(ArtistType.SOLO);
+        verify(artistService, times(1)).findByTypeAsync(ArtistType.SOLO);
     }
 
     @Test
@@ -147,19 +179,22 @@ public class ArtistControllerTest {
         createRequest.setPrimaryLanguage("Korean");
         createRequest.setOriginCountry("KR");
 
-        when(artistService.createArtist(any(ArtistRequestDTO.class))).thenReturn(testArtist);
+        when(artistService.createArtistAsync(any(ArtistRequestDTO.class))).thenReturn(CompletableFuture.completedFuture(testArtist));
 
         String jsonContent = objectMapper.writeValueAsString(createRequest);
 
-        mockMvc.perform(post("/api/artists")
+        MvcResult mvcResult = mockMvc.perform(post("/api/artists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
-                .andDo(result -> {
-                    System.out.println("Status: " + result.getResponse().getStatus());
-                    System.out.println("Content: " + result.getResponse().getContentAsString());
-                });
+                .andExpect(request().asyncStarted())
+                .andReturn();
 
-        verify(artistService, times(1)).createArtist(any(ArtistRequestDTO.class));
+        mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.artistId").value(testId.toString()))
+                .andExpect(jsonPath("$.artistName").value("IU"));
+
+        verify(artistService, times(1)).createArtistAsync(any(ArtistRequestDTO.class));
     }
 
     @Test
@@ -169,55 +204,142 @@ public class ArtistControllerTest {
         createRequest.setArtistName("IU");
         createRequest.setType(ArtistType.SOLO);
 
-        when(artistService.createArtist(any(ArtistRequestDTO.class)))
-                .thenThrow(new IllegalArgumentException("Validation failed"));
+        CompletableFuture<Artist> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new IllegalArgumentException("Validation failed"));
+        when(artistService.createArtistAsync(any(ArtistRequestDTO.class))).thenReturn(failedFuture);
 
         String jsonContent = objectMapper.writeValueAsString(createRequest);
 
-        mockMvc.perform(post("/api/artists")
+        MvcResult mvcResult = mockMvc.perform(post("/api/artists")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isBadRequest());
 
-        verify(artistService, times(1)).createArtist(any(ArtistRequestDTO.class));
+        verify(artistService, times(1)).createArtistAsync(any(ArtistRequestDTO.class));
     }
 
     @Test
     void testCreateArtistLegacy() throws Exception {
         // Test the legacy endpoint
-        when(artistService.save(any(Artist.class))).thenReturn(testArtist);
+        when(artistService.saveAsync(any(Artist.class))).thenReturn(CompletableFuture.completedFuture(testArtist));
 
         String jsonContent = objectMapper.writeValueAsString(testArtist);
 
-        mockMvc.perform(post("/api/artists/legacy")
+        MvcResult mvcResult = mockMvc.perform(post("/api/artists/legacy")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()));
 
-        verify(artistService, times(1)).save(any(Artist.class));
+        verify(artistService, times(1)).saveAsync(any(Artist.class));
     }
 
     @Test
     void testDeleteArtistExists() throws Exception {
-        when(artistService.existsById(testId)).thenReturn(true);
-        doNothing().when(artistService).deleteById(testId);
+        when(artistService.existsByIdAsync(testId)).thenReturn(CompletableFuture.completedFuture(true));
+        when(artistService.deleteByIdAsync(testId)).thenReturn(CompletableFuture.completedFuture(null));
 
-        mockMvc.perform(delete("/api/artists/{id}", testId))
+        MvcResult mvcResult = mockMvc.perform(delete("/api/artists/{id}", testId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNoContent());
 
-        verify(artistService, times(1)).existsById(testId);
-        verify(artistService, times(1)).deleteById(testId);
+        verify(artistService, times(1)).existsByIdAsync(testId);
+        verify(artistService, times(1)).deleteByIdAsync(testId);
     }
 
     @Test
     void testDeleteArtistNotFound() throws Exception {
-        when(artistService.existsById(testId)).thenReturn(false);
+        when(artistService.existsByIdAsync(testId)).thenReturn(CompletableFuture.completedFuture(false));
 
-        mockMvc.perform(delete("/api/artists/{id}", testId))
+        MvcResult mvcResult = mockMvc.perform(delete("/api/artists/{id}", testId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNotFound());
 
-        verify(artistService, times(1)).existsById(testId);
-        verify(artistService, never()).deleteById(testId);
+        verify(artistService, times(1)).existsByIdAsync(testId);
+        verify(artistService, never()).deleteByIdAsync(testId);
+    }
+
+    @Test
+    void testCreateArtistsBatch_Success() throws Exception {
+        ArtistRequestDTO dto1 = new ArtistRequestDTO();
+        dto1.setArtistName("IU");
+        dto1.setType(ArtistType.SOLO);
+        dto1.setGenre("K-Pop");
+        dto1.setPrimaryLanguage("Korean");
+        dto1.setOriginCountry("KR");
+
+        ArtistRequestDTO dto2 = new ArtistRequestDTO();
+        dto2.setArtistName("BTS");
+        dto2.setType(ArtistType.GROUP);
+        dto2.setGenre("K-Pop");
+        dto2.setPrimaryLanguage("Korean");
+        dto2.setOriginCountry("KR");
+
+        Artist artist1 = new ArtistBuilder()
+            .setArtistName("IU")
+            .setType(ArtistType.SOLO)
+            .build();
+        artist1.setArtistId(UUID.randomUUID());
+        Artist artist2 = new ArtistBuilder()
+            .setArtistName("BTS")
+            .setType(ArtistType.GROUP)
+            .build();
+        artist2.setArtistId(UUID.randomUUID());
+
+        when(artistService.processBatchAsync(anyList()))
+            .thenReturn(CompletableFuture.completedFuture(Arrays.asList(artist1, artist2)));
+
+        String jsonContent = objectMapper.writeValueAsString(Arrays.asList(dto1, dto2));
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/artists/batch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent))
+            .andExpect(request().asyncStarted())
+            .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$[0].artistName").value("IU"))
+            .andExpect(jsonPath("$[1].artistName").value("BTS"));
+
+        verify(artistService, times(1)).processBatchAsync(anyList());
+    }
+
+    @Test
+    void testCreateArtistsBatch_ValidationError() throws Exception {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
+        dto.setArtistName(""); // Invalid
+
+        CompletableFuture<List<Artist>> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new IllegalArgumentException("Validation failed"));
+        when(artistService.processBatchAsync(anyList())).thenReturn(failedFuture);
+
+        String jsonContent = objectMapper.writeValueAsString(Arrays.asList(dto));
+
+        MvcResult mvcResult = mockMvc.perform(post("/api/artists/batch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent))
+            .andExpect(request().asyncStarted())
+            .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+            .andExpect(status().isBadRequest());
+
+        verify(artistService, times(1)).processBatchAsync(anyList());
     }
 }

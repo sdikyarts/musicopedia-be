@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,7 +74,8 @@ public class GroupMembershipServiceTest {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipRepository.findByGroup(testGroup)).thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findByGroup(testGroup);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findByGroup(testGroup);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("Kim Namjoon", result.get(0).getMember().getFullName());
@@ -86,7 +88,8 @@ public class GroupMembershipServiceTest {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipRepository.findByGroupId(groupId)).thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findByGroupId(groupId);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findByGroupId(groupId);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals(groupId, result.get(0).getId().getGroupId());
@@ -98,7 +101,8 @@ public class GroupMembershipServiceTest {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipRepository.findByMember(testMember)).thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findByMember(testMember);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findByMember(testMember);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("Kim Namjoon", result.get(0).getMember().getFullName());
@@ -110,7 +114,8 @@ public class GroupMembershipServiceTest {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipRepository.findByMemberId(memberId)).thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findByMemberId(memberId);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findByMemberId(memberId);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals(memberId, result.get(0).getId().getMemberId());
@@ -123,8 +128,9 @@ public class GroupMembershipServiceTest {
         when(groupMembershipRepository.findByGroupIdAndStatus(groupId, MembershipStatus.CURRENT))
             .thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findByGroupIdAndStatus(
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findByGroupIdAndStatus(
             groupId, MembershipStatus.CURRENT);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals(MembershipStatus.CURRENT, result.get(0).getStatus());
@@ -139,7 +145,8 @@ public class GroupMembershipServiceTest {
         
         when(groupMembershipRepository.findFormerMembersByGroupId(groupId)).thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findFormerMembersByGroupId(groupId);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findFormerMembersByGroupId(groupId);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         verify(groupMembershipRepository, times(1)).findFormerMembersByGroupId(groupId);
@@ -153,7 +160,8 @@ public class GroupMembershipServiceTest {
         when(groupMembershipRepository.findByGroupIdAndJoinDateAfter(groupId, date))
             .thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findByGroupIdAndJoinDateAfter(groupId, date);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findByGroupIdAndJoinDateAfter(groupId, date);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         verify(groupMembershipRepository, times(1)).findByGroupIdAndJoinDateAfter(groupId, date);
@@ -170,7 +178,8 @@ public class GroupMembershipServiceTest {
         when(groupMembershipRepository.findByGroupIdAndLeaveDateBefore(groupId, date))
             .thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findByGroupIdAndLeaveDateBefore(groupId, date);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findByGroupIdAndLeaveDateBefore(groupId, date);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         verify(groupMembershipRepository, times(1)).findByGroupIdAndLeaveDateBefore(groupId, date);
@@ -180,7 +189,8 @@ public class GroupMembershipServiceTest {
     void testCountByGroupId() {
         when(groupMembershipRepository.countByGroupId(groupId)).thenReturn(5L);
 
-        long result = groupMembershipService.countByGroupId(groupId);
+        CompletableFuture<Long> future = groupMembershipService.countByGroupId(groupId);
+        long result = future.join();
 
         assertEquals(5, result);
         verify(groupMembershipRepository, times(1)).countByGroupId(groupId);
@@ -191,7 +201,8 @@ public class GroupMembershipServiceTest {
         when(groupMembershipRepository.countByGroupIdAndStatus(groupId, MembershipStatus.CURRENT))
             .thenReturn(3L);
 
-        long result = groupMembershipService.countByGroupIdAndStatus(groupId, MembershipStatus.CURRENT);
+        CompletableFuture<Long> future = groupMembershipService.countByGroupIdAndStatus(groupId, MembershipStatus.CURRENT);
+        long result = future.join();
 
         assertEquals(3, result);
         verify(groupMembershipRepository, times(1))
@@ -203,7 +214,8 @@ public class GroupMembershipServiceTest {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipRepository.findGroupsForMember(memberId)).thenReturn(memberships);
 
-        List<GroupMembership> result = groupMembershipService.findGroupsForMember(memberId);
+        CompletableFuture<List<GroupMembership>> future = groupMembershipService.findGroupsForMember(memberId);
+        List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
         verify(groupMembershipRepository, times(1)).findGroupsForMember(memberId);
@@ -213,7 +225,8 @@ public class GroupMembershipServiceTest {
     void testSave() {
         when(groupMembershipRepository.save(any(GroupMembership.class))).thenReturn(testMembership);
 
-        GroupMembership savedMembership = groupMembershipService.save(testMembership);
+        CompletableFuture<GroupMembership> future = groupMembershipService.save(testMembership);
+        GroupMembership savedMembership = future.join();
 
         assertEquals(groupId, savedMembership.getId().getGroupId());
         assertEquals(memberId, savedMembership.getId().getMemberId());
@@ -227,7 +240,8 @@ public class GroupMembershipServiceTest {
         
         when(groupMembershipRepository.save(any(GroupMembership.class))).thenReturn(testMembership);
 
-        GroupMembership updatedMembership = groupMembershipService.update(testMembership);
+        CompletableFuture<GroupMembership> future = groupMembershipService.update(testMembership);
+        GroupMembership updatedMembership = future.join();
 
         assertEquals(MembershipStatus.FORMER, updatedMembership.getStatus());
         assertNotNull(updatedMembership.getLeaveDate());
@@ -238,10 +252,13 @@ public class GroupMembershipServiceTest {
     void testDelete() {
         doNothing().when(groupMembershipRepository).delete(testMembership);
 
-        groupMembershipService.delete(testMembership);
+        CompletableFuture<Void> future = groupMembershipService.delete(testMembership);
+        future.join();
 
         verify(groupMembershipRepository, times(1)).delete(testMembership);
     }
+    
+
     
     private GroupMembership createMembership(MembershipStatus status) {
         UUID testGroupId = UUID.randomUUID();

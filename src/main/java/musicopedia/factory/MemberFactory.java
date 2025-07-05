@@ -7,6 +7,8 @@ import musicopedia.model.enums.ArtistType;
 import musicopedia.service.ArtistService;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.CompletableFuture;
+
 @Component
 public class MemberFactory {
 
@@ -20,7 +22,7 @@ public class MemberFactory {
      * Creates a new Member entity from a MemberRequestDTO.
      * Validates solo artist reference if provided.
      */
-    public Member createMember(MemberRequestDTO dto) {
+    public CompletableFuture<Member> createMember(MemberRequestDTO dto) {
         // Basic validation
         if (dto.getFullName() == null || dto.getFullName().trim().isEmpty()) {
             throw new IllegalArgumentException("Member full name is required");
@@ -34,20 +36,24 @@ public class MemberFactory {
         
         // Handle solo artist reference with validation
         if (dto.getSoloArtistId() != null) {
-            Artist soloArtist = artistService.findById(dto.getSoloArtistId())
-                .orElseThrow(() -> new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
-            
-            // Business rule: Only allow SOLO type artists to be referenced
-            if (soloArtist.getType() != ArtistType.SOLO) {
-                throw new IllegalArgumentException(
-                    String.format("Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s", 
-                    dto.getFullName(), soloArtist.getArtistName(), soloArtist.getType()));
-            }
-            
-            member.setSoloArtist(soloArtist);
+            return artistService.findByIdAsync(dto.getSoloArtistId())
+                .thenCompose(optionalArtist -> {
+                    Artist soloArtist = optionalArtist.orElseThrow(() -> 
+                        new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
+                    
+                    // Business rule: Only allow SOLO type artists to be referenced
+                    if (soloArtist.getType() != ArtistType.SOLO) {
+                        throw new IllegalArgumentException(
+                            String.format("Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s", 
+                            dto.getFullName(), soloArtist.getArtistName(), soloArtist.getType()));
+                    }
+                    
+                    member.setSoloArtist(soloArtist);
+                    return CompletableFuture.completedFuture(member);
+                });
         }
         
-        return member;
+        return CompletableFuture.completedFuture(member);
     }
 
     /**

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -71,7 +72,8 @@ public class GroupServiceTest {
         
         when(groupRepository.findByType(ArtistType.GROUP)).thenReturn(artists);
 
-        List<Groups> result = groupService.findAll();
+        CompletableFuture<List<Groups>> resultFuture = groupService.findAll();
+        List<Groups> result = resultFuture.join();
 
         assertEquals(2, result.size());
         assertEquals("Group 1", result.get(0).getArtist().getArtistName());
@@ -83,7 +85,8 @@ public class GroupServiceTest {
     void testFindById() {
         when(groupRepository.findById(testId)).thenReturn(Optional.of(testArtist));
 
-        Optional<Groups> result = groupService.findById(testId);
+        CompletableFuture<Optional<Groups>> resultFuture = groupService.findById(testId);
+        Optional<Groups> result = resultFuture.join();
 
         assertTrue(result.isPresent());
         assertEquals("BTS", result.get().getArtist().getArtistName());
@@ -94,7 +97,8 @@ public class GroupServiceTest {
     void testFindByIdNotFound() {
         when(groupRepository.findById(testId)).thenReturn(Optional.empty());
 
-        Optional<Groups> result = groupService.findById(testId);
+        CompletableFuture<Optional<Groups>> resultFuture = groupService.findById(testId);
+        Optional<Groups> result = resultFuture.join();
 
         assertFalse(result.isPresent());
         verify(groupRepository, times(1)).findById(testId);
@@ -109,7 +113,8 @@ public class GroupServiceTest {
         
         when(groupRepository.findById(testId)).thenReturn(Optional.of(soloArtist));
 
-        Optional<Groups> result = groupService.findById(testId);
+        CompletableFuture<Optional<Groups>> resultFuture = groupService.findById(testId);
+        Optional<Groups> result = resultFuture.join();
 
         assertFalse(result.isPresent());
         verify(groupRepository, times(1)).findById(testId);
@@ -171,10 +176,11 @@ public class GroupServiceTest {
         doReturn(group3).when(groupServiceSpy).convertToGroup(artist3);
         doReturn(groupWithNullDate).when(groupServiceSpy).convertToGroup(artistWithNullDate);
 
-        List<Groups> result = groupServiceSpy.findByFormationDateBetween(
+        CompletableFuture<List<Groups>> resultFuture = groupServiceSpy.findByFormationDateBetween(
             LocalDate.of(2014, 1, 1), 
             LocalDate.of(2016, 12, 31)
         );
+        List<Groups> result = resultFuture.join();
 
         assertEquals(1, result.size());
         assertEquals("Group 2", result.get(0).getArtist().getArtistName());
@@ -216,7 +222,8 @@ public class GroupServiceTest {
         doReturn(active).when(groupServiceSpy).convertToGroup(activeGroup);
         doReturn(disbanded).when(groupServiceSpy).convertToGroup(disbandedGroup);
 
-        List<Groups> result = groupServiceSpy.findActiveGroups();
+        CompletableFuture<List<Groups>> resultFuture = groupServiceSpy.findActiveGroups();
+        List<Groups> result = resultFuture.join();
 
         assertEquals(1, result.size());
         assertEquals("Active", result.get(0).getArtist().getArtistName());
@@ -258,7 +265,8 @@ public class GroupServiceTest {
         doReturn(active).when(groupServiceSpy).convertToGroup(activeGroup);
         doReturn(disbanded).when(groupServiceSpy).convertToGroup(disbandedGroup);
 
-        List<Groups> result = groupServiceSpy.findDisbandedGroups();
+        CompletableFuture<List<Groups>> resultFuture = groupServiceSpy.findDisbandedGroups();
+        List<Groups> result = resultFuture.join();
 
         assertEquals(1, result.size());
         assertEquals("Disbanded", result.get(0).getArtist().getArtistName());
@@ -300,7 +308,8 @@ public class GroupServiceTest {
         doReturn(maleGroup).when(groupServiceSpy).convertToGroup(maleGroupArtist);
         doReturn(femaleGroup).when(groupServiceSpy).convertToGroup(femaleGroupArtist);
 
-        List<Groups> result = groupServiceSpy.findByGroupGender(ArtistGender.MALE);
+        CompletableFuture<List<Groups>> resultFuture = groupServiceSpy.findByGroupGender(ArtistGender.MALE);
+        List<Groups> result = resultFuture.join();
 
         assertEquals(1, result.size());
         assertEquals("Male Group", result.get(0).getArtist().getArtistName());
@@ -310,7 +319,8 @@ public class GroupServiceTest {
     void testSave() {
         when(groupRepository.save(any(Artist.class))).thenReturn(testArtist);
 
-        Groups savedGroup = groupService.save(testGroup, testArtist);
+        CompletableFuture<Groups> savedGroupFuture = groupService.save(testGroup, testArtist);
+        Groups savedGroup = savedGroupFuture.join();
 
         assertEquals(testId, savedGroup.getArtistId());
         assertEquals("BTS", savedGroup.getArtist().getArtistName());
@@ -323,7 +333,8 @@ public class GroupServiceTest {
         when(groupRepository.existsById(testId)).thenReturn(true);
         when(groupRepository.save(testArtist)).thenReturn(testArtist);
 
-        Groups updatedGroup = groupService.update(testGroup);
+        CompletableFuture<Groups> updatedGroupFuture = groupService.update(testGroup);
+        Groups updatedGroup = updatedGroupFuture.join();
 
         assertNotNull(updatedGroup);
         verify(groupRepository, times(1)).existsById(testId);
@@ -334,7 +345,8 @@ public class GroupServiceTest {
     void testUpdateNotFound() {
         when(groupRepository.existsById(testId)).thenReturn(false);
 
-        Groups updatedGroup = groupService.update(testGroup);
+        CompletableFuture<Groups> updatedGroupFuture = groupService.update(testGroup);
+        Groups updatedGroup = updatedGroupFuture.join();
 
         assertNull(updatedGroup);
         verify(groupRepository, times(1)).existsById(testId);
@@ -349,7 +361,8 @@ public class GroupServiceTest {
 
         when(groupRepository.existsById(testId)).thenReturn(true);
 
-        Groups updatedGroup = groupService.update(groupWithNullArtist);
+        CompletableFuture<Groups> updatedGroupFuture = groupService.update(groupWithNullArtist);
+        Groups updatedGroup = updatedGroupFuture.join();
 
         assertNotNull(updatedGroup);
         verify(groupRepository, times(1)).existsById(testId);
@@ -360,9 +373,31 @@ public class GroupServiceTest {
     void testDeleteById() {
         doNothing().when(groupRepository).deleteById(testId);
 
-        groupService.deleteById(testId);
+        groupService.deleteById(testId).join();
 
         verify(groupRepository, times(1)).deleteById(testId);
+    }
+
+    @Test
+    void testExistsById() {
+        when(groupRepository.existsById(testId)).thenReturn(true);
+
+        CompletableFuture<Boolean> future = groupService.existsById(testId);
+        Boolean exists = future.join();
+
+        assertTrue(exists);
+        verify(groupRepository, times(1)).existsById(testId);
+    }
+
+    @Test
+    void testExistsByIdNotFound() {
+        when(groupRepository.existsById(testId)).thenReturn(false);
+
+        CompletableFuture<Boolean> future = groupService.existsById(testId);
+        Boolean exists = future.join();
+
+        assertFalse(exists);
+        verify(groupRepository, times(1)).existsById(testId);
     }
 
 

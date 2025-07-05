@@ -2,6 +2,7 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicopedia.builder.MemberBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
 
@@ -23,11 +24,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 
 @Import(ServiceTestConfig.class)
 public class MemberControllerTest {
@@ -54,10 +57,12 @@ public class MemberControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         testId = UUID.randomUUID();
-        testMember = new Member();
+        testMember = new MemberBuilder()
+            .setFullName("Test Member")
+            .setDescription("A test member")
+            .setBirthDate(LocalDate.of(1990, 1, 1))
+            .build();
         testMember.setMemberId(testId);
-        testMember.setFullName("Jisoo");
-        testMember.setBirthDate(LocalDate.of(1995, 1, 3));
         
         // Setup DTOs
         testMemberResponseDTO = new MemberResponseDTO();
@@ -77,10 +82,13 @@ public class MemberControllerTest {
         List<Member> members = Arrays.asList(testMember);
         List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         
-        when(memberService.findAll()).thenReturn(members);
+        when(memberService.findAll()).thenReturn(CompletableFuture.completedFuture(members));
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
 
-        mockMvc.perform(get("/api/members"))
+        var result = mockMvc.perform(get("/api/members"))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].memberId").value(testId.toString()))
@@ -92,10 +100,13 @@ public class MemberControllerTest {
 
     @Test
     void testGetMemberById() throws Exception {
-        when(memberService.findById(testId)).thenReturn(Optional.of(testMember));
+        when(memberService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.of(testMember)));
         when(memberMapper.toResponseDTO(testMember)).thenReturn(testMemberResponseDTO);
 
-        mockMvc.perform(get("/api/members/{id}", testId))
+        var result = mockMvc.perform(get("/api/members/{id}", testId))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.memberId").value(testId.toString()))
                 .andExpect(jsonPath("$.fullName").value("Jisoo"));
@@ -106,9 +117,12 @@ public class MemberControllerTest {
 
     @Test
     void testGetMemberByIdNotFound() throws Exception {
-        when(memberService.findById(testId)).thenReturn(Optional.empty());
+        when(memberService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
 
-        mockMvc.perform(get("/api/members/{id}", testId))
+        var result = mockMvc.perform(get("/api/members/{id}", testId))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isNotFound());
 
         verify(memberService, times(1)).findById(testId);
@@ -119,11 +133,14 @@ public class MemberControllerTest {
         List<Member> members = Arrays.asList(testMember);
         List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         
-        when(memberService.findByNameContaining("Jisoo")).thenReturn(members);
+        when(memberService.findByNameContaining("Jisoo")).thenReturn(CompletableFuture.completedFuture(members));
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
 
-        mockMvc.perform(get("/api/members/search")
+        var result = mockMvc.perform(get("/api/members/search")
                         .param("name", "Jisoo"))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].fullName").value("Jisoo"));
@@ -139,12 +156,15 @@ public class MemberControllerTest {
         LocalDate startDate = LocalDate.of(1990, 1, 1);
         LocalDate endDate = LocalDate.of(1996, 12, 31);
         
-        when(memberService.findByBirthDateBetween(startDate, endDate)).thenReturn(members);
+        when(memberService.findByBirthDateBetween(startDate, endDate)).thenReturn(CompletableFuture.completedFuture(members));
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
 
-        mockMvc.perform(get("/api/members/birthdate")
+        var result = mockMvc.perform(get("/api/members/birthdate")
                         .param("start", "1990-01-01")
                         .param("end", "1996-12-31"))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].memberId").value(testId.toString()));
@@ -158,10 +178,13 @@ public class MemberControllerTest {
         List<Member> members = Arrays.asList(testMember);
         List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         
-        when(memberService.findBySoloArtistNotNull()).thenReturn(members);
+        when(memberService.findBySoloArtistNotNull()).thenReturn(CompletableFuture.completedFuture(members));
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
 
-        mockMvc.perform(get("/api/members/with-solo-career"))
+        var result = mockMvc.perform(get("/api/members/with-solo-career"))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].memberId").value(testId.toString()));
@@ -176,15 +199,18 @@ public class MemberControllerTest {
         createDTO.setFullName("Jisoo");
         createDTO.setBirthDate(LocalDate.of(1995, 1, 3));
         
-        when(memberMapper.toEntity(any(MemberRequestDTO.class))).thenReturn(testMember);
-        when(memberService.save(any(Member.class))).thenReturn(testMember);
+        when(memberMapper.toEntity(any(MemberRequestDTO.class))).thenReturn(CompletableFuture.completedFuture(testMember));
+        when(memberService.save(any(Member.class))).thenReturn(CompletableFuture.completedFuture(testMember));
         when(memberMapper.toResponseDTO(testMember)).thenReturn(testMemberResponseDTO);
 
         String jsonContent = objectMapper.writeValueAsString(createDTO);
 
-        mockMvc.perform(post("/api/members")
+        var result = mockMvc.perform(post("/api/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.memberId").value(testId.toString()));
 
@@ -200,15 +226,19 @@ public class MemberControllerTest {
         updateDTO.setFullName("Jisoo");
         updateDTO.setBirthDate(LocalDate.of(1995, 1, 3));
         
-        when(memberService.findById(testId)).thenReturn(Optional.of(testMember));
-        when(memberService.update(any(Member.class))).thenReturn(testMember);
+        when(memberService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.of(testMember)));
+        when(memberMapper.updateEntityFromDto(any(Member.class), any(MemberRequestDTO.class))).thenReturn(CompletableFuture.completedFuture(null));
+        when(memberService.update(any(Member.class))).thenReturn(CompletableFuture.completedFuture(testMember));
         when(memberMapper.toResponseDTO(testMember)).thenReturn(testMemberResponseDTO);
 
         String jsonContent = objectMapper.writeValueAsString(updateDTO);
 
-        mockMvc.perform(put("/api/members/{id}", testId)
+        var result = mockMvc.perform(put("/api/members/{id}", testId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.memberId").value(testId.toString()));
 
@@ -226,9 +256,12 @@ public class MemberControllerTest {
 
         String jsonContent = objectMapper.writeValueAsString(updateDTO);
 
-        mockMvc.perform(put("/api/members/{id}", testId)
+        var result = mockMvc.perform(put("/api/members/{id}", testId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isBadRequest());
 
         verify(memberService, never()).findById(any(UUID.class));
@@ -240,13 +273,16 @@ public class MemberControllerTest {
         MemberRequestDTO updateDTO = new MemberRequestDTO();
         updateDTO.setMemberId(testId);
         
-        when(memberService.findById(testId)).thenReturn(Optional.empty());
+        when(memberService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
 
         String jsonContent = objectMapper.writeValueAsString(updateDTO);
 
-        mockMvc.perform(put("/api/members/{id}", testId)
+        var result = mockMvc.perform(put("/api/members/{id}", testId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isNotFound());
 
         verify(memberService, times(1)).findById(testId);
@@ -260,15 +296,19 @@ public class MemberControllerTest {
         updateDTO.setFullName("Updated Name");
         updateDTO.setBirthDate(LocalDate.of(1995, 1, 3));
         
-        when(memberService.findById(testId)).thenReturn(Optional.of(testMember));
-        when(memberService.update(any(Member.class))).thenReturn(testMember);
+        when(memberService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.of(testMember)));
+        when(memberMapper.updateEntityFromDto(any(Member.class), any(MemberRequestDTO.class))).thenReturn(CompletableFuture.completedFuture(null));
+        when(memberService.update(any(Member.class))).thenReturn(CompletableFuture.completedFuture(testMember));
         when(memberMapper.toResponseDTO(testMember)).thenReturn(testMemberResponseDTO);
 
         String jsonContent = objectMapper.writeValueAsString(updateDTO);
 
-        mockMvc.perform(put("/api/members/{id}", testId)
+        var result = mockMvc.perform(put("/api/members/{id}", testId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.memberId").value(testId.toString()));
 
@@ -280,9 +320,12 @@ public class MemberControllerTest {
 
     @Test
     void testDeleteMember() throws Exception {
-        doNothing().when(memberService).deleteById(testId);
+        when(memberService.deleteById(testId)).thenReturn(CompletableFuture.completedFuture(null));
 
-        mockMvc.perform(delete("/api/members/{id}", testId))
+        var result = mockMvc.perform(delete("/api/members/{id}", testId))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isNoContent());
 
         verify(memberService, times(1)).deleteById(testId);

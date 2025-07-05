@@ -7,36 +7,65 @@ import musicopedia.dto.request.ArtistRequestDTO;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface ArtistService {
     
-
-    List<Artist> findAll();
+    /**
+     * Asynchronously find all artists
+     */
+    CompletableFuture<List<Artist>> findAllAsync();
     
-
-    Optional<Artist> findById(UUID artistId);
+    /**
+     * Asynchronously find artist by ID
+     */
+    CompletableFuture<Optional<Artist>> findByIdAsync(UUID artistId);
     
-
-    Optional<Artist> findBySpotifyId(String spotifyId);
+    /**
+     * Asynchronously find artist by Spotify ID
+     */
+    CompletableFuture<Optional<Artist>> findBySpotifyIdAsync(String spotifyId);
     
-
-    List<Artist> findByNameContaining(String name);
+    /**
+     * Asynchronously search artists by name
+     */
+    CompletableFuture<List<Artist>> findByNameContainingAsync(String name);
     
-
-    List<Artist> findByType(ArtistType type);
+    /**
+     * Asynchronously find artists by type
+     */
+    CompletableFuture<List<Artist>> findByTypeAsync(ArtistType type);
     
-
-    Artist save(Artist artist);
+    /**
+     * Asynchronously save an artist
+     */
+    CompletableFuture<Artist> saveAsync(Artist artist);
     
     /**
      * Creates and saves an artist using the factory pattern with type-specific validation
      * @param dto The creation request containing artist data
      * @return The created and saved Artist entity
      */
-    Artist createArtist(ArtistRequestDTO dto);
+    CompletableFuture<Artist> createArtistAsync(ArtistRequestDTO dto);
     
-
-    void deleteById(UUID artistId);
+    /**
+     * Asynchronously delete an artist by ID
+     */
+    CompletableFuture<Void> deleteByIdAsync(UUID artistId);
     
-    boolean existsById(UUID artistId);
+    /**
+     * Asynchronously check if artist exists
+     */
+    CompletableFuture<Boolean> existsByIdAsync(UUID artistId);
+    
+    /**
+     * Process multiple artists in batch asynchronously
+     */
+    CompletableFuture<List<Artist>> processBatchAsync(List<ArtistRequestDTO> dtos);
+    
+    /**
+     * Perform heavy processing operations asynchronously
+     * (e.g., data enrichment, external API calls)
+     */
+    CompletableFuture<Artist> enrichArtistDataAsync(UUID artistId);
 }

@@ -1,5 +1,6 @@
 package musicopedia.mapper;
 
+import musicopedia.builder.MemberBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
 
@@ -11,6 +12,7 @@ import musicopedia.service.ArtistService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class MemberMapper {
@@ -23,12 +25,12 @@ public class MemberMapper {
         this.memberFactory = memberFactory;
     }
 
-    public Member toEntity(MemberRequestDTO dto) {
+    public CompletableFuture<Member> toEntity(MemberRequestDTO dto) {
         // Use the factory to create member with validation
         return memberFactory.createMember(dto);
     }
 
-    public void updateEntityFromDto(Member member, MemberRequestDTO dto) {
+    public CompletableFuture<Void> updateEntityFromDto(Member member, MemberRequestDTO dto) {
         if (dto.getFullName() != null) {
             member.setFullName(dto.getFullName());
         }
@@ -44,18 +46,23 @@ public class MemberMapper {
         
         // Handle solo artist update
         if (dto.getSoloArtistId() != null) {
-            Artist soloArtist = artistService.findById(dto.getSoloArtistId())
-                .orElseThrow(() -> new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
-            
-            // Validate that the referenced artist is actually a solo artist
-            if (soloArtist.getType() != ArtistType.SOLO) {
-                throw new IllegalArgumentException("Referenced artist must be of type SOLO, but was: " + soloArtist.getType());
-            }
-            
-            member.setSoloArtist(soloArtist);
+            return artistService.findByIdAsync(dto.getSoloArtistId())
+                .thenCompose(optionalArtist -> {
+                    Artist soloArtist = optionalArtist.orElseThrow(() -> 
+                        new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
+                    
+                    // Validate that the referenced artist is actually a solo artist
+                    if (soloArtist.getType() != ArtistType.SOLO) {
+                        throw new IllegalArgumentException("Referenced artist must be of type SOLO, but was: " + soloArtist.getType());
+                    }
+                    
+                    member.setSoloArtist(soloArtist);
+                    return CompletableFuture.completedFuture(null);
+                });
         } else {
             // If soloArtistId is explicitly null in the update, remove the reference
             member.setSoloArtist(null);
+            return CompletableFuture.completedFuture(null);
         }
     }
 
@@ -106,5 +113,15 @@ public class MemberMapper {
         return members.stream()
                 .map(this::toSummaryDTO)
                 .toList();
+    }
+
+    public Member createMemberFromDto(MemberRequestDTO dto, Artist soloArtist) {
+        return new MemberBuilder()
+            .setFullName(dto.getFullName())
+            .setDescription(dto.getDescription())
+            .setImage(dto.getImage())
+            .setBirthDate(dto.getBirthDate())
+            .setSoloArtist(soloArtist)
+            .build();
     }
 }

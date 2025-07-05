@@ -2,6 +2,8 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.MemberBuilder;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
 import musicopedia.model.enums.ArtistType;
@@ -23,11 +25,13 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 
 @Import(ServiceTestConfig.class)
 public class GroupMembershipControllerTest {
@@ -54,15 +58,17 @@ public class GroupMembershipControllerTest {
         testGroupId = UUID.randomUUID();
         testMemberId = UUID.randomUUID();
 
-        testGroup = new Artist();
-        testGroup.setArtistId(testGroupId);
-        testGroup.setArtistName("BLACKPINK");
-        testGroup.setType(ArtistType.GROUP);
+        testGroup = new ArtistBuilder()
+            .setArtistId(testGroupId)
+            .setArtistName("BLACKPINK")
+            .setType(ArtistType.GROUP)
+            .build();
 
-        testMember = new Member();
+        testMember = new MemberBuilder()
+            .setFullName("Jisoo")
+            .setBirthDate(LocalDate.of(1995, 1, 3))
+            .build();
         testMember.setMemberId(testMemberId);
-        testMember.setFullName("Jisoo");
-        testMember.setBirthDate(LocalDate.of(1995, 1, 3));
 
         GroupMembershipId membershipId = new GroupMembershipId();
         membershipId.setGroupId(testGroupId);
@@ -79,9 +85,13 @@ public class GroupMembershipControllerTest {
     @Test
     void testGetMembershipsByGroupId() throws Exception {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
-        when(groupMembershipService.findByGroupId(testGroupId)).thenReturn(memberships);
+        when(groupMembershipService.findByGroupId(testGroupId)).thenReturn(CompletableFuture.completedFuture(memberships));
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}", testGroupId))
+        var mvcResult = mockMvc.perform(get("/api/memberships/group/{groupId}", testGroupId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id.groupId").value(testGroupId.toString()));
@@ -92,9 +102,13 @@ public class GroupMembershipControllerTest {
     @Test
     void testGetMembershipsByMemberId() throws Exception {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
-        when(groupMembershipService.findByMemberId(testMemberId)).thenReturn(memberships);
+        when(groupMembershipService.findByMemberId(testMemberId)).thenReturn(CompletableFuture.completedFuture(memberships));
 
-        mockMvc.perform(get("/api/memberships/member/{memberId}", testMemberId))
+        var mvcResult = mockMvc.perform(get("/api/memberships/member/{memberId}", testMemberId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id.memberId").value(testMemberId.toString()));
@@ -106,9 +120,13 @@ public class GroupMembershipControllerTest {
     void testGetMembershipsByGroupIdAndStatus() throws Exception {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipService.findByGroupIdAndStatus(testGroupId, MembershipStatus.CURRENT))
-                .thenReturn(memberships);
+                .thenReturn(CompletableFuture.completedFuture(memberships));
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/status/{status}", testGroupId, "CURRENT"))
+        var mvcResult = mockMvc.perform(get("/api/memberships/group/{groupId}/status/{status}", testGroupId, "CURRENT"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].status").value("CURRENT"));
@@ -126,9 +144,13 @@ public class GroupMembershipControllerTest {
         formerMember.setStatus(MembershipStatus.FORMER);
 
         List<GroupMembership> formerMemberships = Arrays.asList(formerMember);
-        when(groupMembershipService.findFormerMembersByGroupId(testGroupId)).thenReturn(formerMemberships);
+        when(groupMembershipService.findFormerMembersByGroupId(testGroupId)).thenReturn(CompletableFuture.completedFuture(formerMemberships));
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/former-members", testGroupId))
+        var mvcResult = mockMvc.perform(get("/api/memberships/group/{groupId}/former-members", testGroupId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].status").value("FORMER"));
@@ -141,10 +163,14 @@ public class GroupMembershipControllerTest {
         LocalDate afterDate = LocalDate.of(2016, 1, 1);
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipService.findByGroupIdAndJoinDateAfter(testGroupId, afterDate))
-                .thenReturn(memberships);
+                .thenReturn(CompletableFuture.completedFuture(memberships));
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/joined-after", testGroupId)
+        var mvcResult = mockMvc.perform(get("/api/memberships/group/{groupId}/joined-after", testGroupId)
                         .param("date", "2016-01-01"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id.groupId").value(testGroupId.toString()));
@@ -157,10 +183,14 @@ public class GroupMembershipControllerTest {
         LocalDate beforeDate = LocalDate.of(2020, 1, 1);
         List<GroupMembership> memberships = Arrays.asList(testMembership);
         when(groupMembershipService.findByGroupIdAndLeaveDateBefore(testGroupId, beforeDate))
-                .thenReturn(memberships);
+                .thenReturn(CompletableFuture.completedFuture(memberships));
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/left-before", testGroupId)
+        var mvcResult = mockMvc.perform(get("/api/memberships/group/{groupId}/left-before", testGroupId)
                         .param("date", "2020-01-01"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id.groupId").value(testGroupId.toString()));
@@ -170,9 +200,13 @@ public class GroupMembershipControllerTest {
 
     @Test
     void testCountMembersByGroupId() throws Exception {
-        when(groupMembershipService.countByGroupId(testGroupId)).thenReturn(4L);
+        when(groupMembershipService.countByGroupId(testGroupId)).thenReturn(CompletableFuture.completedFuture(4L));
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/count", testGroupId))
+        var mvcResult = mockMvc.perform(get("/api/memberships/group/{groupId}/count", testGroupId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(content().string("4"));
 
@@ -181,9 +215,13 @@ public class GroupMembershipControllerTest {
 
     @Test
     void testCountMembersByGroupIdAndStatus() throws Exception {
-        when(groupMembershipService.countByGroupIdAndStatus(testGroupId, MembershipStatus.CURRENT)).thenReturn(3L);
+        when(groupMembershipService.countByGroupIdAndStatus(testGroupId, MembershipStatus.CURRENT)).thenReturn(CompletableFuture.completedFuture(3L));
 
-        mockMvc.perform(get("/api/memberships/group/{groupId}/count/{status}", testGroupId, "CURRENT"))
+        var mvcResult = mockMvc.perform(get("/api/memberships/group/{groupId}/count/{status}", testGroupId, "CURRENT"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(content().string("3"));
 
@@ -193,9 +231,13 @@ public class GroupMembershipControllerTest {
     @Test
     void testGetGroupsForMember() throws Exception {
         List<GroupMembership> memberships = Arrays.asList(testMembership);
-        when(groupMembershipService.findGroupsForMember(testMemberId)).thenReturn(memberships);
+        when(groupMembershipService.findGroupsForMember(testMemberId)).thenReturn(CompletableFuture.completedFuture(memberships));
 
-        mockMvc.perform(get("/api/memberships/member/{memberId}/groups", testMemberId))
+        var mvcResult = mockMvc.perform(get("/api/memberships/member/{memberId}/groups", testMemberId))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].id.memberId").value(testMemberId.toString()));
@@ -205,13 +247,17 @@ public class GroupMembershipControllerTest {
 
     @Test
     void testCreateMembership() throws Exception {
-        when(groupMembershipService.save(any(GroupMembership.class))).thenReturn(testMembership);
+        when(groupMembershipService.save(any(GroupMembership.class))).thenReturn(CompletableFuture.completedFuture(testMembership));
 
         String jsonContent = objectMapper.writeValueAsString(testMembership);
 
-        mockMvc.perform(post("/api/memberships")
+        var mvcResult = mockMvc.perform(post("/api/memberships")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id.groupId").value(testGroupId.toString()));
 
@@ -220,13 +266,17 @@ public class GroupMembershipControllerTest {
 
     @Test
     void testUpdateMembership() throws Exception {
-        when(groupMembershipService.update(any(GroupMembership.class))).thenReturn(testMembership);
+        when(groupMembershipService.update(any(GroupMembership.class))).thenReturn(CompletableFuture.completedFuture(testMembership));
 
         String jsonContent = objectMapper.writeValueAsString(testMembership);
 
-        mockMvc.perform(put("/api/memberships")
+        var mvcResult = mockMvc.perform(put("/api/memberships")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.groupId").value(testGroupId.toString()));
 
@@ -235,13 +285,18 @@ public class GroupMembershipControllerTest {
 
     @Test
     void testDeleteMembership() throws Exception {
-        doNothing().when(groupMembershipService).delete(any(GroupMembership.class));
+        when(groupMembershipService.delete(any(GroupMembership.class)))
+                .thenReturn(CompletableFuture.completedFuture(null));
 
         String jsonContent = objectMapper.writeValueAsString(testMembership);
 
-        mockMvc.perform(delete("/api/memberships")
+        var mvcResult = mockMvc.perform(delete("/api/memberships")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonContent))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+                
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isNoContent());
 
         verify(groupMembershipService, times(1)).delete(any(GroupMembership.class));

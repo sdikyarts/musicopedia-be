@@ -1,5 +1,6 @@
 package musicopedia.factory;
 
+import musicopedia.builder.ArtistBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -42,21 +44,24 @@ class MemberFactoryTest {
         validDto.setBirthDate(LocalDate.of(1990, 1, 1));
         
         // Setup test artists
-        soloArtist = new Artist();
+        soloArtist = new ArtistBuilder()
+            .setArtistName("Solo Artist")
+            .setType(ArtistType.SOLO)
+            .build();
         soloArtist.setArtistId(UUID.randomUUID());
-        soloArtist.setArtistName("Solo Artist");
-        soloArtist.setType(ArtistType.SOLO);
         
-        groupArtist = new Artist();
+        groupArtist = new ArtistBuilder()
+            .setArtistName("Group Artist")
+            .setType(ArtistType.GROUP)
+            .build();
         groupArtist.setArtistId(UUID.randomUUID());
-        groupArtist.setArtistName("Group Artist");
-        groupArtist.setType(ArtistType.GROUP);
     }
 
     @Test
     void createMember_WithValidDataAndNoSoloArtist_ShouldCreateMember() {
         // When
-        Member result = memberFactory.createMember(validDto);
+        CompletableFuture<Member> resultFuture = memberFactory.createMember(validDto);
+        Member result = resultFuture.join();
 
         // Then
         assertNotNull(result);
@@ -73,10 +78,11 @@ class MemberFactoryTest {
         // Given
         UUID soloArtistId = UUID.randomUUID();
         validDto.setSoloArtistId(soloArtistId);
-        when(artistService.findById(soloArtistId)).thenReturn(Optional.of(soloArtist));
+        when(artistService.findByIdAsync(soloArtistId)).thenReturn(CompletableFuture.completedFuture(Optional.of(soloArtist)));
 
         // When
-        Member result = memberFactory.createMember(validDto);
+        CompletableFuture<Member> resultFuture = memberFactory.createMember(validDto);
+        Member result = resultFuture.join();
 
         // Then
         assertNotNull(result);
@@ -86,7 +92,7 @@ class MemberFactoryTest {
         assertEquals(LocalDate.of(1990, 1, 1), result.getBirthDate());
         assertNotNull(result.getSoloArtist());
         assertEquals(soloArtist, result.getSoloArtist());
-        verify(artistService).findById(soloArtistId);
+        verify(artistService).findByIdAsync(soloArtistId);
     }
 
     @Test
@@ -134,7 +140,8 @@ class MemberFactoryTest {
         validDto.setFullName("  John Doe  ");
 
         // When
-        Member result = memberFactory.createMember(validDto);
+        CompletableFuture<Member> resultFuture = memberFactory.createMember(validDto);
+        Member result = resultFuture.join();
 
         // Then
         assertEquals("John Doe", result.getFullName());
@@ -145,14 +152,22 @@ class MemberFactoryTest {
         // Given
         UUID nonExistentId = UUID.randomUUID();
         validDto.setSoloArtistId(nonExistentId);
-        when(artistService.findById(nonExistentId)).thenReturn(Optional.empty());
+        when(artistService.findByIdAsync(nonExistentId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberFactory.createMember(validDto);
+        CompletableFuture<Member> future = memberFactory.createMember(validDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            try {
+                future.join();
+            } catch (RuntimeException e) {
+                throw e.getCause() instanceof IllegalArgumentException ? e.getCause() : e;
+            }
         });
+        
+        assertTrue(exception instanceof IllegalArgumentException);
         assertEquals("Solo artist not found with ID: " + nonExistentId, exception.getMessage());
-        verify(artistService).findById(nonExistentId);
+        verify(artistService).findByIdAsync(nonExistentId);
     }
 
     @Test
@@ -160,66 +175,90 @@ class MemberFactoryTest {
         // Given
         UUID groupArtistId = UUID.randomUUID();
         validDto.setSoloArtistId(groupArtistId);
-        when(artistService.findById(groupArtistId)).thenReturn(Optional.of(groupArtist));
+        when(artistService.findByIdAsync(groupArtistId)).thenReturn(CompletableFuture.completedFuture(Optional.of(groupArtist)));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberFactory.createMember(validDto);
+        CompletableFuture<Member> future = memberFactory.createMember(validDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            try {
+                future.join();
+            } catch (RuntimeException e) {
+                throw e.getCause() instanceof IllegalArgumentException ? e.getCause() : e;
+            }
         });
+        
+        assertTrue(exception instanceof IllegalArgumentException);
         String expectedMessage = String.format(
             "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s",
             "John Doe", "Group Artist", ArtistType.GROUP
         );
         assertEquals(expectedMessage, exception.getMessage());
-        verify(artistService).findById(groupArtistId);
+        verify(artistService).findByIdAsync(groupArtistId);
     }
 
     @Test
     void createMember_WithFranchiseArtistReference_ShouldThrowException() {
         // Given
-        Artist franchiseArtist = new Artist();
-        franchiseArtist.setArtistId(UUID.randomUUID());
-        franchiseArtist.setArtistName("Franchise Artist");
-        franchiseArtist.setType(ArtistType.FRANCHISE);
+        Artist franchiseArtist = new ArtistBuilder()
+            .setArtistName("Franchise Artist")
+            .setType(ArtistType.FRANCHISE)
+            .build();
         
         UUID franchiseArtistId = UUID.randomUUID();
         validDto.setSoloArtistId(franchiseArtistId);
-        when(artistService.findById(franchiseArtistId)).thenReturn(Optional.of(franchiseArtist));
+        when(artistService.findByIdAsync(franchiseArtistId)).thenReturn(CompletableFuture.completedFuture(Optional.of(franchiseArtist)));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberFactory.createMember(validDto);
+        CompletableFuture<Member> future = memberFactory.createMember(validDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            try {
+                future.join();
+            } catch (RuntimeException e) {
+                throw e.getCause() instanceof IllegalArgumentException ? e.getCause() : e;
+            }
         });
+        
+        assertTrue(exception instanceof IllegalArgumentException);
         String expectedMessage = String.format(
             "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s",
             "John Doe", "Franchise Artist", ArtistType.FRANCHISE
         );
         assertEquals(expectedMessage, exception.getMessage());
-        verify(artistService).findById(franchiseArtistId);
+        verify(artistService).findByIdAsync(franchiseArtistId);
     }
 
     @Test
     void createMember_WithVariousArtistReference_ShouldThrowException() {
         // Given
-        Artist variousArtist = new Artist();
-        variousArtist.setArtistId(UUID.randomUUID());
-        variousArtist.setArtistName("Various Artists");
-        variousArtist.setType(ArtistType.VARIOUS);
+        Artist variousArtist = new ArtistBuilder()
+            .setArtistName("Various Artists")
+            .setType(ArtistType.VARIOUS)
+            .build();
         
         UUID variousArtistId = UUID.randomUUID();
         validDto.setSoloArtistId(variousArtistId);
-        when(artistService.findById(variousArtistId)).thenReturn(Optional.of(variousArtist));
+        when(artistService.findByIdAsync(variousArtistId)).thenReturn(CompletableFuture.completedFuture(Optional.of(variousArtist)));
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberFactory.createMember(validDto);
+        CompletableFuture<Member> future = memberFactory.createMember(validDto);
+        
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            try {
+                future.join();
+            } catch (RuntimeException e) {
+                throw e.getCause() instanceof IllegalArgumentException ? e.getCause() : e;
+            }
         });
+        
+        assertTrue(exception instanceof IllegalArgumentException);
         String expectedMessage = String.format(
             "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s",
             "John Doe", "Various Artists", ArtistType.VARIOUS
         );
         assertEquals(expectedMessage, exception.getMessage());
-        verify(artistService).findById(variousArtistId);
+        verify(artistService).findByIdAsync(variousArtistId);
     }
 
     @Test
@@ -259,9 +298,10 @@ class MemberFactoryTest {
         Member member = new Member();
         member.setFullName("Test Member");
         
-        Artist franchiseArtist = new Artist();
-        franchiseArtist.setArtistName("Franchise Artist");
-        franchiseArtist.setType(ArtistType.FRANCHISE);
+        Artist franchiseArtist = new ArtistBuilder()
+            .setArtistName("Franchise Artist")
+            .setType(ArtistType.FRANCHISE)
+            .build();
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -281,9 +321,10 @@ class MemberFactoryTest {
         Member member = new Member();
         member.setFullName("Test Member");
         
-        Artist variousArtist = new Artist();
-        variousArtist.setArtistName("Various Artists");
-        variousArtist.setType(ArtistType.VARIOUS);
+        Artist variousArtist = new ArtistBuilder()
+            .setArtistName("Various Artists")
+            .setType(ArtistType.VARIOUS)
+            .build();
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -334,7 +375,8 @@ class MemberFactoryTest {
         // All other fields are null
 
         // When
-        Member result = memberFactory.createMember(minimalDto);
+        CompletableFuture<Member> resultFuture = memberFactory.createMember(minimalDto);
+        Member result = resultFuture.join();
 
         // Then
         assertNotNull(result);
