@@ -21,6 +21,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 /**
@@ -38,6 +39,20 @@ class DTOIntegrationTest {
     @BeforeEach
     void setUp() {
         artistMapper = new ArtistMapper(artistFactoryManager);
+        // Default mock for any ArtistRequestDTO
+        lenient().when(artistFactoryManager.createArtist(any(ArtistRequestDTO.class))).thenAnswer(invocation -> {
+            ArtistRequestDTO dto = invocation.getArgument(0);
+            Artist artist = new Artist();
+            artist.setArtistName(dto.getArtistName());
+            artist.setType(dto.getType());
+            artist.setSpotifyId(dto.getSpotifyId());
+            artist.setDescription(dto.getDescription());
+            artist.setImage(dto.getImage());
+            artist.setPrimaryLanguage(dto.getPrimaryLanguage());
+            artist.setGenre(dto.getGenre());
+            artist.setOriginCountry(dto.getOriginCountry());
+            return artist;
+        });
     }
 
     @Test

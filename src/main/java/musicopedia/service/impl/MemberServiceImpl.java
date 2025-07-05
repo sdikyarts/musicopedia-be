@@ -3,6 +3,7 @@ package musicopedia.service.impl;
 import musicopedia.model.Member;
 import musicopedia.repository.MemberRepository;
 import musicopedia.service.MemberService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional
@@ -22,27 +24,34 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Async("memberProcessingExecutor")
     @Transactional(readOnly = true)
-    public List<Member> findAll() {
-        return memberRepository.findAll();
+    public CompletableFuture<List<Member>> findAll() {
+        List<Member> members = memberRepository.findAll();
+        return CompletableFuture.completedFuture(members);
     }
 
     @Override
+    @Async("memberProcessingExecutor")
     @Transactional(readOnly = true)
-    public Optional<Member> findById(UUID memberId) {
-        return memberRepository.findById(memberId);
+    public CompletableFuture<Optional<Member>> findById(UUID memberId) {
+        Optional<Member> member = memberRepository.findById(memberId);
+        return CompletableFuture.completedFuture(member);
     }
 
     @Override
+    @Async("memberProcessingExecutor")
     @Transactional(readOnly = true)
-    public List<Member> findByNameContaining(String name) {
-        return memberRepository.findByFullNameContainingIgnoreCase(name);
+    public CompletableFuture<List<Member>> findByNameContaining(String name) {
+        List<Member> members = memberRepository.findByFullNameContainingIgnoreCase(name);
+        return CompletableFuture.completedFuture(members);
     }
 
     @Override
+    @Async("memberProcessingExecutor")
     @Transactional(readOnly = true)
-    public List<Member> findByBirthDateBetween(LocalDate startDate, LocalDate endDate) {
-        return memberRepository.findAll().stream()
+    public CompletableFuture<List<Member>> findByBirthDateBetween(LocalDate startDate, LocalDate endDate) {
+        List<Member> members = memberRepository.findAll().stream()
                 .filter(member -> {
                     LocalDate birthDate = member.getBirthDate();
                     return birthDate != null && 
@@ -50,31 +59,48 @@ public class MemberServiceImpl implements MemberService {
                            !birthDate.isAfter(endDate);
                 })
                 .toList();
+        return CompletableFuture.completedFuture(members);
     }
 
     @Override
+    @Async("memberProcessingExecutor")
     @Transactional(readOnly = true)
-    public List<Member> findBySoloArtistNotNull() {
-        return memberRepository.findAll().stream()
+    public CompletableFuture<List<Member>> findBySoloArtistNotNull() {
+        List<Member> members = memberRepository.findAll().stream()
                 .filter(member -> member.getSoloArtist() != null)
                 .toList();
+        return CompletableFuture.completedFuture(members);
     }
 
     @Override
-    public Member save(Member member) {
-        return memberRepository.save(member);
+    @Async("memberProcessingExecutor")
+    public CompletableFuture<Member> save(Member member) {
+        Member savedMember = memberRepository.save(member);
+        return CompletableFuture.completedFuture(savedMember);
     }
 
     @Override
-    public Member update(Member member) {
+    @Async("memberProcessingExecutor")
+    public CompletableFuture<Member> update(Member member) {
         if (memberRepository.existsById(member.getMemberId())) {
-            return memberRepository.save(member);
+            Member updatedMember = memberRepository.save(member);
+            return CompletableFuture.completedFuture(updatedMember);
         }
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public void deleteById(UUID memberId) {
+    @Async("memberProcessingExecutor")
+    public CompletableFuture<Void> deleteById(UUID memberId) {
         memberRepository.deleteById(memberId);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    @Async("memberProcessingExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<Boolean> existsById(UUID memberId) {
+        boolean exists = memberRepository.existsById(memberId);
+        return CompletableFuture.completedFuture(exists);
     }
 }

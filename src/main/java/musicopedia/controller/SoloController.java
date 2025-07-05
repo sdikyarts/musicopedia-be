@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/soloists")
@@ -25,66 +25,73 @@ public class SoloController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Solo>> getAllSoloists() {
-        return ResponseEntity.ok(soloService.findAll());
+    public CompletableFuture<ResponseEntity<List<Solo>>> getAllSoloists() {
+        return soloService.findAll()
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Solo> getSoloistById(@PathVariable("id") UUID soloId) {
-        Optional<Solo> solo = soloService.findById(soloId);
-        return solo.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public CompletableFuture<ResponseEntity<Solo>> getSoloistById(@PathVariable("id") UUID soloId) {
+        return soloService.findById(soloId)
+                .thenApply(solo -> solo.map(ResponseEntity::ok)
+                        .orElse(ResponseEntity.notFound().build()));
     }
 
     @GetMapping("/birthdate")
-    public ResponseEntity<List<Solo>> getSoloistsByBirthDateRange(
+    public CompletableFuture<ResponseEntity<List<Solo>>> getSoloistsByBirthDateRange(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(soloService.findByBirthDateBetween(startDate, endDate));
+        return soloService.findByBirthDateBetween(startDate, endDate)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/gender/{gender}")
-    public ResponseEntity<List<Solo>> getSoloistsByGender(@PathVariable("gender") ArtistGender gender) {
-        return ResponseEntity.ok(soloService.findByGender(gender));
+    public CompletableFuture<ResponseEntity<List<Solo>>> getSoloistsByGender(@PathVariable("gender") ArtistGender gender) {
+        return soloService.findByGender(gender)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<Solo>> getActiveSoloists() {
-        return ResponseEntity.ok(soloService.findActiveSoloArtists());
+    public CompletableFuture<ResponseEntity<List<Solo>>> getActiveSoloists() {
+        return soloService.findActiveSoloArtists()
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/deceased")
-    public ResponseEntity<List<Solo>> getDeceasedSoloists() {
-        return ResponseEntity.ok(soloService.findDeceasedSoloArtists());
+    public CompletableFuture<ResponseEntity<List<Solo>>> getDeceasedSoloists() {
+        return soloService.findDeceasedSoloArtists()
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping
-    public ResponseEntity<Solo> createSoloist(@RequestBody Solo solo) {
+    public CompletableFuture<ResponseEntity<Solo>> createSoloist(@RequestBody Solo solo) {
         // For simplicity, we'll extract the artist from the solo object
         Artist artist = solo.getArtist();
         if (artist == null) {
-            return ResponseEntity.badRequest().build();
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
         }
-        Solo savedSolo = soloService.save(solo, artist);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedSolo);
+        return soloService.save(solo, artist)
+                .thenApply(savedSolo -> ResponseEntity.status(HttpStatus.CREATED).body(savedSolo));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Solo> updateSoloist(@PathVariable("id") UUID soloId, @RequestBody Solo solo) {
+    public CompletableFuture<ResponseEntity<Solo>> updateSoloist(@PathVariable("id") UUID soloId, @RequestBody Solo solo) {
         if (!solo.getArtistId().equals(soloId)) {
-            return ResponseEntity.badRequest().build();
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
         }
         
-        Solo updatedSolo = soloService.update(solo);
-        if (updatedSolo == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(updatedSolo);
+        return soloService.update(solo)
+                .thenApply(updatedSolo -> {
+                    if (updatedSolo == null) {
+                        return ResponseEntity.notFound().<Solo>build();
+                    }
+                    return ResponseEntity.ok(updatedSolo);
+                });
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSoloist(@PathVariable("id") UUID soloId) {
-        soloService.deleteById(soloId);
-        return ResponseEntity.noContent().build();
+    public CompletableFuture<ResponseEntity<Void>> deleteSoloist(@PathVariable("id") UUID soloId) {
+        return soloService.deleteById(soloId)
+                .thenApply(v -> ResponseEntity.noContent().<Void>build());
     }
 }

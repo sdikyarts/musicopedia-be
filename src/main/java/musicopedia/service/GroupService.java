@@ -8,24 +8,27 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface GroupService {
     
-    List<Groups> findAll();
+    CompletableFuture<List<Groups>> findAll();
     
-    Optional<Groups> findById(UUID groupId);
+    CompletableFuture<Optional<Groups>> findById(UUID groupId);
     
-    List<Groups> findByFormationDateBetween(LocalDate startDate, LocalDate endDate);
+    CompletableFuture<List<Groups>> findByFormationDateBetween(LocalDate startDate, LocalDate endDate);
     
-    List<Groups> findActiveGroups();
+    CompletableFuture<List<Groups>> findActiveGroups();
     
-    List<Groups> findDisbandedGroups();
+    CompletableFuture<List<Groups>> findDisbandedGroups();
     
-    List<Groups> findByGroupGender(ArtistGender gender);
+    CompletableFuture<List<Groups>> findByGroupGender(ArtistGender gender);
     
-    Groups save(Groups group, Artist artist);
+    CompletableFuture<Groups> save(Groups group, Artist artist);
     
-    Groups update(Groups group);
+    CompletableFuture<Groups> update(Groups group);
     
-    void deleteById(UUID groupId);
+    CompletableFuture<Void> deleteById(UUID groupId);
+    
+    CompletableFuture<Boolean> existsById(UUID groupId);
 }

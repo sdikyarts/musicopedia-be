@@ -8,34 +8,35 @@ import musicopedia.model.membership.GroupMembership;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface GroupMembershipService {
     
-    List<GroupMembership> findByGroup(Artist group);
+    CompletableFuture<List<GroupMembership>> findByGroup(Artist group);
     
-    List<GroupMembership> findByGroupId(UUID groupId);
+    CompletableFuture<List<GroupMembership>> findByGroupId(UUID groupId);
     
-    List<GroupMembership> findByMember(Member member);
+    CompletableFuture<List<GroupMembership>> findByMember(Member member);
     
-    List<GroupMembership> findByMemberId(UUID memberId);
+    CompletableFuture<List<GroupMembership>> findByMemberId(UUID memberId);
     
-    List<GroupMembership> findByGroupIdAndStatus(UUID groupId, MembershipStatus status);
+    CompletableFuture<List<GroupMembership>> findByGroupIdAndStatus(UUID groupId, MembershipStatus status);
     
-    List<GroupMembership> findFormerMembersByGroupId(UUID groupId);
+    CompletableFuture<List<GroupMembership>> findFormerMembersByGroupId(UUID groupId);
     
-    List<GroupMembership> findByGroupIdAndJoinDateAfter(UUID groupId, LocalDate date);
+    CompletableFuture<List<GroupMembership>> findByGroupIdAndJoinDateAfter(UUID groupId, LocalDate date);
     
-    List<GroupMembership> findByGroupIdAndLeaveDateBefore(UUID groupId, LocalDate date);
+    CompletableFuture<List<GroupMembership>> findByGroupIdAndLeaveDateBefore(UUID groupId, LocalDate date);
     
-    long countByGroupId(UUID groupId);
+    CompletableFuture<Long> countByGroupId(UUID groupId);
     
-    long countByGroupIdAndStatus(UUID groupId, MembershipStatus status);
+    CompletableFuture<Long> countByGroupIdAndStatus(UUID groupId, MembershipStatus status);
     
-    List<GroupMembership> findGroupsForMember(UUID memberId);
+    CompletableFuture<List<GroupMembership>> findGroupsForMember(UUID memberId);
     
-    GroupMembership save(GroupMembership membership);
+    CompletableFuture<GroupMembership> save(GroupMembership membership);
     
-    GroupMembership update(GroupMembership membership);
+    CompletableFuture<GroupMembership> update(GroupMembership membership);
     
-    void delete(GroupMembership membership);
+    CompletableFuture<Void> delete(GroupMembership membership);
 }

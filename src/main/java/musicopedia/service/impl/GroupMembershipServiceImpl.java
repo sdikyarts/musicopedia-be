@@ -6,12 +6,14 @@ import musicopedia.model.enums.MembershipStatus;
 import musicopedia.model.membership.GroupMembership;
 import musicopedia.repository.GroupMembershipRepository;
 import musicopedia.service.GroupMembershipService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional
@@ -24,83 +26,111 @@ public class GroupMembershipServiceImpl implements GroupMembershipService {
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findByGroup(Artist group) {
-        return groupMembershipRepository.findByGroup(group);
+    public CompletableFuture<List<GroupMembership>> findByGroup(Artist group) {
+        List<GroupMembership> memberships = groupMembershipRepository.findByGroup(group);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findByGroupId(UUID groupId) {
-        return groupMembershipRepository.findByGroupId(groupId);
+    public CompletableFuture<List<GroupMembership>> findByGroupId(UUID groupId) {
+        List<GroupMembership> memberships = groupMembershipRepository.findByGroupId(groupId);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findByMember(Member member) {
-        return groupMembershipRepository.findByMember(member);
+    public CompletableFuture<List<GroupMembership>> findByMember(Member member) {
+        List<GroupMembership> memberships = groupMembershipRepository.findByMember(member);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findByMemberId(UUID memberId) {
-        return groupMembershipRepository.findByMemberId(memberId);
+    public CompletableFuture<List<GroupMembership>> findByMemberId(UUID memberId) {
+        List<GroupMembership> memberships = groupMembershipRepository.findByMemberId(memberId);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findByGroupIdAndStatus(UUID groupId, MembershipStatus status) {
-        return groupMembershipRepository.findByGroupIdAndStatus(groupId, status);
+    public CompletableFuture<List<GroupMembership>> findByGroupIdAndStatus(UUID groupId, MembershipStatus status) {
+        List<GroupMembership> memberships = groupMembershipRepository.findByGroupIdAndStatus(groupId, status);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findFormerMembersByGroupId(UUID groupId) {
-        return groupMembershipRepository.findFormerMembersByGroupId(groupId);
+    public CompletableFuture<List<GroupMembership>> findFormerMembersByGroupId(UUID groupId) {
+        List<GroupMembership> memberships = groupMembershipRepository.findFormerMembersByGroupId(groupId);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findByGroupIdAndJoinDateAfter(UUID groupId, LocalDate date) {
-        return groupMembershipRepository.findByGroupIdAndJoinDateAfter(groupId, date);
+    public CompletableFuture<List<GroupMembership>> findByGroupIdAndJoinDateAfter(UUID groupId, LocalDate date) {
+        List<GroupMembership> memberships = groupMembershipRepository.findByGroupIdAndJoinDateAfter(groupId, date);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findByGroupIdAndLeaveDateBefore(UUID groupId, LocalDate date) {
-        return groupMembershipRepository.findByGroupIdAndLeaveDateBefore(groupId, date);
+    public CompletableFuture<List<GroupMembership>> findByGroupIdAndLeaveDateBefore(UUID groupId, LocalDate date) {
+        List<GroupMembership> memberships = groupMembershipRepository.findByGroupIdAndLeaveDateBefore(groupId, date);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public long countByGroupId(UUID groupId) {
-        return groupMembershipRepository.countByGroupId(groupId);
+    public CompletableFuture<Long> countByGroupId(UUID groupId) {
+        long count = groupMembershipRepository.countByGroupId(groupId);
+        return CompletableFuture.completedFuture(count);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public long countByGroupIdAndStatus(UUID groupId, MembershipStatus status) {
-        return groupMembershipRepository.countByGroupIdAndStatus(groupId, status);
+    public CompletableFuture<Long> countByGroupIdAndStatus(UUID groupId, MembershipStatus status) {
+        long count = groupMembershipRepository.countByGroupIdAndStatus(groupId, status);
+        return CompletableFuture.completedFuture(count);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<GroupMembership> findGroupsForMember(UUID memberId) {
-        return groupMembershipRepository.findGroupsForMember(memberId);
+    public CompletableFuture<List<GroupMembership>> findGroupsForMember(UUID memberId) {
+        List<GroupMembership> memberships = groupMembershipRepository.findGroupsForMember(memberId);
+        return CompletableFuture.completedFuture(memberships);
     }
 
     @Override
-    public GroupMembership save(GroupMembership membership) {
-        return groupMembershipRepository.save(membership);
+    @Async("taskExecutor")
+    public CompletableFuture<GroupMembership> save(GroupMembership membership) {
+        GroupMembership savedMembership = groupMembershipRepository.save(membership);
+        return CompletableFuture.completedFuture(savedMembership);
     }
 
     @Override
-    public GroupMembership update(GroupMembership membership) {
-        return groupMembershipRepository.save(membership);
+    @Async("taskExecutor")
+    public CompletableFuture<GroupMembership> update(GroupMembership membership) {
+        GroupMembership updatedMembership = groupMembershipRepository.save(membership);
+        return CompletableFuture.completedFuture(updatedMembership);
     }
 
     @Override
-    public void delete(GroupMembership membership) {
+    @Async("taskExecutor")
+    public CompletableFuture<Void> delete(GroupMembership membership) {
         groupMembershipRepository.delete(membership);
+        return CompletableFuture.completedFuture(null);
     }
 }

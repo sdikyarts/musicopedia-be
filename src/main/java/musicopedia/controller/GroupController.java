@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/groups")
@@ -25,66 +25,73 @@ public class GroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Groups>> getAllGroups() {
-        return ResponseEntity.ok(groupService.findAll());
+    public CompletableFuture<ResponseEntity<List<Groups>>> getAllGroups() {
+        return groupService.findAll()
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Groups> getGroupById(@PathVariable("id") UUID groupId) {
-        Optional<Groups> group = groupService.findById(groupId);
-        return group.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public CompletableFuture<ResponseEntity<Groups>> getGroupById(@PathVariable("id") UUID groupId) {
+        return groupService.findById(groupId)
+                .thenApply(group -> group.map(ResponseEntity::ok)
+                        .orElse(ResponseEntity.notFound().build()));
     }
 
     @GetMapping("/formation-date")
-    public ResponseEntity<List<Groups>> getGroupsByFormationDateRange(
+    public CompletableFuture<ResponseEntity<List<Groups>>> getGroupsByFormationDateRange(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(groupService.findByFormationDateBetween(startDate, endDate));
+        return groupService.findByFormationDateBetween(startDate, endDate)
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<List<Groups>> getActiveGroups() {
-        return ResponseEntity.ok(groupService.findActiveGroups());
+    public CompletableFuture<ResponseEntity<List<Groups>>> getActiveGroups() {
+        return groupService.findActiveGroups()
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/disbanded")
-    public ResponseEntity<List<Groups>> getDisbandedGroups() {
-        return ResponseEntity.ok(groupService.findDisbandedGroups());
+    public CompletableFuture<ResponseEntity<List<Groups>>> getDisbandedGroups() {
+        return groupService.findDisbandedGroups()
+                .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/gender/{gender}")
-    public ResponseEntity<List<Groups>> getGroupsByGender(@PathVariable("gender") ArtistGender gender) {
-        return ResponseEntity.ok(groupService.findByGroupGender(gender));
+    public CompletableFuture<ResponseEntity<List<Groups>>> getGroupsByGender(@PathVariable("gender") ArtistGender gender) {
+        return groupService.findByGroupGender(gender)
+                .thenApply(ResponseEntity::ok);
     }
 
     @PostMapping
-    public ResponseEntity<Groups> createGroup(@RequestBody Groups group) {
+    public CompletableFuture<ResponseEntity<Groups>> createGroup(@RequestBody Groups group) {
         // For simplicity, we'll extract the artist from the group object
         Artist artist = group.getArtist();
         if (artist == null) {
-            return ResponseEntity.badRequest().build();
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
         }
-        Groups savedGroup = groupService.save(group, artist);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedGroup);
+        return groupService.save(group, artist)
+                .thenApply(savedGroup -> ResponseEntity.status(HttpStatus.CREATED).body(savedGroup));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Groups> updateGroup(@PathVariable("id") UUID groupId, @RequestBody Groups group) {
+    public CompletableFuture<ResponseEntity<Groups>> updateGroup(@PathVariable("id") UUID groupId, @RequestBody Groups group) {
         if (!group.getArtistId().equals(groupId)) {
-            return ResponseEntity.badRequest().build();
+            return CompletableFuture.completedFuture(ResponseEntity.badRequest().build());
         }
         
-        Groups updatedGroup = groupService.update(group);
-        if (updatedGroup == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(updatedGroup);
+        return groupService.update(group)
+                .thenApply(updatedGroup -> {
+                    if (updatedGroup == null) {
+                        return ResponseEntity.notFound().<Groups>build();
+                    }
+                    return ResponseEntity.ok(updatedGroup);
+                });
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGroup(@PathVariable("id") UUID groupId) {
-        groupService.deleteById(groupId);
-        return ResponseEntity.noContent().build();
+    public CompletableFuture<ResponseEntity<Void>> deleteGroup(@PathVariable("id") UUID groupId) {
+        return groupService.deleteById(groupId)
+                .thenApply(v -> ResponseEntity.noContent().<Void>build());
     }
 }

@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,7 +63,8 @@ public class MemberServiceTest {
         
         when(memberRepository.findAll()).thenReturn(members);
 
-        List<Member> result = memberService.findAll();
+        CompletableFuture<List<Member>> future = memberService.findAll();
+        List<Member> result = future.join();
 
         assertEquals(2, result.size());
         assertEquals("Member 1", result.get(0).getFullName());
@@ -74,7 +76,8 @@ public class MemberServiceTest {
     void testFindById() {
         when(memberRepository.findById(testId)).thenReturn(Optional.of(testMember));
 
-        Optional<Member> result = memberService.findById(testId);
+        CompletableFuture<Optional<Member>> future = memberService.findById(testId);
+        Optional<Member> result = future.join();
 
         assertTrue(result.isPresent());
         assertEquals("Lee Ji-eun", result.get().getFullName());
@@ -90,7 +93,8 @@ public class MemberServiceTest {
         
         when(memberRepository.findByFullNameContainingIgnoreCase("Kim")).thenReturn(kimMembers);
 
-        List<Member> result = memberService.findByNameContaining("Kim");
+        CompletableFuture<List<Member>> future = memberService.findByNameContaining("Kim");
+        List<Member> result = future.join();
 
         assertEquals(2, result.size());
         assertTrue(result.stream().anyMatch(member -> member.getFullName().equals("Kim Namjoon")));
@@ -109,10 +113,11 @@ public class MemberServiceTest {
         
         when(memberRepository.findAll()).thenReturn(members);
 
-        List<Member> result = memberService.findByBirthDateBetween(
+        CompletableFuture<List<Member>> future = memberService.findByBirthDateBetween(
             LocalDate.of(1994, 1, 1), 
             LocalDate.of(1996, 12, 31)
         );
+        List<Member> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("Member 2", result.get(0).getFullName());
@@ -129,7 +134,8 @@ public class MemberServiceTest {
         
         when(memberRepository.findAll()).thenReturn(members);
 
-        List<Member> result = memberService.findBySoloArtistNotNull();
+        CompletableFuture<List<Member>> future = memberService.findBySoloArtistNotNull();
+        List<Member> result = future.join();
 
         assertEquals(1, result.size());
         assertEquals("With Solo", result.get(0).getFullName());
@@ -139,7 +145,8 @@ public class MemberServiceTest {
     void testSave() {
         when(memberRepository.save(any(Member.class))).thenReturn(testMember);
 
-        Member savedMember = memberService.save(testMember);
+        CompletableFuture<Member> future = memberService.save(testMember);
+        Member savedMember = future.join();
 
         assertEquals(testId, savedMember.getMemberId());
         assertEquals("Lee Ji-eun", savedMember.getFullName());
@@ -152,7 +159,8 @@ public class MemberServiceTest {
         when(memberRepository.save(testMember)).thenReturn(testMember);
 
         testMember.setFullName("Lee Ji-eun (Updated)");
-        Member updatedMember = memberService.update(testMember);
+        CompletableFuture<Member> future = memberService.update(testMember);
+        Member updatedMember = future.join();
 
         assertNotNull(updatedMember);
         assertEquals("Lee Ji-eun (Updated)", updatedMember.getFullName());
@@ -164,7 +172,8 @@ public class MemberServiceTest {
     void testUpdateNonExistent() {
         when(memberRepository.existsById(testId)).thenReturn(false);
 
-        Member updatedMember = memberService.update(testMember);
+        CompletableFuture<Member> future = memberService.update(testMember);
+        Member updatedMember = future.join();
 
         assertNull(updatedMember);
         verify(memberRepository, times(1)).existsById(testId);
@@ -175,10 +184,24 @@ public class MemberServiceTest {
     void testDeleteById() {
         doNothing().when(memberRepository).deleteById(testId);
 
-        memberService.deleteById(testId);
+        CompletableFuture<Void> future = memberService.deleteById(testId);
+        future.join();
 
         verify(memberRepository, times(1)).deleteById(testId);
     }
+
+    @Test
+    void testExistsById() {
+        when(memberRepository.existsById(testId)).thenReturn(true);
+        
+        CompletableFuture<Boolean> future = memberService.existsById(testId);
+        Boolean exists = future.join();
+        
+        assertTrue(exists);
+        verify(memberRepository, times(1)).existsById(testId);
+    }
+
+
 
     private Member createMember(String name, LocalDate birthDate) {
         Member member = new Member();

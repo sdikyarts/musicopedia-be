@@ -8,6 +8,7 @@ import musicopedia.repository.SoloRepository;
 import musicopedia.service.SoloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional
@@ -34,87 +36,107 @@ public class SoloServiceImpl implements SoloService {
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Solo> findAll() {
+    public CompletableFuture<List<Solo>> findAll() {
         List<Artist> artists = soloRepository.findByType(ArtistType.SOLO);
-        return artists.stream()
+        List<Solo> solos = artists.stream()
                 .map(this::convertToSolo)
                 .toList();
+        return CompletableFuture.completedFuture(solos);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public Optional<Solo> findById(UUID soloId) {
-        return soloRepository.findById(soloId)
+    public CompletableFuture<Optional<Solo>> findById(UUID soloId) {
+        Optional<Solo> solo = soloRepository.findById(soloId)
                 .filter(artist -> artist.getType() == ArtistType.SOLO)
                 .map(this::convertToSolo);
+        return CompletableFuture.completedFuture(solo);
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Solo> findByBirthDateBetween(LocalDate startDate, LocalDate endDate) {
-        List<Solo> allSolos = self.findAll();
-        return allSolos.stream()
-                .filter(solo -> {
-                    LocalDate birthDate = solo.getBirthDate();
-                    return birthDate != null && 
-                           !birthDate.isBefore(startDate) && 
-                           !birthDate.isAfter(endDate);
-                })
-                .toList();
+    public CompletableFuture<List<Solo>> findByBirthDateBetween(LocalDate startDate, LocalDate endDate) {
+        return self.findAll()
+                .thenApply(allSolos -> allSolos.stream()
+                        .filter(solo -> {
+                            LocalDate birthDate = solo.getBirthDate();
+                            return birthDate != null && 
+                                   !birthDate.isBefore(startDate) && 
+                                   !birthDate.isAfter(endDate);
+                        })
+                        .toList());
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Solo> findByGender(ArtistGender gender) {
-        List<Solo> allSolos = self.findAll();
-        return allSolos.stream()
-                .filter(solo -> solo.getGender() == gender)
-                .toList();
+    public CompletableFuture<List<Solo>> findByGender(ArtistGender gender) {
+        return self.findAll()
+                .thenApply(allSolos -> allSolos.stream()
+                        .filter(solo -> solo.getGender() == gender)
+                        .toList());
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Solo> findActiveSoloArtists() {
-        List<Solo> allSolos = self.findAll();
-        return allSolos.stream()
-                .filter(solo -> solo.getDeathDate() == null)
-                .toList();
+    public CompletableFuture<List<Solo>> findActiveSoloArtists() {
+        return self.findAll()
+                .thenApply(allSolos -> allSolos.stream()
+                        .filter(solo -> solo.getDeathDate() == null)
+                        .toList());
     }
 
     @Override
+    @Async("taskExecutor")
     @Transactional(readOnly = true)
-    public List<Solo> findDeceasedSoloArtists() {
-        List<Solo> allSolos = self.findAll();
-        return allSolos.stream()
-                .filter(solo -> solo.getDeathDate() != null)
-                .toList();
+    public CompletableFuture<List<Solo>> findDeceasedSoloArtists() {
+        return self.findAll()
+                .thenApply(allSolos -> allSolos.stream()
+                        .filter(solo -> solo.getDeathDate() != null)
+                        .toList());
     }
 
     @Override
-    public Solo save(Solo solo, Artist artist) {
+    @Async("taskExecutor")
+    public CompletableFuture<Solo> save(Solo solo, Artist artist) {
         artist.setType(ArtistType.SOLO);
         Artist savedArtist = soloRepository.save(artist);
         solo.setArtistId(savedArtist.getArtistId());
         solo.setArtist(savedArtist);
-        return solo;
+        return CompletableFuture.completedFuture(solo);
     }
 
     @Override
-    public Solo update(Solo solo) {
+    @Async("taskExecutor")
+    public CompletableFuture<Solo> update(Solo solo) {
         if (soloRepository.existsById(solo.getArtistId())) {
             Artist artist = solo.getArtist();
             if (artist != null) {
                 soloRepository.save(artist);
             }
-            return solo;
+            return CompletableFuture.completedFuture(solo);
         }
-        return null;
+        return CompletableFuture.completedFuture(null);
     }
 
     @Override
-    public void deleteById(UUID soloId) {
+    @Async("taskExecutor")
+    public CompletableFuture<Void> deleteById(UUID soloId) {
         soloRepository.deleteById(soloId);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    @Async("taskExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<Boolean> existsById(UUID soloId) {
+        boolean exists = soloRepository.existsById(soloId);
+        return CompletableFuture.completedFuture(exists);
     }
 
     // Changed to public for testing purposes

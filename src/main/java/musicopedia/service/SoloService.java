@@ -8,24 +8,27 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public interface SoloService {
     
-    List<Solo> findAll();
+    CompletableFuture<List<Solo>> findAll();
     
-    Optional<Solo> findById(UUID soloId);
+    CompletableFuture<Optional<Solo>> findById(UUID soloId);
     
-    List<Solo> findByBirthDateBetween(LocalDate startDate, LocalDate endDate);
+    CompletableFuture<List<Solo>> findByBirthDateBetween(LocalDate startDate, LocalDate endDate);
     
-    List<Solo> findByGender(ArtistGender gender);
+    CompletableFuture<List<Solo>> findByGender(ArtistGender gender);
     
-    List<Solo> findActiveSoloArtists();
+    CompletableFuture<List<Solo>> findActiveSoloArtists();
     
-    List<Solo> findDeceasedSoloArtists();
+    CompletableFuture<List<Solo>> findDeceasedSoloArtists();
     
-    Solo save(Solo solo, Artist artist);
+    CompletableFuture<Solo> save(Solo solo, Artist artist);
     
-    Solo update(Solo solo);
+    CompletableFuture<Solo> update(Solo solo);
     
-    void deleteById(UUID soloId);
+    CompletableFuture<Void> deleteById(UUID soloId);
+    
+    CompletableFuture<Boolean> existsById(UUID soloId);
 }
