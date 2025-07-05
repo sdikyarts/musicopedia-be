@@ -1,0 +1,48 @@
+package musicopedia.builder;
+
+import musicopedia.model.Member;
+import musicopedia.model.Artist;
+import java.time.LocalDate;
+
+public class MemberBuilder {
+    private String fullName;
+    private String description;
+    private String image;
+    private LocalDate birthDate;
+    private Artist soloArtist;
+
+    public MemberBuilder setFullName(String fullName) {
+        this.fullName = fullName;
+        return this;
+    }
+
+    public MemberBuilder setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public MemberBuilder setImage(String image) {
+        this.image = image;
+        return this;
+    }
+
+    public MemberBuilder setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+        return this;
+    }
+
+    public MemberBuilder setSoloArtist(Artist soloArtist) {
+        this.soloArtist = soloArtist;
+        return this;
+    }
+
+    public Member build() {
+        Member member = new Member();
+        member.setFullName(this.fullName);
+        member.setDescription(this.description);
+        member.setImage(this.image);
+        member.setBirthDate(this.birthDate);
+        member.setSoloArtist(this.soloArtist);
+        return member;
+    }
+}
