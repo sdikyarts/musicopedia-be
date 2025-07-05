@@ -64,7 +64,7 @@ public class MemberController {
     @PostMapping
     public CompletableFuture<ResponseEntity<MemberResponseDTO>> createMember(@RequestBody MemberRequestDTO createMemberRequestDTO) {
         return memberMapper.toEntity(createMemberRequestDTO)
-                .thenCompose(member -> memberService.save(member))
+                .thenCompose(memberService::save)
                 .thenApply(savedMember -> ResponseEntity.status(HttpStatus.CREATED).body(memberMapper.toResponseDTO(savedMember)));
     }
 
