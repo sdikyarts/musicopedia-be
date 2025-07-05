@@ -3,6 +3,8 @@ package musicopedia.model;
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.model.enums.GroupActivityStatus;
+import musicopedia.builder.GroupsBuilder;
+import musicopedia.builder.ArtistBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -16,23 +18,27 @@ public class GroupsTest {
     public void testConstructorAndGetters() {
         UUID artistId = UUID.randomUUID();
         
-        Artist artist = new Artist();
+        Artist artist = new ArtistBuilder()
+            .setArtistName("Test Group")
+            .setType(ArtistType.GROUP)
+            .build();
         artist.setArtistId(artistId);
-        artist.setArtistName("Test Group");
-        artist.setType(ArtistType.GROUP);
         
         LocalDate formationDate = LocalDate.of(2015, 1, 1);
         LocalDate disbandDate = null;
         ArtistGender groupGender = ArtistGender.MIXED;
         GroupActivityStatus activityStatus = GroupActivityStatus.ACTIVE;
         
-        Groups group = new Groups();
+        Groups group = new GroupsBuilder()
+            .setArtistName(artist.getArtistName())
+            .setType(artist.getType())
+            .setFormationDate(formationDate)
+            .setDisbandDate(disbandDate)
+            .setGroupGender(groupGender)
+            .setActivityStatus(activityStatus)
+            .buildGroups();
         group.setArtistId(artistId);
         group.setArtist(artist);
-        group.setFormationDate(formationDate);
-        group.setDisbandDate(disbandDate);
-        group.setGroupGender(groupGender);
-        group.setActivityStatus(activityStatus);
         
         assertEquals(artistId, group.getArtistId());
         assertEquals(artist, group.getArtist());

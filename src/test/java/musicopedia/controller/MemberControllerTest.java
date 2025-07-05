@@ -2,6 +2,7 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicopedia.builder.MemberBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
 
@@ -56,10 +57,12 @@ public class MemberControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         testId = UUID.randomUUID();
-        testMember = new Member();
+        testMember = new MemberBuilder()
+            .setFullName("Test Member")
+            .setDescription("A test member")
+            .setBirthDate(LocalDate.of(1990, 1, 1))
+            .build();
         testMember.setMemberId(testId);
-        testMember.setFullName("Jisoo");
-        testMember.setBirthDate(LocalDate.of(1995, 1, 3));
         
         // Setup DTOs
         testMemberResponseDTO = new MemberResponseDTO();

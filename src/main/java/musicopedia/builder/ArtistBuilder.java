@@ -3,6 +3,8 @@ package musicopedia.builder;
 import musicopedia.model.Artist;
 import musicopedia.model.enums.ArtistType;
 
+import java.util.UUID;
+
 public class ArtistBuilder {
     private String spotifyId;
     private String artistName;
@@ -12,6 +14,7 @@ public class ArtistBuilder {
     private String primaryLanguage;
     private String genre;
     private String originCountry;
+    protected UUID artistId;
 
     public ArtistBuilder setSpotifyId(String spotifyId) {
         this.spotifyId = spotifyId;
@@ -53,8 +56,14 @@ public class ArtistBuilder {
         return this;
     }
 
+    public ArtistBuilder setArtistId(UUID artistId) {
+        this.artistId = artistId;
+        return this;
+    }
+
     public Artist build() {
         Artist artist = new Artist();
+        artist.setArtistId(this.artistId);
         artist.setSpotifyId(this.spotifyId);
         artist.setArtistName(this.artistName);
         artist.setDescription(this.description);

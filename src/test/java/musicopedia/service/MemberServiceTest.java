@@ -1,5 +1,7 @@
 package musicopedia.service;
 
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.MemberBuilder;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
 import musicopedia.model.enums.ArtistType;
@@ -41,17 +43,19 @@ public class MemberServiceTest {
         memberService = new MemberServiceImpl(memberRepository);
 
         testId = UUID.randomUUID();
-        testSoloArtist = new Artist();
+        testSoloArtist = new ArtistBuilder()
+            .setArtistName("IU")
+            .setType(ArtistType.SOLO)
+            .build();
         testSoloArtist.setArtistId(UUID.randomUUID());
-        testSoloArtist.setArtistName("IU");
-        testSoloArtist.setType(ArtistType.SOLO);
 
-        testMember = new Member();
+        testMember = new MemberBuilder()
+            .setFullName("Lee Ji-eun")
+            .setDescription("A talented South Korean singer-songwriter and actress")
+            .setBirthDate(LocalDate.of(1993, 5, 16))
+            .setSoloArtist(testSoloArtist)
+            .build();
         testMember.setMemberId(testId);
-        testMember.setFullName("Lee Ji-eun");
-        testMember.setDescription("A talented South Korean singer-songwriter and actress");
-        testMember.setBirthDate(LocalDate.of(1993, 5, 16));
-        testMember.setSoloArtist(testSoloArtist);
     }
 
     @Test
@@ -204,10 +208,9 @@ public class MemberServiceTest {
 
 
     private Member createMember(String name, LocalDate birthDate) {
-        Member member = new Member();
-        member.setMemberId(UUID.randomUUID());
-        member.setFullName(name);
-        member.setBirthDate(birthDate);
-        return member;
+        return new MemberBuilder()
+            .setFullName(name)
+            .setBirthDate(birthDate)
+            .build();
     }
 }

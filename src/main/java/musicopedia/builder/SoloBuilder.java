@@ -4,12 +4,15 @@ import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.GroupAffiliationStatus;
 import java.time.LocalDate;
+import java.util.UUID;
+import musicopedia.model.Artist;
 
 public class SoloBuilder extends ArtistBuilder {
     private LocalDate birthDate;
     private LocalDate deathDate;
     private ArtistGender gender;
     private GroupAffiliationStatus groupAffiliationStatus;
+    private Artist artist;
 
     public SoloBuilder setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
@@ -71,10 +74,21 @@ public class SoloBuilder extends ArtistBuilder {
         super.setOriginCountry(originCountry);
         return this;
     }
+    @Override
+    public SoloBuilder setArtistId(UUID artistId) {
+        super.setArtistId(artistId);
+        return this;
+    }
+
+    public SoloBuilder setArtist(Artist artist) {
+        this.artist = artist;
+        return this;
+    }
 
     public Solo buildSolo() {
         Solo solo = new Solo();
-        solo.setArtist(super.build());
+        solo.setArtistId(super.artistId);
+        solo.setArtist(this.artist != null ? this.artist : super.build());
         solo.setBirthDate(this.birthDate);
         solo.setDeathDate(this.deathDate);
         solo.setGender(this.gender);

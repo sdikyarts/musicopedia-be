@@ -3,13 +3,16 @@ package musicopedia.builder;
 import musicopedia.model.Groups;
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.GroupActivityStatus;
+import musicopedia.model.Artist;
 import java.time.LocalDate;
+import java.util.UUID;
 
 public class GroupsBuilder extends ArtistBuilder {
     private LocalDate formationDate;
     private LocalDate disbandDate;
     private ArtistGender groupGender;
     private GroupActivityStatus activityStatus;
+    private Artist artist;
 
     public GroupsBuilder setFormationDate(LocalDate formationDate) {
         this.formationDate = formationDate;
@@ -71,10 +74,21 @@ public class GroupsBuilder extends ArtistBuilder {
         super.setOriginCountry(originCountry);
         return this;
     }
+    @Override
+    public GroupsBuilder setArtistId(UUID artistId) {
+        super.setArtistId(artistId);
+        return this;
+    }
+
+    public GroupsBuilder setArtist(Artist artist) {
+        this.artist = artist;
+        return this;
+    }
 
     public Groups buildGroups() {
         Groups groups = new Groups();
-        groups.setArtist(super.build());
+        groups.setArtistId(super.artistId);
+        groups.setArtist(this.artist != null ? this.artist : super.build());
         groups.setFormationDate(this.formationDate);
         groups.setDisbandDate(this.disbandDate);
         groups.setGroupGender(this.groupGender);

@@ -1,5 +1,6 @@
 package musicopedia.factory;
 
+import musicopedia.builder.ArtistBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
@@ -43,15 +44,17 @@ class MemberFactoryTest {
         validDto.setBirthDate(LocalDate.of(1990, 1, 1));
         
         // Setup test artists
-        soloArtist = new Artist();
+        soloArtist = new ArtistBuilder()
+            .setArtistName("Solo Artist")
+            .setType(ArtistType.SOLO)
+            .build();
         soloArtist.setArtistId(UUID.randomUUID());
-        soloArtist.setArtistName("Solo Artist");
-        soloArtist.setType(ArtistType.SOLO);
         
-        groupArtist = new Artist();
+        groupArtist = new ArtistBuilder()
+            .setArtistName("Group Artist")
+            .setType(ArtistType.GROUP)
+            .build();
         groupArtist.setArtistId(UUID.randomUUID());
-        groupArtist.setArtistName("Group Artist");
-        groupArtist.setType(ArtistType.GROUP);
     }
 
     @Test
@@ -197,10 +200,10 @@ class MemberFactoryTest {
     @Test
     void createMember_WithFranchiseArtistReference_ShouldThrowException() {
         // Given
-        Artist franchiseArtist = new Artist();
-        franchiseArtist.setArtistId(UUID.randomUUID());
-        franchiseArtist.setArtistName("Franchise Artist");
-        franchiseArtist.setType(ArtistType.FRANCHISE);
+        Artist franchiseArtist = new ArtistBuilder()
+            .setArtistName("Franchise Artist")
+            .setType(ArtistType.FRANCHISE)
+            .build();
         
         UUID franchiseArtistId = UUID.randomUUID();
         validDto.setSoloArtistId(franchiseArtistId);
@@ -229,10 +232,10 @@ class MemberFactoryTest {
     @Test
     void createMember_WithVariousArtistReference_ShouldThrowException() {
         // Given
-        Artist variousArtist = new Artist();
-        variousArtist.setArtistId(UUID.randomUUID());
-        variousArtist.setArtistName("Various Artists");
-        variousArtist.setType(ArtistType.VARIOUS);
+        Artist variousArtist = new ArtistBuilder()
+            .setArtistName("Various Artists")
+            .setType(ArtistType.VARIOUS)
+            .build();
         
         UUID variousArtistId = UUID.randomUUID();
         validDto.setSoloArtistId(variousArtistId);
@@ -295,9 +298,10 @@ class MemberFactoryTest {
         Member member = new Member();
         member.setFullName("Test Member");
         
-        Artist franchiseArtist = new Artist();
-        franchiseArtist.setArtistName("Franchise Artist");
-        franchiseArtist.setType(ArtistType.FRANCHISE);
+        Artist franchiseArtist = new ArtistBuilder()
+            .setArtistName("Franchise Artist")
+            .setType(ArtistType.FRANCHISE)
+            .build();
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -317,9 +321,10 @@ class MemberFactoryTest {
         Member member = new Member();
         member.setFullName("Test Member");
         
-        Artist variousArtist = new Artist();
-        variousArtist.setArtistName("Various Artists");
-        variousArtist.setType(ArtistType.VARIOUS);
+        Artist variousArtist = new ArtistBuilder()
+            .setArtistName("Various Artists")
+            .setType(ArtistType.VARIOUS)
+            .build();
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {

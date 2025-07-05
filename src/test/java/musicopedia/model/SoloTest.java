@@ -3,6 +3,8 @@ package musicopedia.model;
 import musicopedia.model.enums.ArtistGender;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.model.enums.GroupAffiliationStatus;
+import musicopedia.builder.SoloBuilder;
+import musicopedia.builder.ArtistBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -16,23 +18,27 @@ public class SoloTest {
     public void testConstructorAndGetters() {
         UUID artistId = UUID.randomUUID();
         
-        Artist artist = new Artist();
+        Artist artist = new ArtistBuilder()
+            .setArtistName("Solo Artist")
+            .setType(ArtistType.SOLO)
+            .build();
         artist.setArtistId(artistId);
-        artist.setArtistName("Solo Artist");
-        artist.setType(ArtistType.SOLO);
         
         LocalDate birthDate = LocalDate.of(1990, 3, 15);
         LocalDate deathDate = null;
         ArtistGender gender = ArtistGender.MALE;
         GroupAffiliationStatus groupAffiliationStatus = GroupAffiliationStatus.NEVER_IN_A_GROUP;
         
-        Solo solo = new Solo();
+        Solo solo = new SoloBuilder()
+            .setArtistName(artist.getArtistName())
+            .setType(artist.getType())
+            .setBirthDate(birthDate)
+            .setDeathDate(deathDate)
+            .setGender(gender)
+            .setGroupAffiliationStatus(groupAffiliationStatus)
+            .buildSolo();
         solo.setArtistId(artistId);
         solo.setArtist(artist);
-        solo.setBirthDate(birthDate);
-        solo.setDeathDate(deathDate);
-        solo.setGender(gender);
-        solo.setGroupAffiliationStatus(groupAffiliationStatus);
         
         assertEquals(artistId, solo.getArtistId());
         assertEquals(artist, solo.getArtist());

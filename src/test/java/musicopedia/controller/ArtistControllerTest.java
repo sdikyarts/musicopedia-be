@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import musicopedia.builder.ArtistBuilder;
 
 @ExtendWith(MockitoExtension.class)
 public class ArtistControllerTest {
@@ -46,13 +47,14 @@ public class ArtistControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         testId = UUID.randomUUID();
-        testArtist = new Artist();
+        testArtist = new ArtistBuilder()
+            .setArtistName("IU")
+            .setType(ArtistType.SOLO)
+            .setOriginCountry("KR")
+            .setPrimaryLanguage("Korean")
+            .setSpotifyId("spotify123")
+            .build();
         testArtist.setArtistId(testId);
-        testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.SOLO);
-        testArtist.setOriginCountry("KR");
-        testArtist.setPrimaryLanguage("Korean");
-        testArtist.setSpotifyId("spotify123");
     }
 
     @Test
@@ -287,15 +289,16 @@ public class ArtistControllerTest {
         dto2.setPrimaryLanguage("Korean");
         dto2.setOriginCountry("KR");
 
-        Artist artist1 = new Artist();
+        Artist artist1 = new ArtistBuilder()
+            .setArtistName("IU")
+            .setType(ArtistType.SOLO)
+            .build();
         artist1.setArtistId(UUID.randomUUID());
-        artist1.setArtistName("IU");
-        artist1.setType(ArtistType.SOLO);
-
-        Artist artist2 = new Artist();
+        Artist artist2 = new ArtistBuilder()
+            .setArtistName("BTS")
+            .setType(ArtistType.GROUP)
+            .build();
         artist2.setArtistId(UUID.randomUUID());
-        artist2.setArtistName("BTS");
-        artist2.setType(ArtistType.GROUP);
 
         when(artistService.processBatchAsync(anyList()))
             .thenReturn(CompletableFuture.completedFuture(Arrays.asList(artist1, artist2)));

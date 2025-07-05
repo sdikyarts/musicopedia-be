@@ -2,6 +2,8 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.SoloBuilder;
 import musicopedia.model.Artist;
 import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistGender;
@@ -51,18 +53,20 @@ public class SoloControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         testId = UUID.randomUUID();
-        testArtist = new Artist();
-        testArtist.setArtistId(testId);
-        testArtist.setArtistName("IU");
-        testArtist.setType(ArtistType.SOLO);
-        testArtist.setOriginCountry("KR");
-        testArtist.setPrimaryLanguage("Korean");
+        testArtist = new ArtistBuilder()
+            .setArtistId(testId)
+            .setArtistName("IU")
+            .setType(ArtistType.SOLO)
+            .setOriginCountry("KR")
+            .setPrimaryLanguage("Korean")
+            .build();
 
-        testSolo = new Solo();
-        testSolo.setArtistId(testId);
-        testSolo.setArtist(testArtist);
-        testSolo.setBirthDate(LocalDate.of(1993, 5, 16));
-        testSolo.setGender(ArtistGender.FEMALE);
+        testSolo = new SoloBuilder()
+            .setArtistId(testId)
+            .setArtist(testArtist)
+            .setBirthDate(LocalDate.of(1993, 5, 16))
+            .setGender(ArtistGender.FEMALE)
+            .buildSolo();
     }
 
     @Test

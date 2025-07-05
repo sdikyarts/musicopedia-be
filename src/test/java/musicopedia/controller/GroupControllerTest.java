@@ -2,6 +2,8 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.GroupsBuilder;
 import musicopedia.model.Artist;
 import musicopedia.model.Groups;
 import musicopedia.model.enums.ArtistGender;
@@ -51,18 +53,20 @@ public class GroupControllerTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         testId = UUID.randomUUID();
-        testArtist = new Artist();
-        testArtist.setArtistId(testId);
-        testArtist.setArtistName("BLACKPINK");
-        testArtist.setType(ArtistType.GROUP);
-        testArtist.setOriginCountry("KR");
-        testArtist.setPrimaryLanguage("Korean");
+        testArtist = new ArtistBuilder()
+            .setArtistId(testId)
+            .setArtistName("BLACKPINK")
+            .setType(ArtistType.GROUP)
+            .setOriginCountry("KR")
+            .setPrimaryLanguage("Korean")
+            .build();
 
-        testGroup = new Groups();
-        testGroup.setArtistId(testId);
-        testGroup.setArtist(testArtist);
-        testGroup.setFormationDate(LocalDate.of(2016, 8, 8));
-        testGroup.setGroupGender(ArtistGender.FEMALE);
+        testGroup = new GroupsBuilder()
+            .setArtistId(testId)
+            .setArtist(testArtist)
+            .setFormationDate(LocalDate.of(2016, 8, 8))
+            .setGroupGender(ArtistGender.FEMALE)
+            .buildGroups();
     }
 
     @Test

@@ -1,5 +1,7 @@
 package musicopedia.mapper;
 
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.MemberBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
 
@@ -46,24 +48,26 @@ class MemberMapperTest {
         memberMapper = new MemberMapper(artistService, memberFactory);
 
         // Setup test member
-        testMember = new Member();
+        testMember = new MemberBuilder()
+            .setFullName("Test Member")
+            .setDescription("Test description")
+            .setImage("test-image.jpg")
+            .setBirthDate(LocalDate.of(1990, 1, 1))
+            .build();
         testMember.setMemberId(UUID.randomUUID());
-        testMember.setFullName("Test Member");
-        testMember.setDescription("Test description");
-        testMember.setImage("test-image.jpg");
-        testMember.setBirthDate(LocalDate.of(1990, 1, 1));
 
         // Setup solo artist
-        soloArtist = new Artist();
+        soloArtist = new ArtistBuilder()
+            .setArtistName("Solo Artist")
+            .setType(ArtistType.SOLO)
+            .build();
         soloArtist.setArtistId(UUID.randomUUID());
-        soloArtist.setArtistName("Solo Artist");
-        soloArtist.setType(ArtistType.SOLO);
-
         // Setup group artist
-        groupArtist = new Artist();
+        groupArtist = new ArtistBuilder()
+            .setArtistName("Group Artist")
+            .setType(ArtistType.GROUP)
+            .build();
         groupArtist.setArtistId(UUID.randomUUID());
-        groupArtist.setArtistName("Group Artist");
-        groupArtist.setType(ArtistType.GROUP);
 
         // Setup DTOs
         createDto = new MemberRequestDTO();
@@ -82,7 +86,9 @@ class MemberMapperTest {
     @Test
     void toEntity_ShouldDelegateToMemberFactory() {
         // Given
-        Member expectedMember = new Member();
+        Member expectedMember = new MemberBuilder()
+            .setFullName("Expected Member")
+            .build();
         when(memberFactory.createMember(createDto)).thenReturn(CompletableFuture.completedFuture(expectedMember));
 
         // When
@@ -475,5 +481,31 @@ class MemberMapperTest {
         assertEquals(testMember.getImage(), dto.getImage());
         assertEquals(testMember.getBirthDate(), dto.getBirthDate());
         assertFalse(dto.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void createMemberFromDto_ShouldMapAllFieldsCorrectly() {
+        // Given
+        MemberRequestDTO dto = new MemberRequestDTO();
+        dto.setFullName("Jane Doe");
+        dto.setDescription("A test member");
+        dto.setImage("jane.jpg");
+        dto.setBirthDate(LocalDate.of(1992, 2, 2));
+        Artist soloArtist = new ArtistBuilder()
+            .setArtistName("Solo Jane")
+            .setType(ArtistType.SOLO)
+            .build();
+        soloArtist.setArtistId(UUID.randomUUID());
+
+        // When
+        Member member = memberMapper.createMemberFromDto(dto, soloArtist);
+
+        // Then
+        assertNotNull(member);
+        assertEquals("Jane Doe", member.getFullName());
+        assertEquals("A test member", member.getDescription());
+        assertEquals("jane.jpg", member.getImage());
+        assertEquals(LocalDate.of(1992, 2, 2), member.getBirthDate());
+        assertEquals(soloArtist, member.getSoloArtist());
     }
 }

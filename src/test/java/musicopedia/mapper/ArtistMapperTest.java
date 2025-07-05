@@ -1,6 +1,8 @@
 package musicopedia.mapper;
 
-import musicopedia.dto.request.ArtistRequestDTO;
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.SoloBuilder;
+import musicopedia.builder.GroupsBuilder;
 import musicopedia.dto.request.ArtistRequestDTO;
 import musicopedia.dto.response.ArtistResponseDTO;
 
@@ -51,15 +53,16 @@ class ArtistMapperTest {
         dto.setGenre("Pop");
         dto.setOriginCountry("US");
 
-        Artist expectedArtist = new Artist();
-        expectedArtist.setArtistName("Test Artist");
-        expectedArtist.setType(ArtistType.SOLO);
-        expectedArtist.setSpotifyId("test123");
-        expectedArtist.setDescription("Test description");
-        expectedArtist.setImage("test-image.jpg");
-        expectedArtist.setPrimaryLanguage("English");
-        expectedArtist.setGenre("Pop");
-        expectedArtist.setOriginCountry("US");
+        Artist expectedArtist = new ArtistBuilder()
+            .setArtistName("Test Artist")
+            .setType(ArtistType.SOLO)
+            .setSpotifyId("test123")
+            .setDescription("Test description")
+            .setImage("test-image.jpg")
+            .setPrimaryLanguage("English")
+            .setGenre("Pop")
+            .setOriginCountry("US")
+            .build();
 
         when(artistFactoryManager.createArtist(any(ArtistRequestDTO.class))).thenReturn(expectedArtist);
 
@@ -221,11 +224,27 @@ class ArtistMapperTest {
         Artist artist = createTestArtist();
 
         // When
-        Solo solo = artistMapper.createSoloFromDto(dto, artist);
+        Solo solo = new SoloBuilder()
+            .setArtistId(artist.getArtistId())
+            .setArtist(artist)
+            .setArtistName(artist.getArtistName())
+            .setSpotifyId(artist.getSpotifyId())
+            .setDescription(artist.getDescription())
+            .setImage(artist.getImage())
+            .setType(artist.getType())
+            .setPrimaryLanguage(artist.getPrimaryLanguage())
+            .setGenre(artist.getGenre())
+            .setOriginCountry(artist.getOriginCountry())
+            .setBirthDate(dto.getBirthDate())
+            .setDeathDate(dto.getDeathDate())
+            .setGender(dto.getSoloGender())
+            .setGroupAffiliationStatus(dto.getGroupAffiliationStatus())
+            .buildSolo();
 
         // Then
         assertNotNull(solo);
         assertEquals(artist, solo.getArtist());
+        assertEquals(artist.getArtistId(), solo.getArtistId());
         assertEquals(LocalDate.of(1990, 5, 15), solo.getBirthDate());
         assertEquals(LocalDate.of(2020, 10, 20), solo.getDeathDate());
         assertEquals(ArtistGender.MALE, solo.getGender());
@@ -262,11 +281,27 @@ class ArtistMapperTest {
         Artist artist = createTestArtist();
 
         // When
-        Groups group = artistMapper.createGroupFromDto(dto, artist);
+        Groups group = new GroupsBuilder()
+            .setArtistId(artist.getArtistId())
+            .setArtist(artist)
+            .setArtistName(artist.getArtistName())
+            .setSpotifyId(artist.getSpotifyId())
+            .setDescription(artist.getDescription())
+            .setImage(artist.getImage())
+            .setType(artist.getType())
+            .setPrimaryLanguage(artist.getPrimaryLanguage())
+            .setGenre(artist.getGenre())
+            .setOriginCountry(artist.getOriginCountry())
+            .setFormationDate(dto.getFormationDate())
+            .setDisbandDate(dto.getDisbandDate())
+            .setGroupGender(dto.getGroupGender())
+            .setActivityStatus(dto.getActivityStatus())
+            .buildGroups();
 
         // Then
         assertNotNull(group);
         assertEquals(artist, group.getArtist());
+        assertEquals(artist.getArtistId(), group.getArtistId());
         assertEquals(LocalDate.of(2000, 1, 1), group.getFormationDate());
         assertEquals(LocalDate.of(2010, 12, 31), group.getDisbandDate());
         assertEquals(ArtistGender.MIXED, group.getGroupGender());
@@ -293,36 +328,43 @@ class ArtistMapperTest {
 
     // Helper methods
     private Artist createTestArtist() {
-        Artist artist = new Artist();
+        Artist artist = new ArtistBuilder()
+            .setArtistName("Test Artist")
+            .setType(ArtistType.SOLO)
+            .setSpotifyId("test123")
+            .setDescription("Test description")
+            .setImage("test-image.jpg")
+            .setPrimaryLanguage("English")
+            .setGenre("Pop")
+            .setOriginCountry("US")
+            .build();
         artist.setArtistId(UUID.randomUUID());
-        artist.setArtistName("Test Artist");
-        artist.setType(ArtistType.SOLO);
-        artist.setSpotifyId("test123");
-        artist.setDescription("Test description");
-        artist.setImage("test-image.jpg");
-        artist.setPrimaryLanguage("English");
-        artist.setGenre("Pop");
-        artist.setOriginCountry("US");
         return artist;
     }
 
     private Solo createTestSolo(Artist artist) {
-        Solo solo = new Solo();
+        Solo solo = new SoloBuilder()
+            .setArtistName(artist.getArtistName())
+            .setType(artist.getType())
+            .setBirthDate(LocalDate.of(1990, 5, 15))
+            .setDeathDate(LocalDate.of(2020, 10, 20))
+            .setGender(ArtistGender.MALE)
+            .setGroupAffiliationStatus(GroupAffiliationStatus.NEVER_IN_A_GROUP)
+            .buildSolo();
         solo.setArtist(artist);
-        solo.setBirthDate(LocalDate.of(1990, 5, 15));
-        solo.setDeathDate(LocalDate.of(2020, 10, 20));
-        solo.setGender(ArtistGender.MALE);
-        solo.setGroupAffiliationStatus(GroupAffiliationStatus.NEVER_IN_A_GROUP);
         return solo;
     }
 
     private Groups createTestGroup(Artist artist) {
-        Groups group = new Groups();
+        Groups group = new GroupsBuilder()
+            .setArtistName(artist.getArtistName())
+            .setType(artist.getType())
+            .setFormationDate(LocalDate.of(2000, 1, 1))
+            .setDisbandDate(LocalDate.of(2010, 12, 31))
+            .setGroupGender(ArtistGender.MIXED)
+            .setActivityStatus(GroupActivityStatus.DISBANDED)
+            .buildGroups();
         group.setArtist(artist);
-        group.setFormationDate(LocalDate.of(2000, 1, 1));
-        group.setDisbandDate(LocalDate.of(2010, 12, 31));
-        group.setGroupGender(ArtistGender.MIXED);
-        group.setActivityStatus(GroupActivityStatus.DISBANDED);
         return group;
     }
 
@@ -490,5 +532,83 @@ class ArtistMapperTest {
         assertEquals("", existingArtist.getArtistName()); // Updated to empty
         assertEquals("", existingArtist.getDescription()); // Updated to empty
         assertEquals("", existingArtist.getGenre()); // Updated to empty
+    }
+
+    @Test
+    void createSoloFromDto_shouldReturnNullIfNotSoloType() {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
+        dto.setType(ArtistType.GROUP); // Not SOLO
+        Artist artist = createTestArtist();
+        Solo result = artistMapper.createSoloFromDto(dto, artist);
+        assertNull(result);
+    }
+
+    @Test
+    void createSoloFromDto_shouldMapAllFieldsIfSoloType() {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
+        dto.setType(ArtistType.SOLO);
+        dto.setBirthDate(LocalDate.of(1988, 7, 7));
+        dto.setDeathDate(LocalDate.of(2020, 1, 1));
+        dto.setSoloGender(ArtistGender.FEMALE);
+        dto.setGroupAffiliationStatus(GroupAffiliationStatus.NEVER_IN_A_GROUP);
+        Artist artist = createTestArtist();
+        Solo solo = artistMapper.createSoloFromDto(dto, artist);
+        assertNotNull(solo);
+        assertEquals(artist.getArtistName(), solo.getArtist().getArtistName());
+        assertEquals(LocalDate.of(1988, 7, 7), solo.getBirthDate());
+        assertEquals(LocalDate.of(2020, 1, 1), solo.getDeathDate());
+        assertEquals(ArtistGender.FEMALE, solo.getGender());
+        assertEquals(GroupAffiliationStatus.NEVER_IN_A_GROUP, solo.getGroupAffiliationStatus());
+    }
+
+    @Test
+    void createGroupFromDto_shouldReturnNullIfNotGroupType() {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
+        dto.setType(ArtistType.SOLO); // Not GROUP
+        Artist artist = createTestArtist();
+        Groups result = artistMapper.createGroupFromDto(dto, artist);
+        assertNull(result);
+    }
+
+    @Test
+    void createGroupFromDto_shouldMapAllFieldsIfGroupType() {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
+        dto.setType(ArtistType.GROUP);
+        dto.setFormationDate(LocalDate.of(2010, 5, 5));
+        dto.setDisbandDate(LocalDate.of(2020, 6, 6));
+        dto.setGroupGender(ArtistGender.MIXED);
+        dto.setActivityStatus(GroupActivityStatus.ACTIVE);
+        Artist artist = createTestArtist();
+        artist.setType(ArtistType.GROUP);
+        Groups group = artistMapper.createGroupFromDto(dto, artist);
+        assertNotNull(group);
+        assertEquals(artist.getArtistName(), group.getArtist().getArtistName());
+        assertEquals(LocalDate.of(2010, 5, 5), group.getFormationDate());
+        assertEquals(LocalDate.of(2020, 6, 6), group.getDisbandDate());
+        assertEquals(ArtistGender.MIXED, group.getGroupGender());
+        assertEquals(GroupActivityStatus.ACTIVE, group.getActivityStatus());
+    }
+
+    @Test
+    void createArtistFromDto_shouldMapAllFields() {
+        ArtistRequestDTO dto = new ArtistRequestDTO();
+        dto.setArtistName("A");
+        dto.setType(ArtistType.SOLO);
+        dto.setSpotifyId("spid");
+        dto.setDescription("desc");
+        dto.setImage("img");
+        dto.setPrimaryLanguage("lang");
+        dto.setGenre("genre");
+        dto.setOriginCountry("OC");
+        Artist artist = artistMapper.createArtistFromDto(dto);
+        assertNotNull(artist);
+        assertEquals("A", artist.getArtistName());
+        assertEquals(ArtistType.SOLO, artist.getType());
+        assertEquals("spid", artist.getSpotifyId());
+        assertEquals("desc", artist.getDescription());
+        assertEquals("img", artist.getImage());
+        assertEquals("lang", artist.getPrimaryLanguage());
+        assertEquals("genre", artist.getGenre());
+        assertEquals("OC", artist.getOriginCountry());
     }
 }

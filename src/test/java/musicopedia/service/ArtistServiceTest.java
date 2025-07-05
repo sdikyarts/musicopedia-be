@@ -19,6 +19,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import musicopedia.builder.ArtistBuilder;
 
 public class ArtistServiceTest {
 
@@ -39,20 +40,23 @@ public class ArtistServiceTest {
         artistService = new ArtistServiceImpl(artistRepository, artistFactoryManager);
 
         testId = UUID.randomUUID();
-        testArtist = new Artist();
+        testArtist = new ArtistBuilder()
+            .setArtistName("Test Artist")
+            .setType(ArtistType.SOLO)
+            .setGenre("Pop")
+            .setSpotifyId("spotifyid123")
+            .build();
         testArtist.setArtistId(testId);
-        testArtist.setArtistName("Test Artist");
-        testArtist.setType(ArtistType.SOLO);
-        testArtist.setGenre("Pop");
-        testArtist.setSpotifyId("spotifyid123");
     }
 
     @Test
     void testFindAll() {
-        Artist artist1 = new Artist();
-        artist1.setArtistName("Artist 1");
-        Artist artist2 = new Artist();
-        artist2.setArtistName("Artist 2");
+        Artist artist1 = new ArtistBuilder()
+            .setArtistName("Artist 1")
+            .build();
+        Artist artist2 = new ArtistBuilder()
+            .setArtistName("Artist 2")
+            .build();
         List<Artist> artists = Arrays.asList(artist1, artist2);
 
         when(artistRepository.findAll()).thenReturn(artists);
@@ -189,15 +193,16 @@ public class ArtistServiceTest {
         List<ArtistRequestDTO> dtos = Arrays.asList(dto1, dto2);
         
         // Create expected artists
-        Artist artist1 = new Artist();
+        Artist artist1 = new ArtistBuilder()
+            .setArtistName("Artist 1")
+            .setType(ArtistType.SOLO)
+            .build();
         artist1.setArtistId(UUID.randomUUID());
-        artist1.setArtistName("Artist 1");
-        artist1.setType(ArtistType.SOLO);
-        
-        Artist artist2 = new Artist();
+        Artist artist2 = new ArtistBuilder()
+            .setArtistName("Artist 2")
+            .setType(ArtistType.GROUP)
+            .build();
         artist2.setArtistId(UUID.randomUUID());
-        artist2.setArtistName("Artist 2");
-        artist2.setType(ArtistType.GROUP);
         
         // Mock behavior
         when(artistFactoryManager.createArtist(dto1)).thenReturn(artist1);

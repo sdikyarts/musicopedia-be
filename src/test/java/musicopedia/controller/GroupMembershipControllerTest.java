@@ -2,6 +2,8 @@ package musicopedia.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import musicopedia.builder.ArtistBuilder;
+import musicopedia.builder.MemberBuilder;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
 import musicopedia.model.enums.ArtistType;
@@ -56,15 +58,17 @@ public class GroupMembershipControllerTest {
         testGroupId = UUID.randomUUID();
         testMemberId = UUID.randomUUID();
 
-        testGroup = new Artist();
-        testGroup.setArtistId(testGroupId);
-        testGroup.setArtistName("BLACKPINK");
-        testGroup.setType(ArtistType.GROUP);
+        testGroup = new ArtistBuilder()
+            .setArtistId(testGroupId)
+            .setArtistName("BLACKPINK")
+            .setType(ArtistType.GROUP)
+            .build();
 
-        testMember = new Member();
+        testMember = new MemberBuilder()
+            .setFullName("Jisoo")
+            .setBirthDate(LocalDate.of(1995, 1, 3))
+            .build();
         testMember.setMemberId(testMemberId);
-        testMember.setFullName("Jisoo");
-        testMember.setBirthDate(LocalDate.of(1995, 1, 3));
 
         GroupMembershipId membershipId = new GroupMembershipId();
         membershipId.setGroupId(testGroupId);
