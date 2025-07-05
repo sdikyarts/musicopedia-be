@@ -9,6 +9,9 @@ import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.factory.ArtistFactoryManager;
 import org.springframework.stereotype.Component;
+import musicopedia.builder.SoloBuilder;
+import musicopedia.builder.GroupsBuilder;
+import musicopedia.builder.ArtistBuilder;
 
 @Component
 public class ArtistMapper {
@@ -97,27 +100,52 @@ public class ArtistMapper {
         if (dto.getType() != ArtistType.SOLO) {
             return null;
         }
-        
-        Solo solo = new Solo();
-        solo.setArtist(artist);
-        solo.setBirthDate(dto.getBirthDate());
-        solo.setDeathDate(dto.getDeathDate());
-        solo.setGender(dto.getSoloGender());
-        solo.setGroupAffiliationStatus(dto.getGroupAffiliationStatus());
-        return solo;
+        SoloBuilder builder = new SoloBuilder()
+            .setArtistName(artist.getArtistName())
+            .setSpotifyId(artist.getSpotifyId())
+            .setDescription(artist.getDescription())
+            .setImage(artist.getImage())
+            .setType(artist.getType())
+            .setPrimaryLanguage(artist.getPrimaryLanguage())
+            .setGenre(artist.getGenre())
+            .setOriginCountry(artist.getOriginCountry())
+            .setBirthDate(dto.getBirthDate())
+            .setDeathDate(dto.getDeathDate())
+            .setGender(dto.getSoloGender())
+            .setGroupAffiliationStatus(dto.getGroupAffiliationStatus());
+        return builder.buildSolo();
     }
 
     public Groups createGroupFromDto(ArtistRequestDTO dto, Artist artist) {
         if (dto.getType() != ArtistType.GROUP) {
             return null;
         }
-        
-        Groups group = new Groups();
-        group.setArtist(artist);
-        group.setFormationDate(dto.getFormationDate());
-        group.setDisbandDate(dto.getDisbandDate());
-        group.setGroupGender(dto.getGroupGender());
-        group.setActivityStatus(dto.getActivityStatus());
-        return group;
+        GroupsBuilder builder = new GroupsBuilder()
+            .setArtistName(artist.getArtistName())
+            .setSpotifyId(artist.getSpotifyId())
+            .setDescription(artist.getDescription())
+            .setImage(artist.getImage())
+            .setType(artist.getType())
+            .setPrimaryLanguage(artist.getPrimaryLanguage())
+            .setGenre(artist.getGenre())
+            .setOriginCountry(artist.getOriginCountry())
+            .setFormationDate(dto.getFormationDate())
+            .setDisbandDate(dto.getDisbandDate())
+            .setGroupGender(dto.getGroupGender())
+            .setActivityStatus(dto.getActivityStatus());
+        return builder.buildGroups();
+    }
+
+    public Artist createArtistFromDto(ArtistRequestDTO dto) {
+        return new ArtistBuilder()
+            .setArtistName(dto.getArtistName())
+            .setSpotifyId(dto.getSpotifyId())
+            .setDescription(dto.getDescription())
+            .setImage(dto.getImage())
+            .setType(dto.getType())
+            .setPrimaryLanguage(dto.getPrimaryLanguage())
+            .setGenre(dto.getGenre())
+            .setOriginCountry(dto.getOriginCountry())
+            .build();
     }
 }

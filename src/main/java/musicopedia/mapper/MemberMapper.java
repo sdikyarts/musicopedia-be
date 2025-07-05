@@ -1,5 +1,6 @@
 package musicopedia.mapper;
 
+import musicopedia.builder.MemberBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.dto.response.MemberResponseDTO;
 
@@ -112,5 +113,15 @@ public class MemberMapper {
         return members.stream()
                 .map(this::toSummaryDTO)
                 .toList();
+    }
+
+    public Member createMemberFromDto(MemberRequestDTO dto, Artist soloArtist) {
+        return new MemberBuilder()
+            .setFullName(dto.getFullName())
+            .setDescription(dto.getDescription())
+            .setImage(dto.getImage())
+            .setBirthDate(dto.getBirthDate())
+            .setSoloArtist(soloArtist)
+            .build();
     }
 }
