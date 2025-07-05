@@ -30,6 +30,10 @@ public class GroupMembership {
     private MembershipStatus status;
 
     private LocalDate joinDate;
+
+    // This field is mapped to the database by JPA/Hibernate and must remain as a private field.
+    // Suppress Sonar warning java:S1450 for JPA entity mapping.
+    @SuppressWarnings("java:S1450")
     private LocalDate leaveDate;
 
     public void syncStatusWithMember() {
