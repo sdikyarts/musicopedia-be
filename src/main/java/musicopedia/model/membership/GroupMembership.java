@@ -31,4 +31,11 @@ public class GroupMembership {
 
     private LocalDate joinDate;
     private LocalDate leaveDate;
+
+    public void syncStatusWithMember() {
+        if (this.member != null && this.member.isDeceased()) {
+            this.status = MembershipStatus.FORMER;
+            this.leaveDate = this.member.getDeathDate();
+        }
+    }
 }
