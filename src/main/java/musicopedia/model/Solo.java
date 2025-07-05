@@ -28,4 +28,6 @@ public class Solo {
 
     @Enumerated(EnumType.STRING)
     private GroupAffiliationStatus groupAffiliationStatus;
+
+    private String realName;
 }

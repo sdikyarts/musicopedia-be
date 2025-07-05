@@ -46,55 +46,53 @@ class MemberMapperTest {
     @BeforeEach
     void setUp() {
         memberMapper = new MemberMapper(artistService, memberFactory);
-
         // Setup test member
         testMember = new MemberBuilder()
-            .setFullName("Test Member")
-            .setDescription("Test description")
-            .setImage("test-image.jpg")
-            .setBirthDate(LocalDate.of(1990, 1, 1))
+            .setMemberName("Felix")
+            .setRealName("Felix Yongbok Lee")
+            .setDescription("Main dancer and rapper of Stray Kids")
+            .setImage("felix-image.jpg")
+            .setBirthDate(LocalDate.of(2000, 9, 15))
             .build();
         testMember.setMemberId(UUID.randomUUID());
-
-        // Setup solo artist
+        // Setup solo artist with real-life data
         soloArtist = new ArtistBuilder()
-            .setArtistName("Solo Artist")
+            .setArtistName("Felix")
             .setType(ArtistType.SOLO)
             .build();
         soloArtist.setArtistId(UUID.randomUUID());
-        // Setup group artist
+        // Setup group artist with real-life data
         groupArtist = new ArtistBuilder()
-            .setArtistName("Group Artist")
+            .setArtistName("Stray Kids")
             .setType(ArtistType.GROUP)
             .build();
         groupArtist.setArtistId(UUID.randomUUID());
-
         // Setup DTOs
         createDto = new MemberRequestDTO();
-        createDto.setFullName("New Member");
-        createDto.setDescription("New description");
-        createDto.setImage("new-image.jpg");
-        createDto.setBirthDate(LocalDate.of(1995, 5, 15));
-
+        createDto.setMemberName("HAN");
+        createDto.setRealName("Han Ji-sung");
+        createDto.setDescription("Main rapper and producer");
+        createDto.setImage("han-image.jpg");
+        createDto.setBirthDate(LocalDate.of(2000, 9, 14));
         updateDto = new MemberRequestDTO();
-        updateDto.setFullName("Updated Member");
-        updateDto.setDescription("Updated description");
-        updateDto.setImage("updated-image.jpg");
-        updateDto.setBirthDate(LocalDate.of(1992, 3, 10));
+        updateDto.setMemberName("Hyunjin");
+        updateDto.setRealName("Hwang Hyun-jin");
+        updateDto.setDescription("Main dancer and visual");
+        updateDto.setImage("hyunjin-image.jpg");
+        updateDto.setBirthDate(LocalDate.of(2000, 3, 20));
     }
 
     @Test
     void toEntity_ShouldDelegateToMemberFactory() {
         // Given
         Member expectedMember = new MemberBuilder()
-            .setFullName("Expected Member")
+            .setMemberName("KIMCHAEWON")
+            .setRealName("Kim Chae-won")
             .build();
         when(memberFactory.createMember(createDto)).thenReturn(CompletableFuture.completedFuture(expectedMember));
-
         // When
         CompletableFuture<Member> resultFuture = memberMapper.toEntity(createDto);
         Member result = resultFuture.join();
-
         // Then
         assertEquals(expectedMember, result);
         verify(memberFactory).createMember(createDto);
@@ -105,32 +103,41 @@ class MemberMapperTest {
         // Given
         updateDto.setSoloArtistId(soloArtist.getArtistId());
         when(artistService.findByIdAsync(soloArtist.getArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(soloArtist)));
-
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
-
         // Then
-        assertEquals("Updated Member", testMember.getFullName());
-        assertEquals("Updated description", testMember.getDescription());
-        assertEquals("updated-image.jpg", testMember.getImage());
-        assertEquals(LocalDate.of(1992, 3, 10), testMember.getBirthDate());
+        assertEquals("Hyunjin", testMember.getMemberName());
+        assertEquals("Hwang Hyun-jin", testMember.getRealName());
+        assertEquals("Main dancer and visual", testMember.getDescription());
+        assertEquals("hyunjin-image.jpg", testMember.getImage());
+        assertEquals(LocalDate.of(2000, 3, 20), testMember.getBirthDate());
         assertEquals(soloArtist, testMember.getSoloArtist());
         verify(artistService).findByIdAsync(soloArtist.getArtistId());
     }
 
     @Test
-    void updateEntityFromDto_WithNullFullName_ShouldNotUpdateFullName() {
+    void updateEntityFromDto_WithNullMemberName_ShouldNotUpdateMemberName() {
         // Given
-        String originalFullName = testMember.getFullName();
-        updateDto.setFullName(null);
-
+        String originalMemberName = testMember.getMemberName();
+        updateDto.setMemberName(null);
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
-
         // Then
-        assertEquals(originalFullName, testMember.getFullName());
+        assertEquals(originalMemberName, testMember.getMemberName());
+    }
+
+    @Test
+    void updateEntityFromDto_WithNullRealName_ShouldNotUpdateRealName() {
+        // Given
+        String originalRealName = testMember.getRealName();
+        updateDto.setRealName(null);
+        // When
+        CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
+        future.join(); // Wait for the async operation to complete
+        // Then
+        assertEquals(originalRealName, testMember.getRealName());
     }
 
     @Test
@@ -138,11 +145,9 @@ class MemberMapperTest {
         // Given
         String originalDescription = testMember.getDescription();
         updateDto.setDescription(null);
-
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
-
         // Then
         assertEquals(originalDescription, testMember.getDescription());
     }
@@ -152,11 +157,9 @@ class MemberMapperTest {
         // Given
         String originalImage = testMember.getImage();
         updateDto.setImage(null);
-
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
-
         // Then
         assertEquals(originalImage, testMember.getImage());
     }
@@ -166,11 +169,9 @@ class MemberMapperTest {
         // Given
         LocalDate originalBirthDate = testMember.getBirthDate();
         updateDto.setBirthDate(null);
-
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
-
         // Then
         assertEquals(originalBirthDate, testMember.getBirthDate());
     }
@@ -180,11 +181,9 @@ class MemberMapperTest {
         // Given
         testMember.setSoloArtist(soloArtist); // Set initial solo artist
         updateDto.setSoloArtistId(null);
-
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
-
         // Then
         assertNull(testMember.getSoloArtist());
         verifyNoInteractions(artistService);
@@ -196,7 +195,6 @@ class MemberMapperTest {
         UUID nonExistentId = UUID.randomUUID();
         updateDto.setSoloArtistId(nonExistentId);
         when(artistService.findByIdAsync(nonExistentId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));
-
         // When & Then
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         
@@ -215,7 +213,6 @@ class MemberMapperTest {
         // Given
         updateDto.setSoloArtistId(groupArtist.getArtistId());
         when(artistService.findByIdAsync(groupArtist.getArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(groupArtist)));
-
         // When & Then
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         
@@ -283,7 +280,8 @@ class MemberMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(testMember.getMemberId(), result.getMemberId());
-        assertEquals(testMember.getFullName(), result.getFullName());
+        assertEquals(testMember.getMemberName(), result.getMemberName());
+        assertEquals("Felix Yongbok Lee", result.getRealName());
         assertEquals(testMember.getDescription(), result.getDescription());
         assertEquals(testMember.getImage(), result.getImage());
         assertEquals(testMember.getBirthDate(), result.getBirthDate());
@@ -303,7 +301,8 @@ class MemberMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(testMember.getMemberId(), result.getMemberId());
-        assertEquals(testMember.getFullName(), result.getFullName());
+        assertEquals(testMember.getMemberName(), result.getMemberName());
+        assertEquals("Felix Yongbok Lee", result.getRealName());
         assertEquals(testMember.getDescription(), result.getDescription());
         assertEquals(testMember.getImage(), result.getImage());
         assertEquals(testMember.getBirthDate(), result.getBirthDate());
@@ -320,7 +319,7 @@ class MemberMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(testMember.getMemberId(), result.getMemberId());
-        assertEquals(testMember.getFullName(), result.getFullName());
+        assertEquals(testMember.getMemberName(), result.getMemberName());
         assertEquals(testMember.getImage(), result.getImage());
         assertFalse(result.getHasOfficialSoloDebut());
         assertNull(result.getSoloArtistName());
@@ -337,7 +336,7 @@ class MemberMapperTest {
         // Then
         assertNotNull(result);
         assertEquals(testMember.getMemberId(), result.getMemberId());
-        assertEquals(testMember.getFullName(), result.getFullName());
+        assertEquals(testMember.getMemberName(), result.getMemberName());
         assertEquals(testMember.getImage(), result.getImage());
         assertTrue(result.getHasOfficialSoloDebut());
         assertEquals(soloArtist.getArtistName(), result.getSoloArtistName());
@@ -361,12 +360,12 @@ class MemberMapperTest {
         // Given
         Member member1 = new Member();
         member1.setMemberId(UUID.randomUUID());
-        member1.setFullName("Member 1");
+        member1.setMemberName("Member 1");
         member1.setSoloArtist(soloArtist);
 
         Member member2 = new Member();
         member2.setMemberId(UUID.randomUUID());
-        member2.setFullName("Member 2");
+        member2.setMemberName("Member 2");
         // No solo artist
 
         List<Member> members = Arrays.asList(member1, member2);
@@ -380,13 +379,13 @@ class MemberMapperTest {
 
         MemberResponseDTO dto1 = result.get(0);
         assertEquals(member1.getMemberId(), dto1.getMemberId());
-        assertEquals("Member 1", dto1.getFullName());
+        assertEquals("Member 1", dto1.getMemberName());
         assertTrue(dto1.getHasOfficialSoloDebut());
         assertEquals(soloArtist.getArtistName(), dto1.getSoloArtistName());
 
         MemberResponseDTO dto2 = result.get(1);
         assertEquals(member2.getMemberId(), dto2.getMemberId());
-        assertEquals("Member 2", dto2.getFullName());
+        assertEquals("Member 2", dto2.getMemberName());
         assertFalse(dto2.getHasOfficialSoloDebut());
         assertNull(dto2.getSoloArtistName());
     }
@@ -409,13 +408,13 @@ class MemberMapperTest {
         // Given
         Member member1 = new Member();
         member1.setMemberId(UUID.randomUUID());
-        member1.setFullName("Member 1");
+        member1.setMemberName("Member 1");
         member1.setImage("image1.jpg");
         member1.setSoloArtist(soloArtist);
 
         Member member2 = new Member();
         member2.setMemberId(UUID.randomUUID());
-        member2.setFullName("Member 2");
+        member2.setMemberName("Member 2");
         member2.setImage("image2.jpg");
         // No solo artist
 
@@ -430,14 +429,14 @@ class MemberMapperTest {
 
         MemberResponseDTO dto1 = result.get(0);
         assertEquals(member1.getMemberId(), dto1.getMemberId());
-        assertEquals("Member 1", dto1.getFullName());
+        assertEquals("Member 1", dto1.getMemberName());
         assertEquals("image1.jpg", dto1.getImage());
         assertTrue(dto1.getHasOfficialSoloDebut());
         assertEquals(soloArtist.getArtistName(), dto1.getSoloArtistName());
 
         MemberResponseDTO dto2 = result.get(1);
         assertEquals(member2.getMemberId(), dto2.getMemberId());
-        assertEquals("Member 2", dto2.getFullName());
+        assertEquals("Member 2", dto2.getMemberName());
         assertEquals("image2.jpg", dto2.getImage());
         assertFalse(dto2.getHasOfficialSoloDebut());
         assertNull(dto2.getSoloArtistName());
@@ -457,7 +456,7 @@ class MemberMapperTest {
         
         MemberResponseDTO dto = result.get(0);
         assertEquals(testMember.getMemberId(), dto.getMemberId());
-        assertEquals(testMember.getFullName(), dto.getFullName());
+        assertEquals(testMember.getMemberName(), dto.getMemberName());
         assertEquals(testMember.getImage(), dto.getImage());
         assertFalse(dto.getHasOfficialSoloDebut());
     }
@@ -476,7 +475,7 @@ class MemberMapperTest {
         
         MemberResponseDTO dto = result.get(0);
         assertEquals(testMember.getMemberId(), dto.getMemberId());
-        assertEquals(testMember.getFullName(), dto.getFullName());
+        assertEquals(testMember.getMemberName(), dto.getMemberName());
         assertEquals(testMember.getDescription(), dto.getDescription());
         assertEquals(testMember.getImage(), dto.getImage());
         assertEquals(testMember.getBirthDate(), dto.getBirthDate());
@@ -487,7 +486,7 @@ class MemberMapperTest {
     void createMemberFromDto_ShouldMapAllFieldsCorrectly() {
         // Given
         MemberRequestDTO dto = new MemberRequestDTO();
-        dto.setFullName("Jane Doe");
+        dto.setMemberName("Jane Doe");
         dto.setDescription("A test member");
         dto.setImage("jane.jpg");
         dto.setBirthDate(LocalDate.of(1992, 2, 2));
@@ -502,7 +501,7 @@ class MemberMapperTest {
 
         // Then
         assertNotNull(member);
-        assertEquals("Jane Doe", member.getFullName());
+        assertEquals("Jane Doe", member.getMemberName());
         assertEquals("A test member", member.getDescription());
         assertEquals("jane.jpg", member.getImage());
         assertEquals(LocalDate.of(1992, 2, 2), member.getBirthDate());

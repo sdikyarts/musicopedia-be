@@ -13,6 +13,7 @@ public class SoloBuilder extends ArtistBuilder {
     private ArtistGender gender;
     private GroupAffiliationStatus groupAffiliationStatus;
     private Artist artist;
+    private String realName;
 
     public SoloBuilder setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
@@ -85,6 +86,11 @@ public class SoloBuilder extends ArtistBuilder {
         return this;
     }
 
+    public SoloBuilder setRealName(String realName) {
+        this.realName = realName;
+        return this;
+    }
+
     public Solo buildSolo() {
         Solo solo = new Solo();
         solo.setArtistId(super.artistId);
@@ -93,6 +99,7 @@ public class SoloBuilder extends ArtistBuilder {
         solo.setDeathDate(this.deathDate);
         solo.setGender(this.gender);
         solo.setGroupAffiliationStatus(this.groupAffiliationStatus);
+        solo.setRealName(this.realName);
         return solo;
     }
 }

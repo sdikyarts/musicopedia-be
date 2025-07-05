@@ -31,7 +31,7 @@ public class ModelIntegrationTest {
         UUID memberId = UUID.randomUUID();
         Member member = new Member();
         member.setMemberId(memberId);
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
         member.setBirthDate(LocalDate.of(1995, 5, 15));
         
         UUID soloArtistId = UUID.randomUUID();
@@ -68,7 +68,7 @@ public class ModelIntegrationTest {
         assertEquals(MembershipStatus.CURRENT, membership.getStatus());
         
         assertEquals("Test Group", membership.getGroup().getArtistName());
-        assertEquals("Test Member", membership.getMember().getFullName());
+        assertEquals("Test Member", membership.getMember().getMemberName());
         
         assertEquals(soloArtist, membership.getMember().getSoloArtist());
         assertEquals("Solo Artist Name", membership.getMember().getSoloArtist().getArtistName());
@@ -84,7 +84,7 @@ public class ModelIntegrationTest {
         UUID memberId = UUID.randomUUID();
         Member member = new Member();
         member.setMemberId(memberId);
-        member.setFullName("Former Member");
+        member.setMemberName("Former Member");
         
         GroupMembershipId membershipId = new GroupMembershipId();
         membershipId.setGroupId(groupId);

@@ -65,7 +65,7 @@ public class GroupMembershipControllerTest {
             .build();
 
         testMember = new MemberBuilder()
-            .setFullName("Jisoo")
+            .setMemberName("Jisoo")
             .setBirthDate(LocalDate.of(1995, 1, 3))
             .build();
         testMember.setMemberId(testMemberId);

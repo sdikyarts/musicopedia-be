@@ -24,7 +24,7 @@ public class GroupMembershipTest {
         
         Member member = new Member();
         member.setMemberId(id.getMemberId());
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
         
         MembershipStatus status = MembershipStatus.CURRENT;
         LocalDate joinDate = LocalDate.of(2020, 1, 1);

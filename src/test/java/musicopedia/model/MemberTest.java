@@ -12,18 +12,20 @@ public class MemberTest {
     @Test
     public void testConstructorAndGetters() {
         UUID memberId = UUID.randomUUID();
-        String fullName = "Test Member";
-        String description = "This is a test member description";
+        String memberName = "Felix";
+        String realName = "Felix Yongbok Lee";
+        String description = "Lead dancer and rapper of Stray Kids";
         String image = "base64encodedimage";
-        LocalDate birthDate = LocalDate.of(1995, 5, 15);
+        LocalDate birthDate = LocalDate.of(2000, 9, 15);
         
         Artist soloArtist = new ArtistBuilder()
-            .setArtistName("Solo Artist")
+            .setArtistName("Felix")
             .build();
         soloArtist.setArtistId(UUID.randomUUID());
         
         Member member = new MemberBuilder()
-            .setFullName(fullName)
+            .setMemberName(memberName)
+            .setRealName(realName)
             .setDescription(description)
             .setImage(image)
             .setBirthDate(birthDate)
@@ -32,7 +34,8 @@ public class MemberTest {
         member.setMemberId(memberId);
         
         assertEquals(memberId, member.getMemberId());
-        assertEquals(fullName, member.getFullName());
+        assertEquals(memberName, member.getMemberName());
+        assertEquals(realName, member.getRealName());
         assertEquals(description, member.getDescription());
         assertEquals(image, member.getImage());
         assertEquals(birthDate, member.getBirthDate());
@@ -42,18 +45,18 @@ public class MemberTest {
     @Test
     public void testEquality() {
         UUID memberId = UUID.randomUUID();
-        
         Member member1 = new Member();
         member1.setMemberId(memberId);
-        member1.setFullName("Test Member");
-        
+        member1.setMemberName("HAN");
+        member1.setRealName("Han Ji-sung");
         Member member2 = new Member();
         member2.setMemberId(memberId);
-        member2.setFullName("Test Member");
-        
+        member2.setMemberName("HAN");
+        member2.setRealName("Han Ji-sung");
         Member differentMember = new Member();
         differentMember.setMemberId(UUID.randomUUID());
-        differentMember.setFullName("Different Member");
+        differentMember.setMemberName("Hyunjin");
+        differentMember.setRealName("Hwang Hyun-jin");
         assertEquals(member1, member2);
         assertEquals(member1.hashCode(), member2.hashCode());
         assertNotEquals(member1, differentMember);
@@ -64,24 +67,23 @@ public class MemberTest {
     public void testMemberWithoutSoloArtist() {
         Member member = new Member();
         member.setMemberId(UUID.randomUUID());
-        member.setFullName("Group Member Only");
-        
+        member.setMemberName("KIMCHAEWON");
+        member.setRealName("Kim Chae-won");
         assertNull(member.getSoloArtist());
     }
     
     @Test
     public void testToString() {
         UUID memberId = UUID.randomUUID();
-        String fullName = "Test Member";
-        
+        String memberName = "Felix";
         Member member = new Member();
         member.setMemberId(memberId);
-        member.setFullName(fullName);
-        
+        member.setMemberName(memberName);
+        member.setRealName("Felix Yongbok Lee");
         String toString = member.toString();
-        
         assertTrue(toString.contains(memberId.toString()));
-        assertTrue(toString.contains(fullName));
+        assertTrue(toString.contains(memberName));
+        assertTrue(toString.contains("Felix Yongbok Lee"));
     }
     
     @Test

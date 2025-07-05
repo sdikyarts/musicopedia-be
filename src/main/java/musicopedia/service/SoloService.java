@@ -31,4 +31,6 @@ public interface SoloService {
     CompletableFuture<Void> deleteById(UUID soloId);
     
     CompletableFuture<Boolean> existsById(UUID soloId);
+
+    CompletableFuture<List<Solo>> findByRealNameContaining(String realName);
 }

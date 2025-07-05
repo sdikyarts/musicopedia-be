@@ -35,23 +35,22 @@ class MemberFactoryTest {
     @BeforeEach
     void setUp() {
         memberFactory = new MemberFactory(artistService);
-        
         // Setup valid DTO
         validDto = new MemberRequestDTO();
-        validDto.setFullName("John Doe");
-        validDto.setDescription("A talented member");
-        validDto.setImage("http://example.com/image.jpg");
-        validDto.setBirthDate(LocalDate.of(1990, 1, 1));
-        
+        validDto.setMemberName("Felix");
+        validDto.setRealName("Felix Yongbok Lee");
+        validDto.setDescription("Lead dancer and rapper of Stray Kids");
+        validDto.setImage("http://example.com/felix.jpg");
+        validDto.setBirthDate(LocalDate.of(2000, 9, 15));
         // Setup test artists
         soloArtist = new ArtistBuilder()
-            .setArtistName("Solo Artist")
+            .setArtistName("Jung Kook")
             .setType(ArtistType.SOLO)
             .build();
         soloArtist.setArtistId(UUID.randomUUID());
-        
+        // Use real-life group: Stray Kids for Felix
         groupArtist = new ArtistBuilder()
-            .setArtistName("Group Artist")
+            .setArtistName("Stray Kids")
             .setType(ArtistType.GROUP)
             .build();
         groupArtist.setArtistId(UUID.randomUUID());
@@ -62,13 +61,13 @@ class MemberFactoryTest {
         // When
         CompletableFuture<Member> resultFuture = memberFactory.createMember(validDto);
         Member result = resultFuture.join();
-
         // Then
         assertNotNull(result);
-        assertEquals("John Doe", result.getFullName());
-        assertEquals("A talented member", result.getDescription());
-        assertEquals("http://example.com/image.jpg", result.getImage());
-        assertEquals(LocalDate.of(1990, 1, 1), result.getBirthDate());
+        assertEquals("Felix", result.getMemberName());
+        assertEquals("Felix Yongbok Lee", result.getRealName());
+        assertEquals("Lead dancer and rapper of Stray Kids", result.getDescription());
+        assertEquals("http://example.com/felix.jpg", result.getImage());
+        assertEquals(LocalDate.of(2000, 9, 15), result.getBirthDate());
         assertNull(result.getSoloArtist());
         verifyNoInteractions(artistService);
     }
@@ -79,72 +78,71 @@ class MemberFactoryTest {
         UUID soloArtistId = UUID.randomUUID();
         validDto.setSoloArtistId(soloArtistId);
         when(artistService.findByIdAsync(soloArtistId)).thenReturn(CompletableFuture.completedFuture(Optional.of(soloArtist)));
-
         // When
         CompletableFuture<Member> resultFuture = memberFactory.createMember(validDto);
         Member result = resultFuture.join();
-
         // Then
         assertNotNull(result);
-        assertEquals("John Doe", result.getFullName());
-        assertEquals("A talented member", result.getDescription());
-        assertEquals("http://example.com/image.jpg", result.getImage());
-        assertEquals(LocalDate.of(1990, 1, 1), result.getBirthDate());
+        assertEquals("Felix", result.getMemberName());
+        assertEquals("Felix Yongbok Lee", result.getRealName());
+        assertEquals("Lead dancer and rapper of Stray Kids", result.getDescription());
+        assertEquals("http://example.com/felix.jpg", result.getImage());
+        assertEquals(LocalDate.of(2000, 9, 15), result.getBirthDate());
         assertNotNull(result.getSoloArtist());
         assertEquals(soloArtist, result.getSoloArtist());
         verify(artistService).findByIdAsync(soloArtistId);
     }
 
     @Test
-    void createMember_WithNullFullName_ShouldThrowException() {
+    void createMember_WithNullMemberName_ShouldThrowException() {
         // Given
-        validDto.setFullName(null);
+        validDto.setMemberName(null);
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             memberFactory.createMember(validDto);
         });
-        assertEquals("Member full name is required", exception.getMessage());
+        assertEquals("Member name is required", exception.getMessage());
         verifyNoInteractions(artistService);
     }
 
     @Test
-    void createMember_WithEmptyFullName_ShouldThrowException() {
+    void createMember_WithEmptyMemberName_ShouldThrowException() {
         // Given
-        validDto.setFullName("   ");
+        validDto.setMemberName("   ");
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             memberFactory.createMember(validDto);
         });
-        assertEquals("Member full name is required", exception.getMessage());
+        assertEquals("Member name is required", exception.getMessage());
         verifyNoInteractions(artistService);
     }
 
     @Test
-    void createMember_WithBlankFullName_ShouldThrowException() {
+    void createMember_WithBlankMemberName_ShouldThrowException() {
         // Given
-        validDto.setFullName("");
+        validDto.setMemberName("");
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             memberFactory.createMember(validDto);
         });
-        assertEquals("Member full name is required", exception.getMessage());
+        assertEquals("Member name is required", exception.getMessage());
         verifyNoInteractions(artistService);
     }
 
     @Test
-    void createMember_WithWhitespaceInFullName_ShouldTrimName() {
+    void createMember_WithWhitespaceInMemberName_ShouldTrimName() {
         // Given
-        validDto.setFullName("  John Doe  ");
-
+        validDto.setMemberName("  HAN  ");
+        validDto.setRealName("Han Ji-sung");
         // When
         CompletableFuture<Member> resultFuture = memberFactory.createMember(validDto);
         Member result = resultFuture.join();
-
         // Then
-        assertEquals("John Doe", result.getFullName());
+        assertEquals("HAN", result.getMemberName());
+        assertEquals("Han Ji-sung", result.getRealName());
     }
 
     @Test
@@ -191,7 +189,7 @@ class MemberFactoryTest {
         assertTrue(exception instanceof IllegalArgumentException);
         String expectedMessage = String.format(
             "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s",
-            "John Doe", "Group Artist", ArtistType.GROUP
+            "Felix", "Stray Kids", ArtistType.GROUP
         );
         assertEquals(expectedMessage, exception.getMessage());
         verify(artistService).findByIdAsync(groupArtistId);
@@ -223,7 +221,7 @@ class MemberFactoryTest {
         assertTrue(exception instanceof IllegalArgumentException);
         String expectedMessage = String.format(
             "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s",
-            "John Doe", "Franchise Artist", ArtistType.FRANCHISE
+            "Felix", "Franchise Artist", ArtistType.FRANCHISE
         );
         assertEquals(expectedMessage, exception.getMessage());
         verify(artistService).findByIdAsync(franchiseArtistId);
@@ -255,7 +253,7 @@ class MemberFactoryTest {
         assertTrue(exception instanceof IllegalArgumentException);
         String expectedMessage = String.format(
             "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s",
-            "John Doe", "Various Artists", ArtistType.VARIOUS
+            "Felix", "Various Artists", ArtistType.VARIOUS
         );
         assertEquals(expectedMessage, exception.getMessage());
         verify(artistService).findByIdAsync(variousArtistId);
@@ -265,7 +263,7 @@ class MemberFactoryTest {
     void linkToSoloArtist_WithValidSoloArtist_ShouldLinkSuccessfully() {
         // Given
         Member member = new Member();
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
 
         // When
         memberFactory.linkToSoloArtist(member, soloArtist);
@@ -278,7 +276,7 @@ class MemberFactoryTest {
     void linkToSoloArtist_WithGroupArtist_ShouldThrowException() {
         // Given
         Member member = new Member();
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
 
         // When & Then
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -286,7 +284,7 @@ class MemberFactoryTest {
         });
         String expectedMessage = String.format(
             "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members",
-            "Test Member", "Group Artist"
+            "Test Member", "Stray Kids"
         );
         assertEquals(expectedMessage, exception.getMessage());
         assertNull(member.getSoloArtist());
@@ -296,7 +294,7 @@ class MemberFactoryTest {
     void linkToSoloArtist_WithFranchiseArtist_ShouldThrowException() {
         // Given
         Member member = new Member();
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
         
         Artist franchiseArtist = new ArtistBuilder()
             .setArtistName("Franchise Artist")
@@ -319,7 +317,7 @@ class MemberFactoryTest {
     void linkToSoloArtist_WithVariousArtist_ShouldThrowException() {
         // Given
         Member member = new Member();
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
         
         Artist variousArtist = new ArtistBuilder()
             .setArtistName("Various Artists")
@@ -342,7 +340,7 @@ class MemberFactoryTest {
     void unlinkFromSoloArtist_WithLinkedMember_ShouldRemoveLink() {
         // Given
         Member member = new Member();
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
         member.setSoloArtist(soloArtist);
         assertNotNull(member.getSoloArtist()); // Verify it's linked initially
 
@@ -357,7 +355,7 @@ class MemberFactoryTest {
     void unlinkFromSoloArtist_WithUnlinkedMember_ShouldDoNothing() {
         // Given
         Member member = new Member();
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
         assertNull(member.getSoloArtist()); // Verify it's not linked initially
 
         // When
@@ -371,7 +369,8 @@ class MemberFactoryTest {
     void createMember_WithMinimalValidData_ShouldCreateMember() {
         // Given
         MemberRequestDTO minimalDto = new MemberRequestDTO();
-        minimalDto.setFullName("Jane Doe");
+        minimalDto.setMemberName("Jane Doe");
+        minimalDto.setRealName("Kim Jisoo");
         // All other fields are null
 
         // When
@@ -380,10 +379,47 @@ class MemberFactoryTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("Jane Doe", result.getFullName());
+        assertEquals("Jane Doe", result.getMemberName());
+        assertEquals("Kim Jisoo", result.getRealName());
         assertNull(result.getDescription());
         assertNull(result.getImage());
         assertNull(result.getBirthDate());
         assertNull(result.getSoloArtist());
+    }
+
+    @Test
+    void createMember_WithNullRealName_ShouldThrowException() {
+        // Given
+        validDto.setRealName(null);
+        // When & Then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            memberFactory.createMember(validDto);
+        });
+        assertEquals("Member real name is required", exception.getMessage());
+        verifyNoInteractions(artistService);
+    }
+
+    @Test
+    void createMember_WithEmptyRealName_ShouldThrowException() {
+        // Given
+        validDto.setRealName("");
+        // When & Then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            memberFactory.createMember(validDto);
+        });
+        assertEquals("Member real name is required", exception.getMessage());
+        verifyNoInteractions(artistService);
+    }
+
+    @Test
+    void createMember_WithBlankRealName_ShouldThrowException() {
+        // Given
+        validDto.setRealName("   ");
+        // When & Then
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            memberFactory.createMember(validDto);
+        });
+        assertEquals("Member real name is required", exception.getMessage());
+        verifyNoInteractions(artistService);
     }
 }

@@ -31,8 +31,11 @@ public class MemberMapper {
     }
 
     public CompletableFuture<Void> updateEntityFromDto(Member member, MemberRequestDTO dto) {
-        if (dto.getFullName() != null) {
-            member.setFullName(dto.getFullName());
+        if (dto.getMemberName() != null) {
+            member.setMemberName(dto.getMemberName());
+        }
+        if (dto.getRealName() != null) {
+            member.setRealName(dto.getRealName());
         }
         if (dto.getDescription() != null) {
             member.setDescription(dto.getDescription());
@@ -69,7 +72,8 @@ public class MemberMapper {
     public MemberResponseDTO toResponseDTO(Member member) {
         MemberResponseDTO dto = new MemberResponseDTO();
         dto.setMemberId(member.getMemberId());
-        dto.setFullName(member.getFullName());
+        dto.setMemberName(member.getMemberName());
+        dto.setRealName(member.getRealName());
         dto.setDescription(member.getDescription());
         dto.setImage(member.getImage());
         dto.setBirthDate(member.getBirthDate());
@@ -89,8 +93,9 @@ public class MemberMapper {
     public MemberResponseDTO toSummaryDTO(Member member) {
         MemberResponseDTO dto = new MemberResponseDTO();
         dto.setMemberId(member.getMemberId());
-        dto.setFullName(member.getFullName());
+        dto.setMemberName(member.getMemberName());
         dto.setImage(member.getImage());
+        dto.setRealName(member.getRealName());
         
         // Set solo career information
         if (member.getSoloArtist() != null) {
@@ -117,7 +122,8 @@ public class MemberMapper {
 
     public Member createMemberFromDto(MemberRequestDTO dto, Artist soloArtist) {
         return new MemberBuilder()
-            .setFullName(dto.getFullName())
+            .setMemberName(dto.getMemberName())
+            .setRealName(dto.getRealName())
             .setDescription(dto.getDescription())
             .setImage(dto.getImage())
             .setBirthDate(dto.getBirthDate())

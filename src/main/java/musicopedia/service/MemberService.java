@@ -16,6 +16,8 @@ public interface MemberService {
     
     CompletableFuture<List<Member>> findByNameContaining(String name);
     
+    CompletableFuture<List<Member>> findByRealNameContaining(String realName);
+    
     CompletableFuture<List<Member>> findByBirthDateBetween(LocalDate startDate, LocalDate endDate);
     
     CompletableFuture<List<Member>> findBySoloArtistNotNull();

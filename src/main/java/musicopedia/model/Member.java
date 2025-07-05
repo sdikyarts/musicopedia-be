@@ -14,8 +14,10 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID memberId;
 
-    @Column(nullable = false)
-    private String fullName;
+    @Column(nullable = false, name = "member_name")
+    private String memberName;
+
+    private String realName;
 
     @Column(columnDefinition = "TEXT")
     private String description;

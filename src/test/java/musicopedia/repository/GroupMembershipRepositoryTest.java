@@ -54,15 +54,15 @@ public class GroupMembershipRepositoryTest {
         artistRepository.save(group2);
         
         member1 = new Member();
-        member1.setFullName("Member 1");
+        member1.setMemberName("Kim Namjoon");
         memberRepository.save(member1);
         
         member2 = new Member();
-        member2.setFullName("Member 2");
+        member2.setMemberName("Jisoo");
         memberRepository.save(member2);
         
         member3 = new Member();
-        member3.setFullName("Member 3");
+        member3.setMemberName("Felix");
         memberRepository.save(member3);
         
         createMembership(group1, member1, MembershipStatus.CURRENT, 
@@ -134,7 +134,7 @@ public class GroupMembershipRepositoryTest {
     public void testFindFormerMembersByGroupId() {
         List<GroupMembership> formerMembers = groupMembershipRepository.findFormerMembersByGroupId(group2.getArtistId());
         assertEquals(1, formerMembers.size());
-        assertEquals(member1.getFullName(), formerMembers.get(0).getMember().getFullName());
+        assertEquals(member1.getMemberName(), formerMembers.get(0).getMember().getMemberName());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class GroupMembershipRepositoryTest {
         List<GroupMembership> memberships = groupMembershipRepository.findByGroupIdAndJoinDateAfter(
                 group2.getArtistId(), date);
         assertEquals(1, memberships.size());
-        assertEquals("Member 3", memberships.get(0).getMember().getFullName());
+        assertEquals("Felix", memberships.get(0).getMember().getMemberName());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class GroupMembershipRepositoryTest {
         List<GroupMembership> memberships = groupMembershipRepository.findByGroupIdAndLeaveDateBefore(
                 group2.getArtistId(), date);
         assertEquals(1, memberships.size());
-        assertEquals("Member 1", memberships.get(0).getMember().getFullName());
+        assertEquals("Kim Namjoon", memberships.get(0).getMember().getMemberName());
     }
 
     @Test

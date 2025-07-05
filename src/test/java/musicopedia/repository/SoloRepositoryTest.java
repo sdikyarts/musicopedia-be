@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,6 +31,9 @@ public class SoloRepositoryTest {
     @Autowired
     private ArtistRepository artistRepository;
 
+    @Autowired
+    private TestEntityManager entityManager;
+
     private Artist createSoloArtist(String name, String genre, String country, String language) {
         Artist soloArtist = new Artist();
         soloArtist.setArtistName(name);
@@ -40,13 +44,16 @@ public class SoloRepositoryTest {
         return artistRepository.save(soloArtist);
     }
 
-    private void createSoloEntity(Artist artist, LocalDate birthDate, LocalDate deathDate) {
+    private void createSoloEntity(Artist artist, String realName, LocalDate birthDate, LocalDate deathDate) {
         Solo solo = new Solo();
         solo.setArtistId(artist.getArtistId());
         solo.setArtist(artist);
         solo.setBirthDate(birthDate);
         solo.setDeathDate(deathDate);
         solo.setGender(ArtistGender.FEMALE);
+        solo.setRealName(realName);
+        entityManager.persist(solo);
+        entityManager.flush();
     }
 
     @BeforeEach
@@ -54,11 +61,9 @@ public class SoloRepositoryTest {
         Artist iu = createSoloArtist("IU", "K-pop", "KR", "Korean");
         Artist taylorSwift = createSoloArtist("Taylor Swift", "Pop", "US", "English");
         Artist johnLennon = createSoloArtist("John Lennon", "Rock", "UK", "English");
-        
-        createSoloEntity(iu, LocalDate.of(1993, 5, 16), null);
-        createSoloEntity(taylorSwift, LocalDate.of(1989, 12, 13), null);
-        createSoloEntity(johnLennon, LocalDate.of(1940, 10, 9), LocalDate.of(1980, 12, 8));
-
+        createSoloEntity(iu, "Lee Ji-eun", LocalDate.of(1993, 5, 16), null);
+        createSoloEntity(taylorSwift, "Taylor Alison Swift", LocalDate.of(1989, 12, 13), null);
+        createSoloEntity(johnLennon, "John Winston Lennon", LocalDate.of(1940, 10, 9), LocalDate.of(1980, 12, 8));
         Artist group = new Artist();
         group.setArtistName("BTS");
         group.setType(ArtistType.GROUP);
@@ -113,5 +118,12 @@ public class SoloRepositoryTest {
         
         long koreanArtists = soloRepository.countSoloArtistsByLanguage(ArtistType.SOLO, "Korean");
         assertEquals(1, koreanArtists);
+    }
+
+    @Test
+    public void testFindBySoloRealNameContaining() {
+        List<Artist> swiftArtists = soloRepository.findBySoloRealNameContaining("Swift");
+        assertEquals(1, swiftArtists.size());
+        assertEquals("Taylor Swift", swiftArtists.get(0).getArtistName());
     }
 }

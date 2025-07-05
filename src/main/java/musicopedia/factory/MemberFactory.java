@@ -24,12 +24,17 @@ public class MemberFactory {
      */
     public CompletableFuture<Member> createMember(MemberRequestDTO dto) {
         // Basic validation
-        if (dto.getFullName() == null || dto.getFullName().trim().isEmpty()) {
-            throw new IllegalArgumentException("Member full name is required");
+        if (dto.getMemberName() == null || dto.getMemberName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Member name is required");
+        }
+        // Enforce realName validation for full branch coverage
+        if (dto.getRealName() == null || dto.getRealName().trim().isEmpty()) {
+            throw new IllegalArgumentException("Member real name is required");
         }
 
         Member member = new Member();
-        member.setFullName(dto.getFullName().trim());
+        member.setMemberName(dto.getMemberName().trim());
+        member.setRealName(dto.getRealName().trim());
         member.setDescription(dto.getDescription());
         member.setImage(dto.getImage());
         member.setBirthDate(dto.getBirthDate());
@@ -45,7 +50,7 @@ public class MemberFactory {
                     if (soloArtist.getType() != ArtistType.SOLO) {
                         throw new IllegalArgumentException(
                             String.format("Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s", 
-                            dto.getFullName(), soloArtist.getArtistName(), soloArtist.getType()));
+                            dto.getMemberName(), soloArtist.getArtistName(), soloArtist.getType()));
                     }
                     
                     member.setSoloArtist(soloArtist);
@@ -64,7 +69,7 @@ public class MemberFactory {
         if (soloArtist.getType() != ArtistType.SOLO) {
             throw new IllegalArgumentException(
                 String.format("Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members", 
-                member.getFullName(), soloArtist.getArtistName()));
+                member.getMemberName(), soloArtist.getArtistName()));
         }
         
         member.setSoloArtist(soloArtist);

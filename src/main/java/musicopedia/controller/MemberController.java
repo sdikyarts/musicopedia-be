@@ -98,4 +98,10 @@ public class MemberController {
         return memberService.deleteById(memberId)
                 .thenApply(v -> ResponseEntity.noContent().<Void>build());
     }
+
+    @GetMapping("/search/realname")
+    public CompletableFuture<ResponseEntity<List<MemberResponseDTO>>> searchMembersByRealName(@RequestParam("realName") String realName) {
+        return memberService.findByRealNameContaining(realName)
+                .thenApply(members -> ResponseEntity.ok(memberMapper.toSummaryDTOList(members)));
+    }
 }

@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -55,17 +56,19 @@ public class SoloControllerTest {
         testId = UUID.randomUUID();
         testArtist = new ArtistBuilder()
             .setArtistId(testId)
-            .setArtistName("IU")
+            .setArtistName("Taylor Swift")
             .setType(ArtistType.SOLO)
-            .setOriginCountry("KR")
-            .setPrimaryLanguage("Korean")
+            .setOriginCountry("US")
+            .setGenre("Pop")
+            .setPrimaryLanguage("English")
             .build();
 
         testSolo = new SoloBuilder()
             .setArtistId(testId)
             .setArtist(testArtist)
-            .setBirthDate(LocalDate.of(1993, 5, 16))
+            .setBirthDate(LocalDate.of(1989, 12, 13))
             .setGender(ArtistGender.FEMALE)
+            .setRealName("Taylor Alison Swift")
             .buildSolo();
     }
 
@@ -81,7 +84,9 @@ public class SoloControllerTest {
         mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].artistId").value(testId.toString()));
+                .andExpect(jsonPath("$[0].artistId").value(testId.toString()))
+                .andExpect(jsonPath("$[0].artist.artistName").value("Taylor Swift"))
+                .andExpect(jsonPath("$[0].realName").value("Taylor Alison Swift"));
 
         verify(soloService, times(1)).findAll();
     }
@@ -97,7 +102,8 @@ public class SoloControllerTest {
         mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.artistId").value(testId.toString()))
-                .andExpect(jsonPath("$.artist.artistName").value("IU"));
+                .andExpect(jsonPath("$.artist.artistName").value("Taylor Swift"))
+                .andExpect(jsonPath("$.realName").value("Taylor Alison Swift"));
 
         verify(soloService, times(1)).findById(testId);
     }
@@ -296,5 +302,25 @@ public class SoloControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(soloService, times(1)).deleteById(testId);
+    }
+
+    @Test
+    void testSearchSoloistsByRealName() throws Exception {
+        List<Solo> soloists = Arrays.asList(testSolo);
+        when(soloService.findByRealNameContaining("Taylor Alison Swift")).thenReturn(CompletableFuture.completedFuture(soloists));
+
+        var mvcResult = mockMvc.perform(get("/api/soloists/search/realname")
+                        .param("realName", "Taylor Alison Swift"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].artistId").value(testId.toString()))
+                .andExpect(jsonPath("$[0].realName").value("Taylor Alison Swift"))
+                .andExpect(jsonPath("$[0].artist.artistName").value("Taylor Swift"));
+
+        verify(soloService, times(1)).findByRealNameContaining("Taylor Alison Swift");
     }
 }
