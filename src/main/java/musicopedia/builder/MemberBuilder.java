@@ -5,14 +5,20 @@ import musicopedia.model.Artist;
 import java.time.LocalDate;
 
 public class MemberBuilder {
-    private String fullName;
+    private String memberName;
+    private String realName;
     private String description;
     private String image;
     private LocalDate birthDate;
     private Artist soloArtist;
 
-    public MemberBuilder setFullName(String fullName) {
-        this.fullName = fullName;
+    public MemberBuilder setMemberName(String memberName) {
+        this.memberName = memberName;
+        return this;
+    }
+
+    public MemberBuilder setRealName(String realName) {
+        this.realName = realName;
         return this;
     }
 
@@ -38,7 +44,8 @@ public class MemberBuilder {
 
     public Member build() {
         Member member = new Member();
-        member.setFullName(this.fullName);
+        member.setMemberName(this.memberName);
+        member.setRealName(this.realName);
         member.setDescription(this.description);
         member.setImage(this.image);
         member.setBirthDate(this.birthDate);

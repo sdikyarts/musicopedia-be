@@ -43,7 +43,15 @@ public class MemberServiceImpl implements MemberService {
     @Async("memberProcessingExecutor")
     @Transactional(readOnly = true)
     public CompletableFuture<List<Member>> findByNameContaining(String name) {
-        List<Member> members = memberRepository.findByFullNameContainingIgnoreCase(name);
+        List<Member> members = memberRepository.findByMemberNameContainingIgnoreCase(name);
+        return CompletableFuture.completedFuture(members);
+    }
+
+    @Override
+    @Async("memberProcessingExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<List<Member>> findByRealNameContaining(String realName) {
+        List<Member> members = memberRepository.findByRealNameContainingIgnoreCase(realName);
         return CompletableFuture.completedFuture(members);
     }
 

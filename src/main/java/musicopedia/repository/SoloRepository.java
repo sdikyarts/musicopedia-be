@@ -39,4 +39,7 @@ public interface SoloRepository extends JpaRepository<Artist, UUID> {
 
     @Query("SELECT a FROM Artist a JOIN Solo s ON a.artistId = s.artistId WHERE s.deathDate IS NOT NULL AND s.deathDate <= CURRENT_DATE")
     List<Artist> findDeceasedArtists();
+
+    @Query("SELECT a FROM Artist a JOIN Solo s ON a.artistId = s.artistId WHERE LOWER(s.realName) LIKE LOWER(CONCAT('%', :realName, '%'))")
+    List<Artist> findBySoloRealNameContaining(@Param("realName") String realName);
 }

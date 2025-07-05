@@ -55,7 +55,7 @@ public class GroupMembershipServiceTest {
         
         testMember = new Member();
         testMember.setMemberId(memberId);
-        testMember.setFullName("Kim Namjoon");
+        testMember.setMemberName("Kim Namjoon");
         
         membershipId = new GroupMembershipId();
         membershipId.setGroupId(groupId);
@@ -78,7 +78,7 @@ public class GroupMembershipServiceTest {
         List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
-        assertEquals("Kim Namjoon", result.get(0).getMember().getFullName());
+        assertEquals("Kim Namjoon", result.get(0).getMember().getMemberName());
         assertEquals("BTS", result.get(0).getGroup().getArtistName());
         verify(groupMembershipRepository, times(1)).findByGroup(testGroup);
     }
@@ -105,7 +105,7 @@ public class GroupMembershipServiceTest {
         List<GroupMembership> result = future.join();
 
         assertEquals(1, result.size());
-        assertEquals("Kim Namjoon", result.get(0).getMember().getFullName());
+        assertEquals("Kim Namjoon", result.get(0).getMember().getMemberName());
         verify(groupMembershipRepository, times(1)).findByMember(testMember);
     }
 
@@ -270,7 +270,7 @@ public class GroupMembershipServiceTest {
         
         Member member = new Member();
         member.setMemberId(testMemberId);
-        member.setFullName("Test Member");
+        member.setMemberName("Test Member");
         
         GroupMembershipId id = new GroupMembershipId();
         id.setGroupId(testGroupId);

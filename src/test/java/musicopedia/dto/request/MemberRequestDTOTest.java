@@ -14,15 +14,17 @@ class MemberRequestDTOTest {
         // Given
         UUID memberId = UUID.randomUUID();
         UUID soloArtistId = UUID.randomUUID();
-        String fullName = "John Doe";
-        String description = "Lead vocalist and dancer";
-        String image = "http://example.com/john-doe.jpg";
-        LocalDate birthDate = LocalDate.of(1995, 3, 15);
+        String memberName = "Hyunjin";
+        String realName = "Hwang Hyun-jin";
+        String description = "Main dancer and visual of Stray Kids";
+        String image = "http://example.com/hyunjin.jpg";
+        LocalDate birthDate = LocalDate.of(2000, 3, 20);
 
         // When
         MemberRequestDTO dto = new MemberRequestDTO();
         dto.setMemberId(memberId);
-        dto.setFullName(fullName);
+        dto.setMemberName(memberName);
+        dto.setRealName(realName);
         dto.setDescription(description);
         dto.setImage(image);
         dto.setBirthDate(birthDate);
@@ -30,7 +32,8 @@ class MemberRequestDTOTest {
 
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals(fullName, dto.getFullName());
+        assertEquals(memberName, dto.getMemberName());
+        assertEquals(realName, dto.getRealName());
         assertEquals(description, dto.getDescription());
         assertEquals(image, dto.getImage());
         assertEquals(birthDate, dto.getBirthDate());
@@ -40,15 +43,18 @@ class MemberRequestDTOTest {
     @Test
     void testMemberRequestDTO_MinimalFields() {
         // Given
-        String fullName = "Jane Smith";
+        String memberName2 = "KIMCHAEWON";
+        String realName2 = "Kim Chae-won";
 
         // When
         MemberRequestDTO dto = new MemberRequestDTO();
-        dto.setFullName(fullName);
+        dto.setMemberName(memberName2);
+        dto.setRealName(realName2);
 
         // Then
         assertNull(dto.getMemberId());
-        assertEquals(fullName, dto.getFullName());
+        assertEquals(memberName2, dto.getMemberName());
+        assertEquals(realName2, dto.getRealName());
         assertNull(dto.getDescription());
         assertNull(dto.getImage());
         assertNull(dto.getBirthDate());
@@ -58,20 +64,20 @@ class MemberRequestDTOTest {
     @Test
     void testMemberRequestDTO_ForCreateOperation() {
         // Given - typical create scenario (no memberId)
-        String fullName = "Alice Johnson";
+        String memberName = "Alice Johnson";
         String description = "Main rapper";
         LocalDate birthDate = LocalDate.of(1998, 7, 22);
 
         // When
         MemberRequestDTO dto = new MemberRequestDTO();
-        dto.setFullName(fullName);
+        dto.setMemberName(memberName);
         dto.setDescription(description);
         dto.setBirthDate(birthDate);
         // memberId should remain null for create operations
 
         // Then
         assertNull(dto.getMemberId()); // Important: no ID for create
-        assertEquals(fullName, dto.getFullName());
+        assertEquals(memberName, dto.getMemberName());
         assertEquals(description, dto.getDescription());
         assertEquals(birthDate, dto.getBirthDate());
         assertNull(dto.getSoloArtistId());
@@ -81,7 +87,7 @@ class MemberRequestDTOTest {
     void testMemberRequestDTO_ForUpdateOperation() {
         // Given - typical update scenario (with memberId)
         UUID memberId = UUID.randomUUID();
-        String fullName = "Bob Wilson";
+        String memberName = "Bob Wilson";
         String description = "Lead guitarist";
         String image = "http://example.com/bob-wilson.jpg";
         LocalDate birthDate = LocalDate.of(1992, 11, 8);
@@ -89,14 +95,14 @@ class MemberRequestDTOTest {
         // When
         MemberRequestDTO dto = new MemberRequestDTO();
         dto.setMemberId(memberId); // ID present for update
-        dto.setFullName(fullName);
+        dto.setMemberName(memberName);
         dto.setDescription(description);
         dto.setImage(image);
         dto.setBirthDate(birthDate);
 
         // Then
         assertEquals(memberId, dto.getMemberId()); // Important: ID present for update
-        assertEquals(fullName, dto.getFullName());
+        assertEquals(memberName, dto.getMemberName());
         assertEquals(description, dto.getDescription());
         assertEquals(image, dto.getImage());
         assertEquals(birthDate, dto.getBirthDate());
@@ -107,15 +113,15 @@ class MemberRequestDTOTest {
     void testMemberRequestDTO_WithSoloArtist() {
         // Given
         UUID soloArtistId = UUID.randomUUID();
-        String fullName = "Charlie Brown";
+        String memberName = "Charlie Brown";
 
         // When
         MemberRequestDTO dto = new MemberRequestDTO();
-        dto.setFullName(fullName);
+        dto.setMemberName(memberName);
         dto.setSoloArtistId(soloArtistId);
 
         // Then
-        assertEquals(fullName, dto.getFullName());
+        assertEquals(memberName, dto.getMemberName());
         assertEquals(soloArtistId, dto.getSoloArtistId());
         assertNull(dto.getMemberId());
     }
@@ -127,7 +133,7 @@ class MemberRequestDTOTest {
 
         // Then
         assertNull(dto.getMemberId());
-        assertNull(dto.getFullName());
+        assertNull(dto.getMemberName());
         assertNull(dto.getDescription());
         assertNull(dto.getImage());
         assertNull(dto.getBirthDate());

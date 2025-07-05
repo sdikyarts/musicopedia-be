@@ -15,7 +15,8 @@ import java.util.UUID;
 public abstract class BaseMemberDTO {
     
     private UUID memberId;
-    private String fullName;
+    private String memberName;
+    private String realName;
     private String description;
     private String image;
     private LocalDate birthDate;

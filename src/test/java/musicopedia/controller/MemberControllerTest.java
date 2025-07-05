@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -58,22 +59,24 @@ public class MemberControllerTest {
 
         testId = UUID.randomUUID();
         testMember = new MemberBuilder()
-            .setFullName("Test Member")
-            .setDescription("A test member")
-            .setBirthDate(LocalDate.of(1990, 1, 1))
+            .setMemberName("Felix")
+            .setRealName("Felix Yongbok Lee")
+            .setBirthDate(LocalDate.of(2000, 9, 15))
             .build();
         testMember.setMemberId(testId);
         
         // Setup DTOs
         testMemberResponseDTO = new MemberResponseDTO();
         testMemberResponseDTO.setMemberId(testId);
-        testMemberResponseDTO.setFullName("Jisoo");
-        testMemberResponseDTO.setBirthDate(LocalDate.of(1995, 1, 3));
+        testMemberResponseDTO.setMemberName("Felix");
+        testMemberResponseDTO.setRealName("Felix Yongbok Lee");
+        testMemberResponseDTO.setBirthDate(LocalDate.of(2000, 9, 15));
         testMemberResponseDTO.setHasOfficialSoloDebut(false);
         
         testMemberSummaryDTO = new MemberResponseDTO();
         testMemberSummaryDTO.setMemberId(testId);
-        testMemberSummaryDTO.setFullName("Jisoo");
+        testMemberSummaryDTO.setMemberName("Felix");
+        testMemberSummaryDTO.setRealName("Felix Yongbok Lee");
         testMemberSummaryDTO.setHasOfficialSoloDebut(false);
     }
 
@@ -92,7 +95,8 @@ public class MemberControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$[0].memberId").value(testId.toString()))
-                .andExpect(jsonPath("$[0].fullName").value("Jisoo"));
+                .andExpect(jsonPath("$[0].memberName").value("Felix"))
+                .andExpect(jsonPath("$[0].realName").value("Felix Yongbok Lee"));
 
         verify(memberService, times(1)).findAll();
         verify(memberMapper, times(1)).toSummaryDTOList(members);
@@ -109,7 +113,8 @@ public class MemberControllerTest {
         mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.memberId").value(testId.toString()))
-                .andExpect(jsonPath("$.fullName").value("Jisoo"));
+                .andExpect(jsonPath("$.memberName").value("Felix"))
+                .andExpect(jsonPath("$.realName").value("Felix Yongbok Lee"));
 
         verify(memberService, times(1)).findById(testId);
         verify(memberMapper, times(1)).toResponseDTO(testMember);
@@ -133,19 +138,42 @@ public class MemberControllerTest {
         List<Member> members = Arrays.asList(testMember);
         List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
         
-        when(memberService.findByNameContaining("Jisoo")).thenReturn(CompletableFuture.completedFuture(members));
+        when(memberService.findByNameContaining("Felix")).thenReturn(CompletableFuture.completedFuture(members));
         when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
 
         var result = mockMvc.perform(get("/api/members/search")
-                        .param("name", "Jisoo"))
+                        .param("name", "Felix"))
                 .andExpect(request().asyncStarted());
 
         mockMvc.perform(asyncDispatch(result.andReturn()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].fullName").value("Jisoo"));
+                .andExpect(jsonPath("$[0].memberName").value("Felix"))
+                .andExpect(jsonPath("$[0].realName").value("Felix Yongbok Lee"));
 
-        verify(memberService, times(1)).findByNameContaining("Jisoo");
+        verify(memberService, times(1)).findByNameContaining("Felix");
+        verify(memberMapper, times(1)).toSummaryDTOList(members);
+    }
+
+    @Test
+    void testSearchMembersByRealName() throws Exception {
+        List<Member> members = Arrays.asList(testMember);
+        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
+        
+        when(memberService.findByRealNameContaining("Felix Yongbok Lee")).thenReturn(CompletableFuture.completedFuture(members));
+        when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
+
+        var result = mockMvc.perform(get("/api/members/search/realname")
+                        .param("realName", "Felix Yongbok Lee"))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].memberName").value("Felix"))
+                .andExpect(jsonPath("$[0].realName").value("Felix Yongbok Lee"));
+
+        verify(memberService, times(1)).findByRealNameContaining("Felix Yongbok Lee");
         verify(memberMapper, times(1)).toSummaryDTOList(members);
     }
 
@@ -196,8 +224,9 @@ public class MemberControllerTest {
     @Test
     void testCreateMember() throws Exception {
         MemberRequestDTO createDTO = new MemberRequestDTO();
-        createDTO.setFullName("Jisoo");
-        createDTO.setBirthDate(LocalDate.of(1995, 1, 3));
+        createDTO.setMemberName("Felix");
+        createDTO.setRealName("Felix Yongbok Lee");
+        createDTO.setBirthDate(LocalDate.of(2000, 9, 15));
         
         when(memberMapper.toEntity(any(MemberRequestDTO.class))).thenReturn(CompletableFuture.completedFuture(testMember));
         when(memberService.save(any(Member.class))).thenReturn(CompletableFuture.completedFuture(testMember));
@@ -223,8 +252,9 @@ public class MemberControllerTest {
     void testUpdateMember() throws Exception {
         MemberRequestDTO updateDTO = new MemberRequestDTO();
         updateDTO.setMemberId(testId);
-        updateDTO.setFullName("Jisoo");
-        updateDTO.setBirthDate(LocalDate.of(1995, 1, 3));
+        updateDTO.setMemberName("Felix");
+        updateDTO.setRealName("Felix Yongbok Lee");
+        updateDTO.setBirthDate(LocalDate.of(2000, 9, 15));
         
         when(memberService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.of(testMember)));
         when(memberMapper.updateEntityFromDto(any(Member.class), any(MemberRequestDTO.class))).thenReturn(CompletableFuture.completedFuture(null));
@@ -293,8 +323,9 @@ public class MemberControllerTest {
     void testUpdateMemberWithNullMemberIdInBody() throws Exception {
         MemberRequestDTO updateDTO = new MemberRequestDTO();
         updateDTO.setMemberId(null); // memberId is null in request body
-        updateDTO.setFullName("Updated Name");
-        updateDTO.setBirthDate(LocalDate.of(1995, 1, 3));
+        updateDTO.setMemberName("Updated Name");
+        updateDTO.setRealName("Updated Real Name");
+        updateDTO.setBirthDate(LocalDate.of(2000, 9, 15));
         
         when(memberService.findById(testId)).thenReturn(CompletableFuture.completedFuture(Optional.of(testMember)));
         when(memberMapper.updateEntityFromDto(any(Member.class), any(MemberRequestDTO.class))).thenReturn(CompletableFuture.completedFuture(null));

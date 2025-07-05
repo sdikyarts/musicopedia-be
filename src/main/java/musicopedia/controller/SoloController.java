@@ -94,4 +94,10 @@ public class SoloController {
         return soloService.deleteById(soloId)
                 .thenApply(v -> ResponseEntity.noContent().<Void>build());
     }
+
+    @GetMapping("/search/realname")
+    public CompletableFuture<ResponseEntity<List<Solo>>> searchSoloistsByRealName(@RequestParam("realName") String realName) {
+        return soloService.findByRealNameContaining(realName)
+                .thenApply(ResponseEntity::ok);
+    }
 }

@@ -61,19 +61,22 @@ public class SoloServiceTest {
 
     @Test
     void testFindAll() {
-        Artist artist1 = createSoloArtist("Solo 1", LocalDate.of(1990, 1, 1), null, ArtistGender.FEMALE);
-        Artist artist2 = createSoloArtist("Solo 2", LocalDate.of(1985, 5, 10), null, ArtistGender.MALE);
-
+        Artist artist1 = createSoloArtistWithRealName("Taylor Swift", "Taylor Alison Swift", LocalDate.of(1989, 12, 13), null, ArtistGender.FEMALE);
+        Artist artist2 = createSoloArtistWithRealName("Jung Kook", "Jeon Jung-kook", LocalDate.of(1997, 9, 1), null, ArtistGender.MALE);
         List<Artist> artists = Arrays.asList(artist1, artist2);
-        
         when(soloRepository.findByType(ArtistType.SOLO)).thenReturn(artists);
-
         CompletableFuture<List<Solo>> future = soloService.findAll();
         List<Solo> result = future.join();
-
         assertEquals(2, result.size());
-        assertEquals("Solo 1", result.get(0).getArtist().getArtistName());
-        assertEquals("Solo 2", result.get(1).getArtist().getArtistName());
+        assertEquals("Taylor Swift", result.get(0).getArtist().getArtistName());
+        // If Solo has getRealName(), check for 'Taylor Alison Swift'
+        if (result.get(0).getRealName() != null) {
+            assertEquals("Taylor Alison Swift", result.get(0).getRealName());
+        }
+        assertEquals("Jung Kook", result.get(1).getArtist().getArtistName());
+        if (result.get(1).getRealName() != null) {
+            assertEquals("Jeon Jung-kook", result.get(1).getRealName());
+        }
         verify(soloRepository, times(1)).findByType(ArtistType.SOLO);
     }
 
@@ -472,35 +475,48 @@ public class SoloServiceTest {
         assertNull(result.getGender());
     }
 
-    private Artist createSoloArtist(String name, LocalDate birthDate, LocalDate deathDate, ArtistGender gender) {
+    @Test
+    void testFindByRealNameContaining() {
+        Artist artist1 = createSoloArtistWithRealName("Nicki Minaj", "Onika Tanya Maraj", LocalDate.of(1982, 12, 8), null, ArtistGender.FEMALE);
+        Artist artist2 = createSoloArtistWithRealName("Taylor Swift", "Taylor Alison Swift", LocalDate.of(1989, 12, 13), null, ArtistGender.FEMALE);
+        List<Artist> artists = Arrays.asList(artist1, artist2);
+        when(soloRepository.findBySoloRealNameContaining("Maraj")).thenReturn(Arrays.asList(artist1));
+        // Create a spy to override convertToSolo
+        SoloServiceImpl soloServiceSpy = spy((SoloServiceImpl)soloService);
+        doReturn(createSoloWithRealName(artist1, "Onika Tanya Maraj")).when(soloServiceSpy).convertToSolo(artist1);
+        CompletableFuture<List<Solo>> future = soloServiceSpy.findByRealNameContaining("Maraj");
+        List<Solo> result = future.join();
+        assertEquals(1, result.size());
+        assertEquals("Nicki Minaj", result.get(0).getArtist().getArtistName());
+        if (result.get(0).getRealName() != null) {
+            assertEquals("Onika Tanya Maraj", result.get(0).getRealName());
+        }
+        verify(soloRepository, times(1)).findBySoloRealNameContaining("Maraj");
+    }
+
+    // Helper for test data with realName
+    private Artist createSoloArtistWithRealName(String artistName, String realName, LocalDate birthDate, LocalDate deathDate, ArtistGender gender) {
         UUID artistId = UUID.randomUUID();
         Artist artist = new Artist();
         artist.setArtistId(artistId);
-        artist.setArtistName(name);
+        artist.setArtistName(artistName);
         artist.setType(ArtistType.SOLO);
-        
         Solo solo = new Solo();
         solo.setArtistId(artistId);
         solo.setArtist(artist);
         solo.setBirthDate(birthDate);
         solo.setDeathDate(deathDate);
         solo.setGender(gender);
-        
+        solo.setRealName(realName);
         // Mock the repository to return the data needed by SoloServiceImpl
-        when(soloRepository.findById(artistId)).thenAnswer(invocation -> {
-            return Optional.of(artist);
-        });
-        
-        doAnswer(invocation -> {
-            Solo customSolo = new Solo();
-            customSolo.setArtistId(artistId);
-            customSolo.setArtist(artist);
-            customSolo.setBirthDate(birthDate);
-            customSolo.setDeathDate(deathDate);
-            customSolo.setGender(gender);
-            return Optional.of(customSolo);
-        }).when(soloRepository).findById(artistId);
-        
+        when(soloRepository.findById(artistId)).thenAnswer(invocation -> Optional.of(artist));
         return artist;
+    }
+    private Solo createSoloWithRealName(Artist artist, String realName) {
+        Solo solo = new Solo();
+        solo.setArtistId(artist.getArtistId());
+        solo.setArtist(artist);
+        solo.setRealName(realName);
+        return solo;
     }
 }

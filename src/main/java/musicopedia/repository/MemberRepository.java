@@ -15,9 +15,9 @@ import java.util.UUID;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, UUID> {
     
-    List<Member> findByFullNameContainingIgnoreCase(String name);
+    List<Member> findByMemberNameContainingIgnoreCase(String memberName);
     
-    Optional<Member> findByFullName(String fullName);
+    Optional<Member> findByMemberName(String memberName);
     
     List<Member> findByBirthDate(LocalDate birthDate);
     
@@ -33,7 +33,9 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     @Query("SELECT COUNT(m) FROM Member m WHERE m.soloArtist.artistId = :soloArtistId")
     long countBySoloArtistId(@Param("soloArtistId") UUID soloArtistId);
     
-    boolean existsByFullName(String fullName);
+    boolean existsByMemberName(String memberName);
     
     List<Member> findBySoloArtistIsNull();
+
+    List<Member> findByRealNameContainingIgnoreCase(String realName);
 }

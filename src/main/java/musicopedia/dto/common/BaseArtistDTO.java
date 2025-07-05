@@ -27,6 +27,7 @@ public abstract class BaseArtistDTO {
     private String originCountry;
 
     // Solo-specific fields
+    private String realName;
     private LocalDate birthDate;
     private LocalDate deathDate;
     private ArtistGender soloGender;

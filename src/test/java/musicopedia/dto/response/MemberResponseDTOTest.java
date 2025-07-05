@@ -15,25 +15,25 @@ class MemberResponseDTOTest {
         MemberResponseDTO dto = new MemberResponseDTO();
         UUID memberId = UUID.randomUUID();
         UUID soloArtistId = UUID.randomUUID();
-        
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("John Doe");
-        dto.setDescription("Lead vocalist and main rapper");
-        dto.setImage("https://example.com/john-doe.jpg");
-        dto.setBirthDate(LocalDate.of(1995, 3, 15));
+        dto.setMemberName("HAN");
+        dto.setRealName("Han Ji-sung");
+        dto.setDescription("Main rapper and producer");
+        dto.setImage("https://example.com/han.jpg");
+        dto.setBirthDate(LocalDate.of(2000, 9, 14));
         dto.setSoloArtistId(soloArtistId);
-        dto.setSoloArtistName("J.D.");
+        dto.setSoloArtistName("HAN");
         dto.setHasOfficialSoloDebut(true);
-        
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("John Doe", dto.getFullName());
-        assertEquals("Lead vocalist and main rapper", dto.getDescription());
-        assertEquals("https://example.com/john-doe.jpg", dto.getImage());
-        assertEquals(LocalDate.of(1995, 3, 15), dto.getBirthDate());
+        assertEquals("HAN", dto.getMemberName());
+        assertEquals("Han Ji-sung", dto.getRealName());
+        assertEquals("Main rapper and producer", dto.getDescription());
+        assertEquals("https://example.com/han.jpg", dto.getImage());
+        assertEquals(LocalDate.of(2000, 9, 14), dto.getBirthDate());
         assertEquals(soloArtistId, dto.getSoloArtistId());
-        assertEquals("J.D.", dto.getSoloArtistName());
+        assertEquals("HAN", dto.getSoloArtistName());
         assertTrue(dto.getHasOfficialSoloDebut());
     }
 
@@ -42,23 +42,23 @@ class MemberResponseDTOTest {
         // Given
         MemberResponseDTO dto = new MemberResponseDTO();
         UUID memberId = UUID.randomUUID();
-        
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("Jane Smith");
-        dto.setDescription("Main dancer");
-        dto.setImage("https://example.com/jane-smith.jpg");
-        dto.setBirthDate(LocalDate.of(1998, 8, 22));
+        dto.setMemberName("KIMCHAEWON");
+        dto.setRealName("Kim Chae-won");
+        dto.setDescription("Leader and main vocalist");
+        dto.setImage("https://example.com/chaewon.jpg");
+        dto.setBirthDate(LocalDate.of(2000, 8, 1));
         dto.setSoloArtistId(null);
         dto.setSoloArtistName(null);
         dto.setHasOfficialSoloDebut(false);
-        
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("Jane Smith", dto.getFullName());
-        assertEquals("Main dancer", dto.getDescription());
-        assertEquals("https://example.com/jane-smith.jpg", dto.getImage());
-        assertEquals(LocalDate.of(1998, 8, 22), dto.getBirthDate());
+        assertEquals("KIMCHAEWON", dto.getMemberName());
+        assertEquals("Kim Chae-won", dto.getRealName());
+        assertEquals("Leader and main vocalist", dto.getDescription());
+        assertEquals("https://example.com/chaewon.jpg", dto.getImage());
+        assertEquals(LocalDate.of(2000, 8, 1), dto.getBirthDate());
         assertNull(dto.getSoloArtistId());
         assertNull(dto.getSoloArtistName());
         assertFalse(dto.getHasOfficialSoloDebut());
@@ -69,15 +69,15 @@ class MemberResponseDTOTest {
         // Given
         MemberResponseDTO dto = new MemberResponseDTO();
         UUID memberId = UUID.randomUUID();
-        
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("Bob Wilson");
+        dto.setMemberName("Felix");
+        dto.setRealName("Felix Yongbok Lee");
         dto.setHasOfficialSoloDebut(false);
-        
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("Bob Wilson", dto.getFullName());
+        assertEquals("Felix", dto.getMemberName());
+        assertEquals("Felix Yongbok Lee", dto.getRealName());
         assertNull(dto.getDescription());
         assertNull(dto.getImage());
         assertNull(dto.getBirthDate());
@@ -93,7 +93,7 @@ class MemberResponseDTOTest {
         
         // When
         dto.setMemberId(null);
-        dto.setFullName(null);
+        dto.setMemberName(null);
         dto.setDescription(null);
         dto.setImage(null);
         dto.setBirthDate(null);
@@ -103,7 +103,7 @@ class MemberResponseDTOTest {
         
         // Then
         assertNull(dto.getMemberId());
-        assertNull(dto.getFullName());
+        assertNull(dto.getMemberName());
         assertNull(dto.getDescription());
         assertNull(dto.getImage());
         assertNull(dto.getBirthDate());
@@ -120,14 +120,14 @@ class MemberResponseDTOTest {
         
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("");
+        dto.setMemberName("");
         dto.setDescription("");
         dto.setImage("");
         dto.setSoloArtistName("");
         
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("", dto.getFullName());
+        assertEquals("", dto.getMemberName());
         assertEquals("", dto.getDescription());
         assertEquals("", dto.getImage());
         assertEquals("", dto.getSoloArtistName());
@@ -141,14 +141,14 @@ class MemberResponseDTOTest {
         
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("Alice Cooper");
+        dto.setMemberName("Alice Cooper");
         dto.setSoloArtistId(null);
         dto.setSoloArtistName("Alice Solo");
         dto.setHasOfficialSoloDebut(true);
         
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("Alice Cooper", dto.getFullName());
+        assertEquals("Alice Cooper", dto.getMemberName());
         assertNull(dto.getSoloArtistId());
         assertEquals("Alice Solo", dto.getSoloArtistName());
         assertTrue(dto.getHasOfficialSoloDebut());
@@ -163,12 +163,12 @@ class MemberResponseDTOTest {
         
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("Multi-talented Member");
+        dto.setMemberName("Multi-talented Member");
         dto.setDescription(longDescription);
         
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("Multi-talented Member", dto.getFullName());
+        assertEquals("Multi-talented Member", dto.getMemberName());
         assertEquals(longDescription, dto.getDescription());
     }
 
@@ -181,12 +181,12 @@ class MemberResponseDTOTest {
         
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("Future Member");
+        dto.setMemberName("Future Member");
         dto.setBirthDate(futureDate);
         
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("Future Member", dto.getFullName());
+        assertEquals("Future Member", dto.getMemberName());
         assertEquals(futureDate, dto.getBirthDate());
     }
 
@@ -199,12 +199,12 @@ class MemberResponseDTOTest {
         
         // When
         dto.setMemberId(memberId);
-        dto.setFullName("Old Member");
+        dto.setMemberName("Old Member");
         dto.setBirthDate(oldDate);
         
         // Then
         assertEquals(memberId, dto.getMemberId());
-        assertEquals("Old Member", dto.getFullName());
+        assertEquals("Old Member", dto.getMemberName());
         assertEquals(oldDate, dto.getBirthDate());
     }
 
@@ -217,7 +217,7 @@ class MemberResponseDTOTest {
         UUID soloArtistId = UUID.randomUUID();
         
         dto1.setMemberId(memberId);
-        dto1.setFullName("Test Member");
+        dto1.setMemberName("Test Member");
         dto1.setDescription("Test Description");
         dto1.setImage("test-image.jpg");
         dto1.setBirthDate(LocalDate.of(1990, 1, 1));
@@ -226,7 +226,7 @@ class MemberResponseDTOTest {
         dto1.setHasOfficialSoloDebut(true);
         
         dto2.setMemberId(memberId);
-        dto2.setFullName("Test Member");
+        dto2.setMemberName("Test Member");
         dto2.setDescription("Test Description");
         dto2.setImage("test-image.jpg");
         dto2.setBirthDate(LocalDate.of(1990, 1, 1));
@@ -246,11 +246,11 @@ class MemberResponseDTOTest {
         MemberResponseDTO dto2 = new MemberResponseDTO();
         
         dto1.setMemberId(UUID.randomUUID());
-        dto1.setFullName("Member 1");
+        dto1.setMemberName("Member 1");
         dto1.setHasOfficialSoloDebut(true);
         
         dto2.setMemberId(UUID.randomUUID());
-        dto2.setFullName("Member 2");
+        dto2.setMemberName("Member 2");
         dto2.setHasOfficialSoloDebut(false);
         
         // Then
@@ -264,7 +264,7 @@ class MemberResponseDTOTest {
         MemberResponseDTO dto = new MemberResponseDTO();
         UUID memberId = UUID.randomUUID();
         dto.setMemberId(memberId);
-        dto.setFullName("Test Member");
+        dto.setMemberName("Test Member");
         dto.setDescription("Test Description");
         dto.setHasOfficialSoloDebut(true);
         

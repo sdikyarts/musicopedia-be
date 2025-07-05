@@ -139,6 +139,17 @@ public class SoloServiceImpl implements SoloService {
         return CompletableFuture.completedFuture(exists);
     }
 
+    @Override
+    @Async("taskExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<List<Solo>> findByRealNameContaining(String realName) {
+        List<Artist> artists = soloRepository.findBySoloRealNameContaining(realName);
+        List<Solo> solos = artists.stream()
+                .map(this::convertToSolo)
+                .toList();
+        return CompletableFuture.completedFuture(solos);
+    }
+
     // Changed to public for testing purposes
     public Solo convertToSolo(Artist artist) {
         // Since we're working with mocked data in the tests,

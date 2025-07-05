@@ -40,75 +40,86 @@ public class MemberRepositoryTest {
         artistRepository.save(soloArtist);
 
         Member member1 = new Member();
-        member1.setFullName("Kim Namjoon");
-        member1.setBirthDate(LocalDate.of(1994, 9, 12));
+        member1.setMemberName("Felix");
+        member1.setRealName("Felix Yongbok Lee");
+        member1.setBirthDate(LocalDate.of(2000, 9, 15));
         memberRepository.save(member1);
 
         Member member2 = new Member();
-        member2.setFullName("Lee Ji-eun");
-        member2.setBirthDate(LocalDate.of(1993, 5, 16));
+        member2.setMemberName("Hyunjin");
+        member2.setRealName("Hwang Hyun-jin");
+        member2.setBirthDate(LocalDate.of(2000, 3, 20));
         member2.setSoloArtist(soloArtist);
         memberRepository.save(member2);
 
         Member member3 = new Member();
-        member3.setFullName("Jung Hoseok");
-        member3.setBirthDate(LocalDate.of(1994, 2, 18));
+        member3.setMemberName("HAN");
+        member3.setRealName("Han Ji-sung");
+        member3.setBirthDate(LocalDate.of(2000, 9, 14));
         memberRepository.save(member3);
     }
 
     @Test
-    public void testFindByFullNameContainingIgnoreCase() {
-        List<Member> kimMembers = memberRepository.findByFullNameContainingIgnoreCase("Kim");
-        assertEquals(1, kimMembers.size());
-        assertEquals("Kim Namjoon", kimMembers.get(0).getFullName());
-        
-        List<Member> leeMembers = memberRepository.findByFullNameContainingIgnoreCase("lee");
-        assertEquals(1, leeMembers.size());
-        assertEquals("Lee Ji-eun", leeMembers.get(0).getFullName());
+    public void testFindByMemberNameContainingIgnoreCase() {
+        List<Member> hanMembers = memberRepository.findByMemberNameContainingIgnoreCase("HAN");
+        assertEquals(1, hanMembers.size());
+        assertEquals("HAN", hanMembers.get(0).getMemberName());
+        assertEquals("Han Ji-sung", hanMembers.get(0).getRealName());
+        List<Member> hyunMembers = memberRepository.findByMemberNameContainingIgnoreCase("hyun");
+        assertEquals(1, hyunMembers.size());
+        assertEquals("Hyunjin", hyunMembers.get(0).getMemberName());
+        assertEquals("Hwang Hyun-jin", hyunMembers.get(0).getRealName());
     }
 
     @Test
-    public void testFindByFullName() {
-        Optional<Member> member = memberRepository.findByFullName("Kim Namjoon");
+    public void testFindByRealNameContainingIgnoreCase() {
+        List<Member> leeMembers = memberRepository.findByRealNameContainingIgnoreCase("Lee");
+        assertEquals(1, leeMembers.size());
+        assertEquals("Felix", leeMembers.get(0).getMemberName());
+        assertEquals("Felix Yongbok Lee", leeMembers.get(0).getRealName());
+    }
+
+    @Test
+    public void testFindByMemberName() {
+        Optional<Member> member = memberRepository.findByMemberName("Felix");
         assertTrue(member.isPresent());
-        assertEquals(LocalDate.of(1994, 9, 12), member.get().getBirthDate());
+        assertEquals(LocalDate.of(2000, 9, 15), member.get().getBirthDate());
     }
 
     @Test
     public void testFindByBirthDate() {
-        LocalDate birthDate = LocalDate.of(1994, 9, 12);
+        LocalDate birthDate = LocalDate.of(2000, 9, 15);
         List<Member> members = memberRepository.findByBirthDate(birthDate);
         assertEquals(1, members.size());
-        assertEquals("Kim Namjoon", members.get(0).getFullName());
+        assertEquals("Felix", members.get(0).getMemberName());
     }
 
     @Test
     public void testFindByBirthDateAfter() {
-        LocalDate date = LocalDate.of(1994, 3, 1);
+        LocalDate date = LocalDate.of(2000, 1, 1);
         List<Member> members = memberRepository.findByBirthDateAfter(date);
-        assertEquals(1, members.size());
-        assertEquals("Kim Namjoon", members.get(0).getFullName());
+        assertEquals(3, members.size());
     }
 
     @Test
     public void testFindByBirthDateBefore() {
-        LocalDate date = LocalDate.of(1994, 3, 1);
+        LocalDate date = LocalDate.of(2000, 1, 1);
         List<Member> members = memberRepository.findByBirthDateBefore(date);
-        assertEquals(2, members.size());
+        assertEquals(0, members.size());
     }
 
     @Test
     public void testFindBySoloArtist() {
         List<Member> members = memberRepository.findBySoloArtist(soloArtist);
         assertEquals(1, members.size());
-        assertEquals("Lee Ji-eun", members.get(0).getFullName());
+        assertEquals("Hyunjin", members.get(0).getMemberName());
     }
 
     @Test
     public void testFindBySoloArtistId() {
         List<Member> members = memberRepository.findBySoloArtistId(soloArtist.getArtistId());
         assertEquals(1, members.size());
-        assertEquals("Lee Ji-eun", members.get(0).getFullName());
+        assertEquals("Hyunjin", members.get(0).getMemberName());
     }
 
     @Test
@@ -118,9 +129,9 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    public void testExistsByFullName() {
-        assertTrue(memberRepository.existsByFullName("Kim Namjoon"));
-        assertFalse(memberRepository.existsByFullName("Unknown Person"));
+    public void testExistsByMemberName() {
+        assertTrue(memberRepository.existsByMemberName("Felix"));
+        assertFalse(memberRepository.existsByMemberName("Unknown Person"));
     }
 
     @Test

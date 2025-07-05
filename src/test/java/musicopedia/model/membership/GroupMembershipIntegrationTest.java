@@ -42,7 +42,7 @@ public class GroupMembershipIntegrationTest {
             UUID memberId = UUID.randomUUID();
             Member member = new Member();
             member.setMemberId(memberId);
-            member.setFullName("Member " + (i + 1));
+            member.setMemberName("Member " + (i + 1));
             member.setBirthDate(LocalDate.of(1990 + i, 1, 1));
             members.add(member);
         }
@@ -161,7 +161,7 @@ public class GroupMembershipIntegrationTest {
         UUID newMemberId = UUID.randomUUID();
         Member newMember = new Member();
         newMember.setMemberId(newMemberId);
-        newMember.setFullName("Lifecycle Test Member");
+        newMember.setMemberName("Lifecycle Test Member");
         
         GroupMembershipId id = new GroupMembershipId();
         id.setGroupId(groupArtist.getArtistId());
