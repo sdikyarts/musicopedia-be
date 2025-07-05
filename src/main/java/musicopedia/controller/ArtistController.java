@@ -72,7 +72,7 @@ public class ArtistController {
     public CompletableFuture<ResponseEntity<Void>> deleteArtist(@PathVariable("id") UUID artistId) {
         return artistService.existsByIdAsync(artistId)
                 .thenCompose(exists -> {
-                    if (!exists) {
+                    if (Boolean.FALSE.equals(exists)) {
                         return CompletableFuture.completedFuture(ResponseEntity.notFound().<Void>build());
                     }
                     return artistService.deleteByIdAsync(artistId)
