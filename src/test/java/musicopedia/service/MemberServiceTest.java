@@ -206,6 +206,21 @@ public class MemberServiceTest {
         verify(memberRepository, times(1)).existsById(testId);
     }
 
+    @Test
+    void testFindByNationality() {
+        Member member1 = createMember("Felix", "Felix Yongbok Lee", LocalDate.of(2000, 9, 15));
+        member1.setNationality("AU");
+        Member member2 = createMember("Hyunjin", "Hwang Hyun-jin", LocalDate.of(2000, 3, 20));
+        member2.setNationality("KR");
+        when(memberRepository.findByNationality("AU")).thenReturn(Arrays.asList(member1));
+        CompletableFuture<List<Member>> future = memberService.findByNationality("AU");
+        List<Member> result = future.join();
+        assertEquals(1, result.size());
+        assertEquals("Felix", result.get(0).getMemberName());
+        assertEquals("AU", result.get(0).getNationality());
+        verify(memberRepository, times(1)).findByNationality("AU");
+    }
+
 
 
     private Member createMember(String memberName, String realName, LocalDate birthDate) {

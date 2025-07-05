@@ -33,6 +33,9 @@ public class Member {
     @JoinColumn(name = "solo_artist_id")
     private Artist soloArtist;
 
+    @Column(length = 2)
+    private String nationality;
+
     public boolean isDeceased() {
         return this.deathDate != null;
     }

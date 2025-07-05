@@ -22,4 +22,5 @@ public abstract class BaseMemberDTO {
     private LocalDate birthDate;
     private LocalDate deathDate;
     private UUID soloArtistId;
+    private String nationality;
 }
