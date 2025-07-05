@@ -20,5 +20,6 @@ public abstract class BaseMemberDTO {
     private String description;
     private String image;
     private LocalDate birthDate;
+    private LocalDate deathDate;
     private UUID soloArtistId;
 }

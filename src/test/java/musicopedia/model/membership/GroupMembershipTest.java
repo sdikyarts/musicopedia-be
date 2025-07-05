@@ -120,4 +120,58 @@ public class GroupMembershipTest {
         assertTrue(toString.contains(memberId.toString()));
         assertTrue(toString.contains(MembershipStatus.CURRENT.toString()));
     }
+    
+    @Test
+    public void testLeaveDateSetFromMemberDeathDate() {
+        Member member = new Member();
+        member.setMemberId(UUID.randomUUID());
+        LocalDate deathDate = LocalDate.of(2024, 2, 2);
+        member.setDeathDate(deathDate);
+        GroupMembership membership = new GroupMembership();
+        membership.setMember(member);
+        membership.setStatus(MembershipStatus.FORMER);
+        membership.setLeaveDate(member.getDeathDate());
+        assertEquals(deathDate, membership.getLeaveDate());
+        assertEquals(MembershipStatus.FORMER, membership.getStatus());
+    }
+    
+    @Test
+    public void testSyncStatusWithMemberDeceased() {
+        Member member = new Member();
+        member.setMemberId(UUID.randomUUID());
+        LocalDate deathDate = LocalDate.of(2025, 7, 5);
+        member.setDeathDate(deathDate);
+        GroupMembership membership = new GroupMembership();
+        membership.setMember(member);
+        membership.setStatus(MembershipStatus.CURRENT); // Should be updated
+        membership.setJoinDate(LocalDate.of(2020, 1, 1));
+        membership.syncStatusWithMember();
+        assertEquals(MembershipStatus.FORMER, membership.getStatus());
+        assertEquals(deathDate, membership.getLeaveDate());
+    }
+
+    @Test
+    public void testSyncStatusWithMemberNotDeceased() {
+        Member member = new Member();
+        member.setMemberId(UUID.randomUUID());
+        member.setDeathDate(null); // Not deceased
+        GroupMembership membership = new GroupMembership();
+        membership.setMember(member);
+        membership.setStatus(MembershipStatus.CURRENT);
+        membership.setLeaveDate(null);
+        membership.syncStatusWithMember();
+        assertEquals(MembershipStatus.CURRENT, membership.getStatus());
+        assertNull(membership.getLeaveDate());
+    }
+
+    @Test
+    public void testSyncStatusWithMemberNullMember() {
+        GroupMembership membership = new GroupMembership();
+        membership.setMember(null);
+        membership.setStatus(MembershipStatus.CURRENT);
+        membership.setLeaveDate(null);
+        membership.syncStatusWithMember();
+        assertEquals(MembershipStatus.CURRENT, membership.getStatus());
+        assertNull(membership.getLeaveDate());
+    }
 }

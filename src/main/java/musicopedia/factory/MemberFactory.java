@@ -38,6 +38,7 @@ public class MemberFactory {
         member.setDescription(dto.getDescription());
         member.setImage(dto.getImage());
         member.setBirthDate(dto.getBirthDate());
+        member.setDeathDate(dto.getDeathDate());
         
         // Handle solo artist reference with validation
         if (dto.getSoloArtistId() != null) {

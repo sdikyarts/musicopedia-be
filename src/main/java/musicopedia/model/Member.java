@@ -27,7 +27,13 @@ public class Member {
 
     private LocalDate birthDate;
 
+    private LocalDate deathDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "solo_artist_id")
     private Artist soloArtist;
+
+    public boolean isDeceased() {
+        return this.deathDate != null;
+    }
 }

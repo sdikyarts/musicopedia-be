@@ -103,4 +103,15 @@ public class MemberTest {
         
         assertNull(member.getDescription());
     }
+    
+    @Test
+    public void testDeathDateAndIsDeceased() {
+        Member member = new Member();
+        assertFalse(member.isDeceased());
+        assertNull(member.getDeathDate());
+        LocalDate deathDate = LocalDate.of(2024, 1, 1);
+        member.setDeathDate(deathDate);
+        assertTrue(member.isDeceased());
+        assertEquals(deathDate, member.getDeathDate());
+    }
 }
