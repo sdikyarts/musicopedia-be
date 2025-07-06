@@ -35,7 +35,10 @@ public class SubunitServiceImpl implements SubunitService {
             .map(subunit -> {
                 try {
                     return subunitMapper.toResponseDTO(subunit).get();
-                } catch (InterruptedException | ExecutionException e) {
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new RuntimeException(e);
+                } catch (ExecutionException e) {
                     throw new RuntimeException(e);
                 }
             })
@@ -50,7 +53,10 @@ public class SubunitServiceImpl implements SubunitService {
         if (subunit.isEmpty()) return CompletableFuture.completedFuture(Optional.empty());
         try {
             return CompletableFuture.completedFuture(Optional.of(subunitMapper.toResponseDTO(subunit.get()).get()));
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -65,7 +71,10 @@ public class SubunitServiceImpl implements SubunitService {
             Subunit subunit = subunitMapper.toEntity(dto, null, null).get();
             Subunit saved = subunitRepository.save(subunit);
             return subunitMapper.toResponseDTO(saved);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
@@ -85,7 +94,10 @@ public class SubunitServiceImpl implements SubunitService {
             subunit.setSubunitId(subunitId);
             Subunit saved = subunitRepository.save(subunit);
             return subunitMapper.toResponseDTO(saved);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
     }
