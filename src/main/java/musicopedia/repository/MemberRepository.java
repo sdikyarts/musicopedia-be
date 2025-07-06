@@ -38,4 +38,6 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     List<Member> findBySoloArtistIsNull();
 
     List<Member> findByRealNameContainingIgnoreCase(String realName);
+
+    List<Member> findByNationality(String nationality);
 }

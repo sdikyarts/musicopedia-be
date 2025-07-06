@@ -29,4 +29,6 @@ public interface MemberService {
     CompletableFuture<Void> deleteById(UUID memberId);
     
     CompletableFuture<Boolean> existsById(UUID memberId);
+
+    CompletableFuture<List<Member>> findByNationality(String nationality);
 }

@@ -361,4 +361,24 @@ public class MemberControllerTest {
 
         verify(memberService, times(1)).deleteById(testId);
     }
+
+    @Test
+    void testSearchMembersByNationality() throws Exception {
+        List<Member> members = Arrays.asList(testMember);
+        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
+        when(memberService.findByNationality("KR")).thenReturn(CompletableFuture.completedFuture(members));
+        when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
+
+        var result = mockMvc.perform(get("/api/members/search/nationality")
+                        .param("nationality", "KR"))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].memberName").value("Felix"));
+
+        verify(memberService, times(1)).findByNationality("KR");
+        verify(memberMapper, times(1)).toSummaryDTOList(members);
+    }
 }

@@ -111,4 +111,12 @@ public class MemberServiceImpl implements MemberService {
         boolean exists = memberRepository.existsById(memberId);
         return CompletableFuture.completedFuture(exists);
     }
+
+    @Override
+    @Async("memberProcessingExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<List<Member>> findByNationality(String nationality) {
+        List<Member> members = memberRepository.findByNationality(nationality);
+        return CompletableFuture.completedFuture(members);
+    }
 }

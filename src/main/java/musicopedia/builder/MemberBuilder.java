@@ -11,6 +11,7 @@ public class MemberBuilder {
     private String image;
     private LocalDate birthDate;
     private Artist soloArtist;
+    private String nationality;
 
     public MemberBuilder setMemberName(String memberName) {
         this.memberName = memberName;
@@ -42,6 +43,11 @@ public class MemberBuilder {
         return this;
     }
 
+    public MemberBuilder setNationality(String nationality) {
+        this.nationality = nationality;
+        return this;
+    }
+
     public Member build() {
         Member member = new Member();
         member.setMemberName(this.memberName);
@@ -50,6 +56,7 @@ public class MemberBuilder {
         member.setImage(this.image);
         member.setBirthDate(this.birthDate);
         member.setSoloArtist(this.soloArtist);
+        member.setNationality(this.nationality);
         return member;
     }
 }

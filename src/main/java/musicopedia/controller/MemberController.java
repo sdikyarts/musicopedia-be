@@ -104,4 +104,10 @@ public class MemberController {
         return memberService.findByRealNameContaining(realName)
                 .thenApply(members -> ResponseEntity.ok(memberMapper.toSummaryDTOList(members)));
     }
+
+    @GetMapping("/search/nationality")
+    public CompletableFuture<ResponseEntity<List<MemberResponseDTO>>> searchMembersByNationality(@RequestParam("nationality") String nationality) {
+        return memberService.findByNationality(nationality)
+                .thenApply(members -> ResponseEntity.ok(memberMapper.toSummaryDTOList(members)));
+    }
 }

@@ -17,6 +17,7 @@ public class MemberTest {
         String description = "Lead dancer and rapper of Stray Kids";
         String image = "base64encodedimage";
         LocalDate birthDate = LocalDate.of(2000, 9, 15);
+        String nationality = "AU";
         
         Artist soloArtist = new ArtistBuilder()
             .setArtistName("Felix")
@@ -30,6 +31,7 @@ public class MemberTest {
             .setImage(image)
             .setBirthDate(birthDate)
             .setSoloArtist(soloArtist)
+            .setNationality(nationality)
             .build();
         member.setMemberId(memberId);
         
@@ -40,6 +42,7 @@ public class MemberTest {
         assertEquals(image, member.getImage());
         assertEquals(birthDate, member.getBirthDate());
         assertEquals(soloArtist, member.getSoloArtist());
+        assertEquals(nationality, member.getNationality());
     }
     
     @Test
@@ -113,5 +116,13 @@ public class MemberTest {
         member.setDeathDate(deathDate);
         assertTrue(member.isDeceased());
         assertEquals(deathDate, member.getDeathDate());
+    }
+    
+    @Test
+    public void testNationalityField() {
+        Member member = new Member();
+        String nationality = "KR";
+        member.setNationality(nationality);
+        assertEquals(nationality, member.getNationality());
     }
 }
