@@ -28,7 +28,7 @@ public class SubunitMapper {
     public CompletableFuture<SubunitResponseDTO> toResponseDTO(Subunit subunit) {
         SubunitResponseDTO dto = new SubunitResponseDTO();
         dto.setSubunitId(subunit.getSubunitId());
-        dto.setMainGroupId(subunit.getMainGroup().getArtistId());
+        dto.setMainGroupId(subunit.getMainGroup() != null ? subunit.getMainGroup().getArtistId() : null);
         dto.setSubunitName(subunit.getSubunitName());
         dto.setDescription(subunit.getDescription());
         dto.setImage(subunit.getImage());
@@ -38,8 +38,16 @@ public class SubunitMapper {
         dto.setActivityStatus(subunit.getActivityStatus() != null ? subunit.getActivityStatus().name() : null);
         dto.setOriginCountry(subunit.getOriginCountry());
         dto.setGroupSubunitId(subunit.getGroupSubunit() != null ? subunit.getGroupSubunit().getArtistId() : null);
-        dto.setMainGroupName(subunit.getMainGroup().getArtist().getArtistName());
-        dto.setGroupSubunitName(subunit.getGroupSubunit() != null ? subunit.getGroupSubunit().getArtist().getArtistName() : null);
+        dto.setMainGroupName(
+            subunit.getMainGroup() != null && subunit.getMainGroup().getArtist() != null
+                ? subunit.getMainGroup().getArtist().getArtistName()
+                : null
+        );
+        dto.setGroupSubunitName(
+            subunit.getGroupSubunit() != null && subunit.getGroupSubunit().getArtist() != null
+                ? subunit.getGroupSubunit().getArtist().getArtistName()
+                : null
+        );
         return CompletableFuture.completedFuture(dto);
     }
 }

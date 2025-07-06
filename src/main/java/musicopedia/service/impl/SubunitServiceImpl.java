@@ -74,7 +74,9 @@ public class SubunitServiceImpl implements SubunitService {
     @Async
     public CompletableFuture<SubunitResponseDTO> update(UUID subunitId, SubunitRequestDTO dto) {
         Optional<Subunit> existing = subunitRepository.findById(subunitId);
-        if (existing.isEmpty()) return CompletableFuture.completedFuture(null);
+        if (existing.isEmpty()) {
+            return CompletableFuture.completedFuture(null);
+        }
         if (dto.getMainGroupId() == null) {
             throw new IllegalArgumentException("Main group is required");
         }
