@@ -2,6 +2,7 @@ package musicopedia.service.impl;
 
 import musicopedia.dto.request.SubunitRequestDTO;
 import musicopedia.dto.response.SubunitResponseDTO;
+import musicopedia.exception.SubunitServiceException;
 import musicopedia.mapper.SubunitMapper;
 import musicopedia.model.Subunit;
 import musicopedia.repository.SubunitRepository;
@@ -173,5 +174,147 @@ class SubunitServiceImplTest {
         failedFuture.completeExceptionally(new ExecutionException(new Exception("fail")));
         when(subunitMapper.toEntity(any(), any(), any())).thenReturn(failedFuture);
         assertThrows(RuntimeException.class, () -> subunitService.update(testId, testRequestDTO).get());
+    }
+
+    @Test
+    void create_shouldThrowSubunitServiceExceptionOnInterruptedException() throws Exception {
+        CompletableFuture<Subunit> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.create(testRequestDTO).get());
+        assertTrue(ex.getCause() instanceof ExecutionException);
+        assertTrue(ex.getCause().getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    void update_shouldThrowSubunitServiceExceptionOnInterruptedException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<Subunit> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.update(testId, testRequestDTO).get());
+        assertTrue(ex.getCause() instanceof ExecutionException);
+        assertTrue(ex.getCause().getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    void findById_shouldThrowSubunitServiceExceptionOnInterruptedException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findById(testId).get());
+        assertTrue(ex.getCause() instanceof ExecutionException);
+        assertTrue(ex.getCause().getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    void findAll_shouldThrowSubunitServiceExceptionOnInterruptedException() throws Exception {
+        when(subunitRepository.findAll()).thenReturn(List.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findAll().get());
+        assertTrue(ex.getCause() instanceof ExecutionException);
+        assertTrue(ex.getCause().getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    void create_shouldThrowSubunitServiceExceptionOnExecutionException() throws Exception {
+        CompletableFuture<Subunit> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new ExecutionException(new Exception("fail")));
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.create(testRequestDTO).get());
+        assertTrue(ex.getMessage().contains("Execution error"));
+        assertTrue(ex.getCause() instanceof ExecutionException);
+    }
+
+    @Test
+    void update_shouldThrowSubunitServiceExceptionOnExecutionException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<Subunit> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new ExecutionException(new Exception("fail")));
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.update(testId, testRequestDTO).get());
+        assertTrue(ex.getMessage().contains("Execution error"));
+        assertTrue(ex.getCause() instanceof ExecutionException);
+    }
+
+    @Test
+    void findById_shouldThrowSubunitServiceExceptionOnExecutionException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new ExecutionException(new Exception("fail")));
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findById(testId).get());
+        assertTrue(ex.getMessage().contains("Execution error"));
+        assertTrue(ex.getCause() instanceof ExecutionException);
+    }
+
+    @Test
+    void findAll_shouldThrowSubunitServiceExceptionOnExecutionException() throws Exception {
+        when(subunitRepository.findAll()).thenReturn(List.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new ExecutionException(new Exception("fail")));
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(failedFuture);
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findAll().get());
+        assertTrue(ex.getMessage().contains("Execution error"));
+        assertTrue(ex.getCause() instanceof ExecutionException);
+    }
+
+    @Test
+    void findAll_shouldInterruptThreadOnInterruptedException() throws Exception {
+        when(subunitRepository.findAll()).thenReturn(List.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(failedFuture);
+        try {
+            subunitService.findAll().get();
+            fail("Expected SubunitServiceException");
+        } catch (Exception e) {
+            // Check that the thread was interrupted
+            assertTrue(Thread.currentThread().isInterrupted() || e.getCause() instanceof InterruptedException || e.getCause() instanceof ExecutionException);
+        }
+    }
+
+    @Test
+    void findById_shouldInterruptThreadOnInterruptedException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(failedFuture);
+        try {
+            subunitService.findById(testId).get();
+            fail("Expected SubunitServiceException");
+        } catch (Exception e) {
+            assertTrue(Thread.currentThread().isInterrupted() || e.getCause() instanceof InterruptedException || e.getCause() instanceof ExecutionException);
+        }
+    }
+
+    @Test
+    void create_shouldInterruptThreadOnInterruptedException() throws Exception {
+        CompletableFuture<Subunit> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(failedFuture);
+        try {
+            subunitService.create(testRequestDTO).get();
+            fail("Expected SubunitServiceException");
+        } catch (Exception e) {
+            assertTrue(Thread.currentThread().isInterrupted() || e.getCause() instanceof InterruptedException || e.getCause() instanceof ExecutionException);
+        }
+    }
+
+    @Test
+    void update_shouldInterruptThreadOnInterruptedException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<Subunit> failedFuture = new CompletableFuture<>();
+        failedFuture.completeExceptionally(new InterruptedException("fail"));
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(failedFuture);
+        try {
+            subunitService.update(testId, testRequestDTO).get();
+            fail("Expected SubunitServiceException");
+        } catch (Exception e) {
+            assertTrue(Thread.currentThread().isInterrupted() || e.getCause() instanceof InterruptedException || e.getCause() instanceof ExecutionException);
+        }
     }
 }

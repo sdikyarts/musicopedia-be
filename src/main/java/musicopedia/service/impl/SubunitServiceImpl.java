@@ -6,6 +6,7 @@ import musicopedia.mapper.SubunitMapper;
 import musicopedia.model.Subunit;
 import musicopedia.repository.SubunitRepository;
 import musicopedia.service.SubunitService;
+import musicopedia.exception.SubunitServiceException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,9 +38,9 @@ public class SubunitServiceImpl implements SubunitService {
                     return subunitMapper.toResponseDTO(subunit).get();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    throw new RuntimeException(e);
+                    throw new SubunitServiceException("Interrupted while mapping Subunit", e);
                 } catch (ExecutionException e) {
-                    throw new RuntimeException(e);
+                    throw new SubunitServiceException("Execution error while mapping Subunit", e);
                 }
             })
             .toList();
@@ -55,9 +56,9 @@ public class SubunitServiceImpl implements SubunitService {
             return CompletableFuture.completedFuture(Optional.of(subunitMapper.toResponseDTO(subunit.get()).get()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new SubunitServiceException("Interrupted while mapping Subunit", e);
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new SubunitServiceException("Execution error while mapping Subunit", e);
         }
     }
 
@@ -73,9 +74,9 @@ public class SubunitServiceImpl implements SubunitService {
             return subunitMapper.toResponseDTO(saved);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new SubunitServiceException("Interrupted while creating Subunit", e);
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new SubunitServiceException("Execution error while creating Subunit", e);
         }
     }
 
@@ -96,9 +97,9 @@ public class SubunitServiceImpl implements SubunitService {
             return subunitMapper.toResponseDTO(saved);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
+            throw new SubunitServiceException("Interrupted while updating Subunit", e);
         } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+            throw new SubunitServiceException("Execution error while updating Subunit", e);
         }
     }
 
