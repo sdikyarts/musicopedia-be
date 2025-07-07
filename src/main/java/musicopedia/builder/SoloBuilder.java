@@ -10,6 +10,7 @@ import musicopedia.model.Artist;
 public class SoloBuilder extends ArtistBuilder {
     private LocalDate birthDate;
     private LocalDate deathDate;
+    private LocalDate debutDate;
     private ArtistGender gender;
     private GroupAffiliationStatus groupAffiliationStatus;
     private Artist artist;
@@ -22,6 +23,11 @@ public class SoloBuilder extends ArtistBuilder {
 
     public SoloBuilder setDeathDate(LocalDate deathDate) {
         this.deathDate = deathDate;
+        return this;
+    }
+
+    public SoloBuilder setDebutDate(LocalDate debutDate) {
+        this.debutDate = debutDate;
         return this;
     }
 
@@ -97,6 +103,7 @@ public class SoloBuilder extends ArtistBuilder {
         solo.setArtist(this.artist != null ? this.artist : super.build());
         solo.setBirthDate(this.birthDate);
         solo.setDeathDate(this.deathDate);
+        solo.setDebutDate(this.debutDate);
         solo.setGender(this.gender);
         solo.setGroupAffiliationStatus(this.groupAffiliationStatus);
         solo.setRealName(this.realName);

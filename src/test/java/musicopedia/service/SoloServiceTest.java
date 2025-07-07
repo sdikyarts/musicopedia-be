@@ -259,6 +259,34 @@ public class SoloServiceTest {
         verify(soloRepository, times(1)).findAll();
     }
 
+    @Test
+    void testFindByDebutDate() {
+        LocalDate debutDate = LocalDate.of(2010, 1, 1);
+        testSolo.setDebutDate(debutDate);
+        List<Solo> solos = Arrays.asList(testSolo);
+        when(soloRepository.findByDebutDate(debutDate)).thenReturn(solos);
+        CompletableFuture<List<Solo>> future = soloService.findByDebutDate(debutDate);
+        List<Solo> result = future.join();
+        assertEquals(1, result.size());
+        assertEquals(debutDate, result.get(0).getDebutDate());
+        verify(soloRepository, times(1)).findByDebutDate(debutDate);
+    }
+
+    @Test
+    void testFindByDebutDateBetween() {
+        LocalDate start = LocalDate.of(2009, 1, 1);
+        LocalDate end = LocalDate.of(2011, 12, 31);
+        LocalDate debutDate = LocalDate.of(2010, 1, 1);
+        testSolo.setDebutDate(debutDate);
+        List<Solo> solos = Arrays.asList(testSolo);
+        when(soloRepository.findByDebutDateBetween(start, end)).thenReturn(solos);
+        CompletableFuture<List<Solo>> future = soloService.findByDebutDateBetween(start, end);
+        List<Solo> result = future.join();
+        assertEquals(1, result.size());
+        assertEquals(debutDate, result.get(0).getDebutDate());
+        verify(soloRepository, times(1)).findByDebutDateBetween(start, end);
+    }
+
     // Helper for test data
     private Solo createSoloWithArtist(String artistName, LocalDate birthDate, ArtistGender gender) {
         UUID artistId = UUID.randomUUID();

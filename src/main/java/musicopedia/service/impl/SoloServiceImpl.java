@@ -138,4 +138,20 @@ public class SoloServiceImpl implements SoloService {
                 .toList();
         return CompletableFuture.completedFuture(solos);
     }
+
+    @Override
+    @Async("taskExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<List<Solo>> findByDebutDate(LocalDate debutDate) {
+        List<Solo> solos = soloRepository.findByDebutDate(debutDate);
+        return CompletableFuture.completedFuture(solos);
+    }
+
+    @Override
+    @Async("taskExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<List<Solo>> findByDebutDateBetween(LocalDate startDate, LocalDate endDate) {
+        List<Solo> solos = soloRepository.findByDebutDateBetween(startDate, endDate);
+        return CompletableFuture.completedFuture(solos);
+    }
 }

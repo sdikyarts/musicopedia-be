@@ -23,6 +23,8 @@ public class Solo {
     private LocalDate birthDate;
     private LocalDate deathDate;
 
+    private LocalDate debutDate;
+
     @Enumerated(EnumType.STRING)
     private ArtistGender gender;
 

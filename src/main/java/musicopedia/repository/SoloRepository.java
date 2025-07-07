@@ -42,4 +42,10 @@ public interface SoloRepository extends JpaRepository<Solo, UUID> {
 
     @Query("SELECT s FROM Solo s WHERE LOWER(s.realName) LIKE LOWER(CONCAT('%', :realName, '%'))")
     List<Solo> findBySoloRealNameContaining(@Param("realName") String realName);
+
+    @Query("SELECT s FROM Solo s WHERE s.debutDate = :debutDate")
+    List<Solo> findByDebutDate(@Param("debutDate") LocalDate debutDate);
+
+    @Query("SELECT s FROM Solo s WHERE s.debutDate BETWEEN :startDate AND :endDate")
+    List<Solo> findByDebutDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }
