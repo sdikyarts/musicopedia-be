@@ -1,7 +1,6 @@
 package musicopedia.builder;
 
 import musicopedia.model.Member;
-import musicopedia.model.Artist;
 import java.time.LocalDate;
 
 public class MemberBuilder {
@@ -10,7 +9,6 @@ public class MemberBuilder {
     private String description;
     private String image;
     private LocalDate birthDate;
-    private Artist soloArtist;
     private String nationality;
 
     public MemberBuilder setMemberName(String memberName) {
@@ -50,13 +48,6 @@ public class MemberBuilder {
         member.setDescription(this.description);
         member.setImage(this.image);
         member.setBirthDate(this.birthDate);
-        // member.setSoloArtist(this.soloArtist); // removed, no longer valid
-        // If you want to add a solo identity, use:
-        // if (this.soloArtist != null) {
-        //     Solo solo = new Solo();
-        //     solo.setArtist(this.soloArtist);
-        //     member.getSoloIdentities().add(solo);
-        // }
         member.setNationality(this.nationality);
         return member;
     }

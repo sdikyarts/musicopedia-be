@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "members")
+@SuppressWarnings("java:S7027") // Suppress Sonar warning for circular dependency with Solo (JPA bidirectional mapping is intentional)
 public class Member {
 
     @Id
