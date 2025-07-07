@@ -202,26 +202,6 @@ public class MemberControllerTest {
     }
 
     @Test
-    void testGetMembersWithSoloCareer() throws Exception {
-        List<Member> members = Arrays.asList(testMember);
-        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
-        
-        when(memberService.findBySoloArtistNotNull()).thenReturn(CompletableFuture.completedFuture(members));
-        when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
-
-        var result = mockMvc.perform(get("/api/members/with-solo-career"))
-                .andExpect(request().asyncStarted());
-
-        mockMvc.perform(asyncDispatch(result.andReturn()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].memberId").value(testId.toString()));
-
-        verify(memberService, times(1)).findBySoloArtistNotNull();
-        verify(memberMapper, times(1)).toSummaryDTOList(members);
-    }
-
-    @Test
     void testCreateMember() throws Exception {
         MemberRequestDTO createDTO = new MemberRequestDTO();
         createDTO.setMemberName("Felix");
@@ -379,6 +359,26 @@ public class MemberControllerTest {
                 .andExpect(jsonPath("$[0].memberName").value("Felix"));
 
         verify(memberService, times(1)).findByNationality("KR");
+        verify(memberMapper, times(1)).toSummaryDTOList(members);
+    }
+
+    @Test
+    void testGetMembersWithSoloCareer() throws Exception {
+        List<Member> members = Arrays.asList(testMember);
+        List<MemberResponseDTO> memberSummaryDTOs = Arrays.asList(testMemberSummaryDTO);
+        
+        when(memberService.findWithSoloIdentities()).thenReturn(CompletableFuture.completedFuture(members));
+        when(memberMapper.toSummaryDTOList(members)).thenReturn(memberSummaryDTOs);
+
+        var result = mockMvc.perform(get("/api/members/with-solo-career"))
+                .andExpect(request().asyncStarted());
+
+        mockMvc.perform(asyncDispatch(result.andReturn()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].memberId").value(testId.toString()));
+
+        verify(memberService, times(1)).findWithSoloIdentities();
         verify(memberMapper, times(1)).toSummaryDTOList(members);
     }
 }

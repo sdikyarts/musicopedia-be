@@ -72,16 +72,6 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Async("memberProcessingExecutor")
-    @Transactional(readOnly = true)
-    public CompletableFuture<List<Member>> findBySoloArtistNotNull() {
-        List<Member> members = memberRepository.findAll().stream()
-                .filter(member -> member.getSoloArtist() != null)
-                .toList();
-        return CompletableFuture.completedFuture(members);
-    }
-
-    @Override
-    @Async("memberProcessingExecutor")
     public CompletableFuture<Member> save(Member member) {
         Member savedMember = memberRepository.save(member);
         return CompletableFuture.completedFuture(savedMember);
@@ -117,6 +107,16 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public CompletableFuture<List<Member>> findByNationality(String nationality) {
         List<Member> members = memberRepository.findByNationality(nationality);
+        return CompletableFuture.completedFuture(members);
+    }
+
+    @Override
+    @Async("memberProcessingExecutor")
+    @Transactional(readOnly = true)
+    public CompletableFuture<List<Member>> findWithSoloIdentities() {
+        List<Member> members = memberRepository.findAll().stream()
+                .filter(member -> member.getSoloIdentities() != null && !member.getSoloIdentities().isEmpty())
+                .toList();
         return CompletableFuture.completedFuture(members);
     }
 }

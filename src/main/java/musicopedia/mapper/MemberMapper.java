@@ -7,11 +7,13 @@ import musicopedia.dto.response.MemberResponseDTO;
 import musicopedia.factory.MemberFactory;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
+import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.service.ArtistService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Component
@@ -49,24 +51,25 @@ public class MemberMapper {
         
         // Handle solo artist update
         if (dto.getSoloArtistId() != null) {
-            return artistService.findByIdAsync(dto.getSoloArtistId())
-                .thenCompose(optionalArtist -> {
-                    Artist soloArtist = optionalArtist.orElseThrow(() -> 
-                        new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
-                    
-                    // Validate that the referenced artist is actually a solo artist
-                    if (soloArtist.getType() != ArtistType.SOLO) {
-                        throw new IllegalArgumentException("Referenced artist must be of type SOLO, but was: " + soloArtist.getType());
-                    }
-                    
-                    member.setSoloArtist(soloArtist);
-                    return CompletableFuture.completedFuture(null);
-                });
-        } else {
-            // If soloArtistId is explicitly null in the update, remove the reference
-            member.setSoloArtist(null);
-            return CompletableFuture.completedFuture(null);
+            CompletableFuture<Optional<Artist>> artistFuture = artistService.findByIdAsync(dto.getSoloArtistId());
+            if (artistFuture == null) {
+                return CompletableFuture.completedFuture(null);
+            }
+            return artistFuture.thenCompose(optionalArtist -> {
+                Artist soloArtist = optionalArtist.orElseThrow(() ->
+                    new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
+                if (soloArtist.getType() != ArtistType.SOLO) {
+                    throw new IllegalArgumentException("Referenced artist must be of type SOLO, but was: " + soloArtist.getType());
+                }
+                java.util.List<Solo> newSoloIdentities = new java.util.ArrayList<>();
+                Solo solo = new Solo(soloArtist, member);
+                newSoloIdentities.add(solo);
+                member.setSoloIdentities(newSoloIdentities);
+                return CompletableFuture.completedFuture(null);
+            });
         }
+        // Do not clear soloIdentities if soloArtistId is null
+        return CompletableFuture.completedFuture(null);
     }
 
     public MemberResponseDTO toResponseDTO(Member member) {
@@ -77,16 +80,17 @@ public class MemberMapper {
         dto.setDescription(member.getDescription());
         dto.setImage(member.getImage());
         dto.setBirthDate(member.getBirthDate());
-        
         // Set solo artist information if available
-        if (member.getSoloArtist() != null) {
-            dto.setSoloArtistId(member.getSoloArtist().getArtistId());
-            dto.setSoloArtistName(member.getSoloArtist().getArtistName());
+        Solo firstSolo = (member.getSoloIdentities() != null && !member.getSoloIdentities().isEmpty()) ? member.getSoloIdentities().get(0) : null;
+        if (firstSolo != null && firstSolo.getArtist() != null) {
+            dto.setSoloArtistId(firstSolo.getArtist().getArtistId());
+            dto.setSoloArtistName(firstSolo.getArtist().getArtistName());
             dto.setHasOfficialSoloDebut(true);
         } else {
             dto.setHasOfficialSoloDebut(false);
+            dto.setSoloArtistId(null);
+            dto.setSoloArtistName(null);
         }
-        
         return dto;
     }
 
@@ -96,15 +100,15 @@ public class MemberMapper {
         dto.setMemberName(member.getMemberName());
         dto.setImage(member.getImage());
         dto.setRealName(member.getRealName());
-        
         // Set solo career information
-        if (member.getSoloArtist() != null) {
+        Solo firstSolo = (member.getSoloIdentities() != null && !member.getSoloIdentities().isEmpty()) ? member.getSoloIdentities().get(0) : null;
+        if (firstSolo != null && firstSolo.getArtist() != null) {
             dto.setHasOfficialSoloDebut(true);
-            dto.setSoloArtistName(member.getSoloArtist().getArtistName());
+            dto.setSoloArtistName(firstSolo.getArtist().getArtistName());
         } else {
             dto.setHasOfficialSoloDebut(false);
+            dto.setSoloArtistName(null);
         }
-        
         return dto;
     }
 
@@ -121,13 +125,17 @@ public class MemberMapper {
     }
 
     public Member createMemberFromDto(MemberRequestDTO dto, Artist soloArtist) {
-        return new MemberBuilder()
+        Member member = new MemberBuilder()
             .setMemberName(dto.getMemberName())
             .setRealName(dto.getRealName())
             .setDescription(dto.getDescription())
             .setImage(dto.getImage())
             .setBirthDate(dto.getBirthDate())
-            .setSoloArtist(soloArtist)
             .build();
+        if (soloArtist != null) {
+            Solo solo = new Solo(soloArtist, member);
+            member.getSoloIdentities().add(solo);
+        }
+        return member;
     }
 }

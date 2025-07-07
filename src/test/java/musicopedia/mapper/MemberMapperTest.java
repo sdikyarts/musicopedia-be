@@ -8,6 +8,7 @@ import musicopedia.dto.response.MemberResponseDTO;
 import musicopedia.factory.MemberFactory;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
+import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.service.ArtistService;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,6 +81,9 @@ class MemberMapperTest {
         updateDto.setDescription("Main dancer and visual");
         updateDto.setImage("hyunjin-image.jpg");
         updateDto.setBirthDate(LocalDate.of(2000, 3, 20));
+        updateDto.setSoloArtistId(soloArtist.getArtistId());
+
+        // Only mock artistService for updateDto.soloArtistId if needed in a test
     }
 
     @Test
@@ -101,8 +105,14 @@ class MemberMapperTest {
     @Test
     void updateEntityFromDto_WithAllFields_ShouldUpdateAllFields() {
         // Given
+        // Simulate adding a solo identity
+        Solo soloIdentity = new Solo();
+        soloIdentity.setArtist(soloArtist);
+        soloIdentity.setMember(testMember);
+        testMember.setSoloIdentities(List.of(soloIdentity));
+        // Set up the mock only for the correct soloArtistId after setting it on the DTO
         updateDto.setSoloArtistId(soloArtist.getArtistId());
-        when(artistService.findByIdAsync(soloArtist.getArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(soloArtist)));
+        when(artistService.findByIdAsync(updateDto.getSoloArtistId())).thenReturn(CompletableFuture.completedFuture(Optional.of(soloArtist)));
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
@@ -112,7 +122,8 @@ class MemberMapperTest {
         assertEquals("Main dancer and visual", testMember.getDescription());
         assertEquals("hyunjin-image.jpg", testMember.getImage());
         assertEquals(LocalDate.of(2000, 3, 20), testMember.getBirthDate());
-        assertEquals(soloArtist, testMember.getSoloArtist());
+        assertFalse(testMember.getSoloIdentities().isEmpty());
+        assertEquals(soloArtist, testMember.getSoloIdentities().get(0).getArtist());
         verify(artistService).findByIdAsync(soloArtist.getArtistId());
     }
 
@@ -179,13 +190,13 @@ class MemberMapperTest {
     @Test
     void updateEntityFromDto_WithNullSoloArtistId_ShouldRemoveSoloArtistReference() {
         // Given
-        testMember.setSoloArtist(soloArtist); // Set initial solo artist
+        testMember.setSoloIdentities(List.of()); // Remove all solo identities
         updateDto.setSoloArtistId(null);
         // When
         CompletableFuture<Void> future = memberMapper.updateEntityFromDto(testMember, updateDto);
         future.join(); // Wait for the async operation to complete
         // Then
-        assertNull(testMember.getSoloArtist());
+        assertTrue(testMember.getSoloIdentities().isEmpty());
         verifyNoInteractions(artistService);
     }
 
@@ -276,7 +287,6 @@ class MemberMapperTest {
     void toResponseDTO_WithoutSoloArtist_ShouldMapCorrectly() {
         // When
         MemberResponseDTO result = memberMapper.toResponseDTO(testMember);
-
         // Then
         assertNotNull(result);
         assertEquals(testMember.getMemberId(), result.getMemberId());
@@ -293,11 +303,12 @@ class MemberMapperTest {
     @Test
     void toResponseDTO_WithSoloArtist_ShouldMapCorrectly() {
         // Given
-        testMember.setSoloArtist(soloArtist);
-
+        Solo soloIdentity = new Solo();
+        soloIdentity.setArtist(soloArtist);
+        soloIdentity.setMember(testMember);
+        testMember.setSoloIdentities(List.of(soloIdentity));
         // When
         MemberResponseDTO result = memberMapper.toResponseDTO(testMember);
-
         // Then
         assertNotNull(result);
         assertEquals(testMember.getMemberId(), result.getMemberId());
@@ -328,8 +339,10 @@ class MemberMapperTest {
     @Test
     void toSummaryDTO_WithSoloArtist_ShouldMapCorrectly() {
         // Given
-        testMember.setSoloArtist(soloArtist);
-
+        Solo soloIdentity = new Solo();
+        soloIdentity.setArtist(soloArtist);
+        soloIdentity.setMember(testMember);
+        testMember.setSoloIdentities(List.of(soloIdentity));
         // When
         MemberResponseDTO result = memberMapper.toSummaryDTO(testMember);
 
@@ -361,28 +374,25 @@ class MemberMapperTest {
         Member member1 = new Member();
         member1.setMemberId(UUID.randomUUID());
         member1.setMemberName("Member 1");
-        member1.setSoloArtist(soloArtist);
-
+        Solo soloIdentity1 = new Solo();
+        soloIdentity1.setArtist(soloArtist);
+        soloIdentity1.setMember(member1);
+        member1.setSoloIdentities(List.of(soloIdentity1));
         Member member2 = new Member();
         member2.setMemberId(UUID.randomUUID());
         member2.setMemberName("Member 2");
         // No solo artist
-
         List<Member> members = Arrays.asList(member1, member2);
-
         // When
         List<MemberResponseDTO> result = memberMapper.toResponseDTOList(members);
-
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-
         MemberResponseDTO dto1 = result.get(0);
         assertEquals(member1.getMemberId(), dto1.getMemberId());
         assertEquals("Member 1", dto1.getMemberName());
         assertTrue(dto1.getHasOfficialSoloDebut());
         assertEquals(soloArtist.getArtistName(), dto1.getSoloArtistName());
-
         MemberResponseDTO dto2 = result.get(1);
         assertEquals(member2.getMemberId(), dto2.getMemberId());
         assertEquals("Member 2", dto2.getMemberName());
@@ -410,30 +420,27 @@ class MemberMapperTest {
         member1.setMemberId(UUID.randomUUID());
         member1.setMemberName("Member 1");
         member1.setImage("image1.jpg");
-        member1.setSoloArtist(soloArtist);
-
+        Solo soloIdentity1 = new Solo();
+        soloIdentity1.setArtist(soloArtist);
+        soloIdentity1.setMember(member1);
+        member1.setSoloIdentities(List.of(soloIdentity1));
         Member member2 = new Member();
         member2.setMemberId(UUID.randomUUID());
         member2.setMemberName("Member 2");
         member2.setImage("image2.jpg");
         // No solo artist
-
         List<Member> members = Arrays.asList(member1, member2);
-
         // When
         List<MemberResponseDTO> result = memberMapper.toSummaryDTOList(members);
-
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
-
         MemberResponseDTO dto1 = result.get(0);
         assertEquals(member1.getMemberId(), dto1.getMemberId());
         assertEquals("Member 1", dto1.getMemberName());
         assertEquals("image1.jpg", dto1.getImage());
         assertTrue(dto1.getHasOfficialSoloDebut());
         assertEquals(soloArtist.getArtistName(), dto1.getSoloArtistName());
-
         MemberResponseDTO dto2 = result.get(1);
         assertEquals(member2.getMemberId(), dto2.getMemberId());
         assertEquals("Member 2", dto2.getMemberName());
@@ -495,16 +502,140 @@ class MemberMapperTest {
             .setType(ArtistType.SOLO)
             .build();
         soloArtist.setArtistId(UUID.randomUUID());
-
         // When
         Member member = memberMapper.createMemberFromDto(dto, soloArtist);
-
         // Then
         assertNotNull(member);
         assertEquals("Jane Doe", member.getMemberName());
         assertEquals("A test member", member.getDescription());
         assertEquals("jane.jpg", member.getImage());
         assertEquals(LocalDate.of(1992, 2, 2), member.getBirthDate());
-        assertEquals(soloArtist, member.getSoloArtist());
+        assertFalse(member.getSoloIdentities().isEmpty());
+        assertEquals(soloArtist, member.getSoloIdentities().get(0).getArtist());
+    }
+
+    @Test
+    void createMemberFromDto_WithNullSoloArtist_ShouldNotAddSoloIdentity() {
+        // Given
+        MemberRequestDTO dto = new MemberRequestDTO();
+        dto.setMemberName("No Solo");
+        dto.setDescription("No solo artist");
+        dto.setImage("nosolo.jpg");
+        dto.setBirthDate(LocalDate.of(1990, 1, 1));
+        // When
+        Member member = memberMapper.createMemberFromDto(dto, null);
+        // Then
+        assertNotNull(member);
+        assertEquals("No Solo", member.getMemberName());
+        assertEquals("No solo artist", member.getDescription());
+        assertEquals("nosolo.jpg", member.getImage());
+        assertEquals(LocalDate.of(1990, 1, 1), member.getBirthDate());
+        assertTrue(member.getSoloIdentities() == null || member.getSoloIdentities().isEmpty());
+    }
+
+    @Test
+    void toResponseDTO_WithNullSoloIdentities_ShouldHandleGracefully() {
+        // Given
+        testMember.setSoloIdentities(null);
+        // When
+        MemberResponseDTO result = memberMapper.toResponseDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistId());
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void toResponseDTO_WithEmptySoloIdentities_ShouldHandleGracefully() {
+        // Given
+        testMember.setSoloIdentities(List.of());
+        // When
+        MemberResponseDTO result = memberMapper.toResponseDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistId());
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void toResponseDTO_WithNullSoloIdentityElement_ShouldHandleGracefully() {
+        // Given
+        testMember.setSoloIdentities(Arrays.asList((Solo) null));
+        // When
+        MemberResponseDTO result = memberMapper.toResponseDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistId());
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void toResponseDTO_WithSoloIdentityButNullArtist_ShouldHandleGracefully() {
+        // Given
+        Solo soloIdentity = new Solo();
+        soloIdentity.setArtist(null);
+        soloIdentity.setMember(testMember);
+        testMember.setSoloIdentities(List.of(soloIdentity));
+        // When
+        MemberResponseDTO result = memberMapper.toResponseDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistId());
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void toSummaryDTO_WithNullSoloIdentities_ShouldHandleGracefully() {
+        // Given
+        testMember.setSoloIdentities(null);
+        // When
+        MemberResponseDTO result = memberMapper.toSummaryDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void toSummaryDTO_WithEmptySoloIdentities_ShouldHandleGracefully() {
+        // Given
+        testMember.setSoloIdentities(List.of());
+        // When
+        MemberResponseDTO result = memberMapper.toSummaryDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void toSummaryDTO_WithNullSoloIdentityElement_ShouldHandleGracefully() {
+        // Given
+        testMember.setSoloIdentities(Arrays.asList((Solo) null));
+        // When
+        MemberResponseDTO result = memberMapper.toSummaryDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
+    }
+
+    @Test
+    void toSummaryDTO_WithSoloIdentityButNullArtist_ShouldHandleGracefully() {
+        // Given
+        Solo soloIdentity = new Solo();
+        soloIdentity.setArtist(null);
+        soloIdentity.setMember(testMember);
+        testMember.setSoloIdentities(List.of(soloIdentity));
+        // When
+        MemberResponseDTO result = memberMapper.toSummaryDTO(testMember);
+        // Then
+        assertNotNull(result);
+        assertNull(result.getSoloArtistName());
+        assertFalse(result.getHasOfficialSoloDebut());
     }
 }

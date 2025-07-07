@@ -38,11 +38,6 @@ public class MemberBuilder {
         return this;
     }
 
-    public MemberBuilder setSoloArtist(Artist soloArtist) {
-        this.soloArtist = soloArtist;
-        return this;
-    }
-
     public MemberBuilder setNationality(String nationality) {
         this.nationality = nationality;
         return this;
@@ -55,7 +50,13 @@ public class MemberBuilder {
         member.setDescription(this.description);
         member.setImage(this.image);
         member.setBirthDate(this.birthDate);
-        member.setSoloArtist(this.soloArtist);
+        // member.setSoloArtist(this.soloArtist); // removed, no longer valid
+        // If you want to add a solo identity, use:
+        // if (this.soloArtist != null) {
+        //     Solo solo = new Solo();
+        //     solo.setArtist(this.soloArtist);
+        //     member.getSoloIdentities().add(solo);
+        // }
         member.setNationality(this.nationality);
         return member;
     }

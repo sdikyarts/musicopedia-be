@@ -4,6 +4,7 @@ import musicopedia.builder.ArtistBuilder;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
+import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.service.ArtistService;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +69,7 @@ class MemberFactoryTest {
         assertEquals("Lead dancer and rapper of Stray Kids", result.getDescription());
         assertEquals("http://example.com/felix.jpg", result.getImage());
         assertEquals(LocalDate.of(2000, 9, 15), result.getBirthDate());
-        assertNull(result.getSoloArtist());
+        assertTrue(result.getSoloIdentities() == null || result.getSoloIdentities().isEmpty());
         verifyNoInteractions(artistService);
     }
 
@@ -88,8 +89,8 @@ class MemberFactoryTest {
         assertEquals("Lead dancer and rapper of Stray Kids", result.getDescription());
         assertEquals("http://example.com/felix.jpg", result.getImage());
         assertEquals(LocalDate.of(2000, 9, 15), result.getBirthDate());
-        assertNotNull(result.getSoloArtist());
-        assertEquals(soloArtist, result.getSoloArtist());
+        assertFalse(result.getSoloIdentities().isEmpty());
+        assertEquals(soloArtist, result.getSoloIdentities().get(0).getArtist());
         verify(artistService).findByIdAsync(soloArtistId);
     }
 
@@ -260,112 +261,6 @@ class MemberFactoryTest {
     }
 
     @Test
-    void linkToSoloArtist_WithValidSoloArtist_ShouldLinkSuccessfully() {
-        // Given
-        Member member = new Member();
-        member.setMemberName("Test Member");
-
-        // When
-        memberFactory.linkToSoloArtist(member, soloArtist);
-
-        // Then
-        assertEquals(soloArtist, member.getSoloArtist());
-    }
-
-    @Test
-    void linkToSoloArtist_WithGroupArtist_ShouldThrowException() {
-        // Given
-        Member member = new Member();
-        member.setMemberName("Test Member");
-
-        // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberFactory.linkToSoloArtist(member, groupArtist);
-        });
-        String expectedMessage = String.format(
-            "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members",
-            "Test Member", "Stray Kids"
-        );
-        assertEquals(expectedMessage, exception.getMessage());
-        assertNull(member.getSoloArtist());
-    }
-
-    @Test
-    void linkToSoloArtist_WithFranchiseArtist_ShouldThrowException() {
-        // Given
-        Member member = new Member();
-        member.setMemberName("Test Member");
-        
-        Artist franchiseArtist = new ArtistBuilder()
-            .setArtistName("Franchise Artist")
-            .setType(ArtistType.FRANCHISE)
-            .build();
-
-        // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberFactory.linkToSoloArtist(member, franchiseArtist);
-        });
-        String expectedMessage = String.format(
-            "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members",
-            "Test Member", "Franchise Artist"
-        );
-        assertEquals(expectedMessage, exception.getMessage());
-        assertNull(member.getSoloArtist());
-    }
-
-    @Test
-    void linkToSoloArtist_WithVariousArtist_ShouldThrowException() {
-        // Given
-        Member member = new Member();
-        member.setMemberName("Test Member");
-        
-        Artist variousArtist = new ArtistBuilder()
-            .setArtistName("Various Artists")
-            .setType(ArtistType.VARIOUS)
-            .build();
-
-        // When & Then
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            memberFactory.linkToSoloArtist(member, variousArtist);
-        });
-        String expectedMessage = String.format(
-            "Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members",
-            "Test Member", "Various Artists"
-        );
-        assertEquals(expectedMessage, exception.getMessage());
-        assertNull(member.getSoloArtist());
-    }
-
-    @Test
-    void unlinkFromSoloArtist_WithLinkedMember_ShouldRemoveLink() {
-        // Given
-        Member member = new Member();
-        member.setMemberName("Test Member");
-        member.setSoloArtist(soloArtist);
-        assertNotNull(member.getSoloArtist()); // Verify it's linked initially
-
-        // When
-        memberFactory.unlinkFromSoloArtist(member);
-
-        // Then
-        assertNull(member.getSoloArtist());
-    }
-
-    @Test
-    void unlinkFromSoloArtist_WithUnlinkedMember_ShouldDoNothing() {
-        // Given
-        Member member = new Member();
-        member.setMemberName("Test Member");
-        assertNull(member.getSoloArtist()); // Verify it's not linked initially
-
-        // When
-        memberFactory.unlinkFromSoloArtist(member);
-
-        // Then
-        assertNull(member.getSoloArtist());
-    }
-
-    @Test
     void createMember_WithMinimalValidData_ShouldCreateMember() {
         // Given
         MemberRequestDTO minimalDto = new MemberRequestDTO();
@@ -384,7 +279,7 @@ class MemberFactoryTest {
         assertNull(result.getDescription());
         assertNull(result.getImage());
         assertNull(result.getBirthDate());
-        assertNull(result.getSoloArtist());
+        assertTrue(result.getSoloIdentities() == null || result.getSoloIdentities().isEmpty());
     }
 
     @Test
@@ -421,5 +316,85 @@ class MemberFactoryTest {
         });
         assertEquals("Member real name is required", exception.getMessage());
         verifyNoInteractions(artistService);
+    }
+
+    @Test
+    void linkToSoloIdentity_WithNullSolo_ShouldThrowException() {
+        Member member = new Member();
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            memberFactory.linkToSoloIdentity(member, null);
+        });
+        assertEquals("Solo identity cannot be null", ex.getMessage());
+    }
+
+    @Test
+    void linkToSoloIdentity_WhenSoloIdentitiesIsNull_ShouldInitializeAndAdd() {
+        Member member = new Member();
+        member.setSoloIdentities(null);
+        Solo solo = new Solo();
+        memberFactory.linkToSoloIdentity(member, solo);
+        assertNotNull(member.getSoloIdentities());
+        assertTrue(member.getSoloIdentities().contains(solo));
+        assertEquals(member, solo.getMember());
+    }
+
+    @Test
+    void linkToSoloIdentity_WhenSoloAlreadyPresent_ShouldNotAddAgain() {
+        Member member = new Member();
+        Solo solo = new Solo();
+        java.util.List<Solo> solos = new java.util.ArrayList<>();
+        solos.add(solo);
+        member.setSoloIdentities(solos);
+        memberFactory.linkToSoloIdentity(member, solo);
+        assertEquals(1, member.getSoloIdentities().size());
+        assertEquals(member, solo.getMember());
+    }
+
+    @Test
+    void linkToSoloIdentity_WhenSoloNotPresent_ShouldAdd() {
+        Member member = new Member();
+        Solo solo1 = new Solo();
+        Solo solo2 = new Solo();
+        java.util.List<Solo> solos = new java.util.ArrayList<>();
+        solos.add(solo1);
+        member.setSoloIdentities(solos);
+        memberFactory.linkToSoloIdentity(member, solo2);
+        assertTrue(member.getSoloIdentities().contains(solo2));
+        assertEquals(member, solo2.getMember());
+    }
+
+    @Test
+    void unlinkFromSoloIdentity_WhenSoloIdentitiesIsNull_ShouldNotThrow() {
+        Member member = new Member();
+        member.setSoloIdentities(null);
+        Solo solo = new Solo();
+        assertDoesNotThrow(() -> memberFactory.unlinkFromSoloIdentity(member, solo));
+        assertNull(solo.getMember());
+    }
+
+    @Test
+    void unlinkFromSoloIdentity_WhenSoloPresent_ShouldRemove() {
+        Member member = new Member();
+        Solo solo = new Solo();
+        java.util.List<Solo> solos = new java.util.ArrayList<>();
+        solos.add(solo);
+        member.setSoloIdentities(solos);
+        memberFactory.unlinkFromSoloIdentity(member, solo);
+        assertFalse(member.getSoloIdentities().contains(solo));
+        assertNull(solo.getMember());
+    }
+
+    @Test
+    void unlinkFromSoloIdentity_WhenSoloNotPresent_ShouldNotThrow() {
+        Member member = new Member();
+        Solo solo1 = new Solo();
+        solo1.setArtistId(UUID.randomUUID());
+        Solo solo2 = new Solo();
+        solo2.setArtistId(UUID.randomUUID()); // ensure different artistId
+        java.util.List<Solo> solos = new java.util.ArrayList<>();
+        solos.add(solo1);
+        member.setSoloIdentities(solos);
+        assertDoesNotThrow(() -> memberFactory.unlinkFromSoloIdentity(member, solo2));
+        assertTrue(member.getSoloIdentities().contains(solo1));
     }
 }
