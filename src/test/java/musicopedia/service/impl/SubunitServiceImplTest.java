@@ -57,6 +57,27 @@ class SubunitServiceImplTest {
     }
 
     @Test
+    void findAll_shouldReturnListWithMultipleSubunits() throws Exception {
+        Subunit subunit1 = new Subunit();
+        subunit1.setSubunitId(UUID.randomUUID());
+        Subunit subunit2 = new Subunit();
+        subunit2.setSubunitId(UUID.randomUUID());
+        SubunitResponseDTO dto1 = new SubunitResponseDTO();
+        dto1.setSubunitId(subunit1.getSubunitId());
+        dto1.setSubunitName("Subunit 1");
+        SubunitResponseDTO dto2 = new SubunitResponseDTO();
+        dto2.setSubunitId(subunit2.getSubunitId());
+        dto2.setSubunitName("Subunit 2");
+        when(subunitRepository.findAll()).thenReturn(List.of(subunit1, subunit2));
+        when(subunitMapper.toResponseDTO(subunit1)).thenReturn(CompletableFuture.completedFuture(dto1));
+        when(subunitMapper.toResponseDTO(subunit2)).thenReturn(CompletableFuture.completedFuture(dto2));
+        List<SubunitResponseDTO> result = subunitService.findAll().get();
+        assertEquals(2, result.size());
+        assertTrue(result.stream().anyMatch(dto -> "Subunit 1".equals(dto.getSubunitName())));
+        assertTrue(result.stream().anyMatch(dto -> "Subunit 2".equals(dto.getSubunitName())));
+    }
+
+    @Test
     void findById_shouldReturnOptional() throws Exception {
         when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
         when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(CompletableFuture.completedFuture(testResponseDTO));
@@ -316,5 +337,78 @@ class SubunitServiceImplTest {
         } catch (Exception e) {
             assertTrue(Thread.currentThread().isInterrupted() || e.getCause() instanceof InterruptedException || e.getCause() instanceof ExecutionException);
         }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void create_shouldThrowSubunitServiceExceptionOnDirectInterruptedException() throws Exception {
+        CompletableFuture<Subunit> mockFuture = (CompletableFuture<Subunit>) mock(CompletableFuture.class);
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(mockFuture);
+        when(mockFuture.get()).thenThrow(new InterruptedException("direct interrupt"));
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.create(testRequestDTO).get());
+        assertTrue(ex.getMessage().contains("Interrupted while creating Subunit"));
+        assertTrue(ex.getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void update_shouldThrowSubunitServiceExceptionOnDirectInterruptedException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<Subunit> mockFuture = (CompletableFuture<Subunit>) mock(CompletableFuture.class);
+        when(subunitMapper.toEntity(any(), any(), any())).thenReturn(mockFuture);
+        when(mockFuture.get()).thenThrow(new InterruptedException("direct interrupt"));
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.update(testId, testRequestDTO).get());
+        assertTrue(ex.getMessage().contains("Interrupted while updating Subunit"));
+        assertTrue(ex.getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findAll_shouldThrowSubunitServiceExceptionOnDirectInterruptedException() throws Exception {
+        Subunit subunit = new Subunit();
+        when(subunitRepository.findAll()).thenReturn(List.of(subunit));
+        CompletableFuture<SubunitResponseDTO> mockFuture = (CompletableFuture<SubunitResponseDTO>) mock(CompletableFuture.class);
+        when(subunitMapper.toResponseDTO(subunit)).thenReturn(mockFuture);
+        when(mockFuture.get()).thenThrow(new InterruptedException("direct interrupt"));
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findAll().get());
+        assertTrue(ex.getMessage().contains("Interrupted while mapping Subunit"));
+        assertTrue(ex.getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findAll_shouldThrowSubunitServiceExceptionOnDirectExecutionException() throws Exception {
+        Subunit subunit = new Subunit();
+        when(subunitRepository.findAll()).thenReturn(List.of(subunit));
+        CompletableFuture<SubunitResponseDTO> mockFuture = (CompletableFuture<SubunitResponseDTO>) mock(CompletableFuture.class);
+        when(subunitMapper.toResponseDTO(subunit)).thenReturn(mockFuture);
+        when(mockFuture.get()).thenThrow(new ExecutionException(new Exception("fail")));
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findAll().get());
+        assertTrue(ex.getMessage().contains("Execution error while mapping Subunit"));
+        assertTrue(ex.getCause() instanceof ExecutionException);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findById_shouldThrowSubunitServiceExceptionOnDirectInterruptedException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> mockFuture = (CompletableFuture<SubunitResponseDTO>) mock(CompletableFuture.class);
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(mockFuture);
+        when(mockFuture.get()).thenThrow(new InterruptedException("direct interrupt"));
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findById(testId).get());
+        assertTrue(ex.getMessage().contains("Interrupted while mapping Subunit"));
+        assertTrue(ex.getCause() instanceof InterruptedException);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void findById_shouldThrowSubunitServiceExceptionOnDirectExecutionException() throws Exception {
+        when(subunitRepository.findById(testId)).thenReturn(Optional.of(testSubunit));
+        CompletableFuture<SubunitResponseDTO> mockFuture = (CompletableFuture<SubunitResponseDTO>) mock(CompletableFuture.class);
+        when(subunitMapper.toResponseDTO(testSubunit)).thenReturn(mockFuture);
+        when(mockFuture.get()).thenThrow(new ExecutionException(new Exception("fail")));
+        SubunitServiceException ex = assertThrows(SubunitServiceException.class, () -> subunitService.findById(testId).get());
+        assertTrue(ex.getMessage().contains("Execution error while mapping Subunit"));
+        assertTrue(ex.getCause() instanceof ExecutionException);
     }
 }

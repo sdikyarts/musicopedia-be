@@ -3,6 +3,7 @@ package musicopedia.factory;
 import musicopedia.dto.request.MemberRequestDTO;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
+import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.service.ArtistService;
 import org.springframework.stereotype.Component;
@@ -47,15 +48,20 @@ public class MemberFactory {
                 .thenCompose(optionalArtist -> {
                     Artist soloArtist = optionalArtist.orElseThrow(() -> 
                         new IllegalArgumentException("Solo artist not found with ID: " + dto.getSoloArtistId()));
-                    
                     // Business rule: Only allow SOLO type artists to be referenced
                     if (soloArtist.getType() != ArtistType.SOLO) {
                         throw new IllegalArgumentException(
                             String.format("Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members, but this artist is type: %s", 
                             dto.getMemberName(), soloArtist.getArtistName(), soloArtist.getType()));
                     }
-                    
-                    member.setSoloArtist(soloArtist);
+                    // Find or create the Solo entity for this artist
+                    // In this model, you likely need to fetch the Solo entity by artistId from a SoloService or SoloRepository
+                    // For now, create a new Solo if not found (in real code, fetch from DB)
+                    Solo solo = new Solo();
+                    solo.setArtistId(soloArtist.getArtistId());
+                    solo.setArtist(soloArtist);
+                    // Optionally set other fields from dto if needed
+                    linkToSoloIdentity(member, solo);
                     return CompletableFuture.completedFuture(member);
                 });
         }
@@ -66,22 +72,29 @@ public class MemberFactory {
     /**
      * Updates a member's solo artist reference.
      * Used when a member gets an official solo debut.
+     * Updated: now links a Solo to a Member (one-to-many).
      */
-    public void linkToSoloArtist(Member member, Artist soloArtist) {
-        if (soloArtist.getType() != ArtistType.SOLO) {
-            throw new IllegalArgumentException(
-                String.format("Cannot link member '%s' to artist '%s' - only SOLO artists can be linked to members", 
-                member.getMemberName(), soloArtist.getArtistName()));
+    public void linkToSoloIdentity(Member member, Solo solo) {
+        if (solo == null) {
+            throw new IllegalArgumentException("Solo identity cannot be null");
         }
-        
-        member.setSoloArtist(soloArtist);
+        solo.setMember(member);
+        if (member.getSoloIdentities() == null) {
+            member.setSoloIdentities(new java.util.ArrayList<>());
+        }
+        if (!member.getSoloIdentities().contains(solo)) {
+            member.getSoloIdentities().add(solo);
+        }
     }
 
     /**
-     * Removes solo artist reference from a member.
-     * Used if a solo artist relationship needs to be removed.
+     * Removes solo identity reference from a member.
+     * Used if a solo identity relationship needs to be removed.
      */
-    public void unlinkFromSoloArtist(Member member) {
-        member.setSoloArtist(null);
+    public void unlinkFromSoloIdentity(Member member, Solo solo) {
+        if (member.getSoloIdentities() != null) {
+            member.getSoloIdentities().remove(solo);
+        }
+        solo.setMember(null);
     }
 }

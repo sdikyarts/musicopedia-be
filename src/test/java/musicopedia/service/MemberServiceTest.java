@@ -4,6 +4,7 @@ import musicopedia.builder.ArtistBuilder;
 import musicopedia.builder.MemberBuilder;
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
+import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.repository.MemberRepository;
 import musicopedia.service.config.ServiceTestConfig;
@@ -54,8 +55,13 @@ public class MemberServiceTest {
             .setRealName("Lee Ji-eun")
             .setDescription("A talented South Korean singer-songwriter and actress")
             .setBirthDate(LocalDate.of(1993, 5, 16))
-            .setSoloArtist(testSoloArtist)
             .build();
+        // Add solo identity directly after building
+        Solo soloIdentity = new Solo();
+        soloIdentity.setArtist(testSoloArtist);
+        soloIdentity.setArtistId(testSoloArtist.getArtistId());
+        soloIdentity.setMember(testMember);
+        testMember.setSoloIdentities(java.util.List.of(soloIdentity));
         testMember.setMemberId(testId);
     }
 
@@ -132,20 +138,6 @@ public class MemberServiceTest {
     }
 
     @Test
-    void testFindBySoloArtistNotNull() {
-        Member memberWithSolo = createMember("HAN", "Han Ji-sung", LocalDate.of(2000, 9, 14));
-        memberWithSolo.setSoloArtist(testSoloArtist);
-        Member memberWithoutSolo = createMember("KIMCHAEWON", "Kim Chae-won", LocalDate.of(2000, 8, 1));
-        List<Member> members = Arrays.asList(memberWithSolo, memberWithoutSolo);
-        when(memberRepository.findAll()).thenReturn(members);
-        CompletableFuture<List<Member>> future = memberService.findBySoloArtistNotNull();
-        List<Member> result = future.join();
-        assertEquals(1, result.size());
-        assertEquals("HAN", result.get(0).getMemberName());
-        assertEquals("Han Ji-sung", result.get(0).getRealName());
-    }
-
-    @Test
     void testSave() {
         testMember.setMemberName("Felix");
         testMember.setRealName("Felix Yongbok Lee");
@@ -219,6 +211,28 @@ public class MemberServiceTest {
         assertEquals("Felix", result.get(0).getMemberName());
         assertEquals("AU", result.get(0).getNationality());
         verify(memberRepository, times(1)).findByNationality("AU");
+    }
+
+    @Test
+    void testFindWithSoloIdentities_AllBranches() {
+        // Member with non-null, non-empty soloIdentities
+        Member memberWithSolo = createMember("Felix", "Felix Yongbok Lee", LocalDate.of(2000, 9, 15));
+        Solo solo = new Solo();
+        solo.setArtistId(UUID.randomUUID());
+        memberWithSolo.setSoloIdentities(java.util.List.of(solo));
+        // Member with null soloIdentities
+        Member memberWithNullSolo = createMember("NullSolo", "Null Solo", LocalDate.of(1990, 1, 1));
+        memberWithNullSolo.setSoloIdentities(null);
+        // Member with empty soloIdentities
+        Member memberWithEmptySolo = createMember("EmptySolo", "Empty Solo", LocalDate.of(1991, 2, 2));
+        memberWithEmptySolo.setSoloIdentities(java.util.Collections.emptyList());
+        List<Member> allMembers = Arrays.asList(memberWithSolo, memberWithNullSolo, memberWithEmptySolo);
+        when(memberRepository.findAll()).thenReturn(allMembers);
+        CompletableFuture<List<Member>> future = memberService.findWithSoloIdentities();
+        List<Member> result = future.join();
+        assertEquals(1, result.size());
+        assertEquals("Felix", result.get(0).getMemberName());
+        verify(memberRepository, times(1)).findAll();
     }
 
 

@@ -45,8 +45,8 @@ public class ModelIntegrationTest {
         solo.setArtist(soloArtist);
         solo.setBirthDate(LocalDate.of(1995, 5, 15));
         solo.setGender(ArtistGender.FEMALE);
-        
-        member.setSoloArtist(soloArtist);
+        solo.setMember(member);
+        member.setSoloIdentities(java.util.List.of(solo));
         
         GroupMembershipId membershipId = new GroupMembershipId();
         membershipId.setGroupId(groupArtistId);
@@ -70,8 +70,8 @@ public class ModelIntegrationTest {
         assertEquals("Test Group", membership.getGroup().getArtistName());
         assertEquals("Test Member", membership.getMember().getMemberName());
         
-        assertEquals(soloArtist, membership.getMember().getSoloArtist());
-        assertEquals("Solo Artist Name", membership.getMember().getSoloArtist().getArtistName());
+        assertEquals(soloArtist, membership.getMember().getSoloIdentities().get(0).getArtist());
+        assertEquals("Solo Artist Name", membership.getMember().getSoloIdentities().get(0).getArtist().getArtistName());
     }
     
     @Test

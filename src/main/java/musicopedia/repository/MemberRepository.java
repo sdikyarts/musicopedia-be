@@ -1,10 +1,7 @@
 package musicopedia.repository;
 
-import musicopedia.model.Artist;
 import musicopedia.model.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -25,17 +22,7 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
     
     List<Member> findByBirthDateBefore(LocalDate date);
     
-    List<Member> findBySoloArtist(Artist soloArtist);
-    
-    @Query("SELECT m FROM Member m WHERE m.soloArtist.artistId = :soloArtistId")
-    List<Member> findBySoloArtistId(@Param("soloArtistId") UUID soloArtistId);
-    
-    @Query("SELECT COUNT(m) FROM Member m WHERE m.soloArtist.artistId = :soloArtistId")
-    long countBySoloArtistId(@Param("soloArtistId") UUID soloArtistId);
-    
     boolean existsByMemberName(String memberName);
-    
-    List<Member> findBySoloArtistIsNull();
 
     List<Member> findByRealNameContainingIgnoreCase(String realName);
 

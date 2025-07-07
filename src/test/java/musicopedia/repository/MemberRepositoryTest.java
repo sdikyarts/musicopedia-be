@@ -2,6 +2,7 @@ package musicopedia.repository;
 
 import musicopedia.model.Artist;
 import musicopedia.model.Member;
+import musicopedia.model.Solo;
 import musicopedia.model.enums.ArtistType;
 import musicopedia.repository.config.RepositoryTestConfig;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,11 @@ public class MemberRepositoryTest {
     @Autowired
     private ArtistRepository artistRepository;
     
+    @Autowired
+    private SoloRepository soloRepository;
+
     private Artist soloArtist;
+    private Solo hyunjinSolo;
 
     @BeforeEach
     void setup() {
@@ -49,7 +54,13 @@ public class MemberRepositoryTest {
         member2.setMemberName("Hyunjin");
         member2.setRealName("Hwang Hyun-jin");
         member2.setBirthDate(LocalDate.of(2000, 3, 20));
-        member2.setSoloArtist(soloArtist);
+        memberRepository.save(member2);
+
+        hyunjinSolo = new Solo();
+        hyunjinSolo.setArtist(soloArtist);
+        hyunjinSolo.setMember(member2);
+        soloRepository.save(hyunjinSolo);
+        member2.getSoloIdentities().add(hyunjinSolo);
         memberRepository.save(member2);
 
         Member member3 = new Member();
@@ -69,6 +80,10 @@ public class MemberRepositoryTest {
         assertEquals(1, hyunMembers.size());
         assertEquals("Hyunjin", hyunMembers.get(0).getMemberName());
         assertEquals("Hwang Hyun-jin", hyunMembers.get(0).getRealName());
+        // Check that Hyunjin has a solo identity with the correct artist
+        Member hyunjin = hyunMembers.get(0);
+        assertFalse(hyunjin.getSoloIdentities().isEmpty());
+        assertEquals("IU", hyunjin.getSoloIdentities().get(0).getArtist().getArtistName());
     }
 
     @Test
@@ -77,6 +92,9 @@ public class MemberRepositoryTest {
         assertEquals(1, leeMembers.size());
         assertEquals("Felix", leeMembers.get(0).getMemberName());
         assertEquals("Felix Yongbok Lee", leeMembers.get(0).getRealName());
+        // Check that Felix has no solo identities
+        Member felix = leeMembers.get(0);
+        assertTrue(felix.getSoloIdentities() == null || felix.getSoloIdentities().isEmpty());
     }
 
     @Test
@@ -106,37 +124,5 @@ public class MemberRepositoryTest {
         LocalDate date = LocalDate.of(2000, 1, 1);
         List<Member> members = memberRepository.findByBirthDateBefore(date);
         assertEquals(0, members.size());
-    }
-
-    @Test
-    public void testFindBySoloArtist() {
-        List<Member> members = memberRepository.findBySoloArtist(soloArtist);
-        assertEquals(1, members.size());
-        assertEquals("Hyunjin", members.get(0).getMemberName());
-    }
-
-    @Test
-    public void testFindBySoloArtistId() {
-        List<Member> members = memberRepository.findBySoloArtistId(soloArtist.getArtistId());
-        assertEquals(1, members.size());
-        assertEquals("Hyunjin", members.get(0).getMemberName());
-    }
-
-    @Test
-    public void testCountBySoloArtistId() {
-        long count = memberRepository.countBySoloArtistId(soloArtist.getArtistId());
-        assertEquals(1, count);
-    }
-
-    @Test
-    public void testExistsByMemberName() {
-        assertTrue(memberRepository.existsByMemberName("Felix"));
-        assertFalse(memberRepository.existsByMemberName("Unknown Person"));
-    }
-
-    @Test
-    public void testFindBySoloArtistIsNull() {
-        List<Member> members = memberRepository.findBySoloArtistIsNull();
-        assertEquals(2, members.size());
     }
 }

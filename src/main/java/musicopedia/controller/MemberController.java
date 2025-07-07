@@ -55,12 +55,6 @@ public class MemberController {
                 .thenApply(members -> ResponseEntity.ok(memberMapper.toSummaryDTOList(members)));
     }
 
-    @GetMapping("/with-solo-career")
-    public CompletableFuture<ResponseEntity<List<MemberResponseDTO>>> getMembersWithSoloCareer() {
-        return memberService.findBySoloArtistNotNull()
-                .thenApply(members -> ResponseEntity.ok(memberMapper.toSummaryDTOList(members)));
-    }
-
     @PostMapping
     public CompletableFuture<ResponseEntity<MemberResponseDTO>> createMember(@RequestBody MemberRequestDTO createMemberRequestDTO) {
         return memberMapper.toEntity(createMemberRequestDTO)
@@ -108,6 +102,12 @@ public class MemberController {
     @GetMapping("/search/nationality")
     public CompletableFuture<ResponseEntity<List<MemberResponseDTO>>> searchMembersByNationality(@RequestParam("nationality") String nationality) {
         return memberService.findByNationality(nationality)
+                .thenApply(members -> ResponseEntity.ok(memberMapper.toSummaryDTOList(members)));
+    }
+
+    @GetMapping("/with-solo-career")
+    public CompletableFuture<ResponseEntity<List<MemberResponseDTO>>> getMembersWithSoloCareer() {
+        return memberService.findWithSoloIdentities()
                 .thenApply(members -> ResponseEntity.ok(memberMapper.toSummaryDTOList(members)));
     }
 }

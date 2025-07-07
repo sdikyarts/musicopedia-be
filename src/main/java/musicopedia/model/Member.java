@@ -29,9 +29,8 @@ public class Member {
 
     private LocalDate deathDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "solo_artist_id")
-    private Artist soloArtist;
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private java.util.List<Solo> soloIdentities = new java.util.ArrayList<>();
 
     @Column(length = 2)
     private String nationality;

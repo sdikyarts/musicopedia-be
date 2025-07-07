@@ -99,4 +99,50 @@ public class SoloTest {
         assertTrue(toString.contains(ArtistGender.FEMALE.toString()));
         assertTrue(toString.contains(GroupAffiliationStatus.WAS_IN_A_GROUP.toString()));
     }
+    
+    @Test
+    public void testEqualsBranches() {
+        UUID id1 = UUID.randomUUID();
+        UUID id2 = UUID.randomUUID();
+        Artist artist1 = new ArtistBuilder().setArtistName("A").setType(ArtistType.SOLO).build();
+        artist1.setArtistId(id1);
+        Artist artist2 = new ArtistBuilder().setArtistName("B").setType(ArtistType.SOLO).build();
+        artist2.setArtistId(id2);
+
+        Solo solo = new Solo();
+        solo.setArtistId(id1);
+        solo.setRealName("Name");
+        solo.setArtist(artist1);
+
+        // same object
+        assertEquals(solo, solo);
+        // null
+        assertNotEquals(solo, null);
+        // different class
+        assertNotEquals(solo, "not a solo");
+        // different artistId
+        Solo diffId = new Solo();
+        diffId.setArtistId(id2);
+        diffId.setRealName("Name");
+        diffId.setArtist(artist1);
+        assertNotEquals(solo, diffId);
+        // different realName
+        Solo diffName = new Solo();
+        diffName.setArtistId(id1);
+        diffName.setRealName("Other");
+        diffName.setArtist(artist1);
+        assertNotEquals(solo, diffName);
+        // different artist
+        Solo diffArtist = new Solo();
+        diffArtist.setArtistId(id1);
+        diffArtist.setRealName("Name");
+        diffArtist.setArtist(artist2);
+        assertNotEquals(solo, diffArtist);
+        // all equal
+        Solo equalSolo = new Solo();
+        equalSolo.setArtistId(id1);
+        equalSolo.setRealName("Name");
+        equalSolo.setArtist(artist1);
+        assertEquals(solo, equalSolo);
+    }
 }

@@ -20,8 +20,6 @@ public interface MemberService {
     
     CompletableFuture<List<Member>> findByBirthDateBetween(LocalDate startDate, LocalDate endDate);
     
-    CompletableFuture<List<Member>> findBySoloArtistNotNull();
-    
     CompletableFuture<Member> save(Member member);
     
     CompletableFuture<Member> update(Member member);
@@ -31,4 +29,6 @@ public interface MemberService {
     CompletableFuture<Boolean> existsById(UUID memberId);
 
     CompletableFuture<List<Member>> findByNationality(String nationality);
+
+    CompletableFuture<List<Member>> findWithSoloIdentities();
 }

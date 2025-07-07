@@ -23,6 +23,8 @@ public class MemberTest {
             .setArtistName("Felix")
             .build();
         soloArtist.setArtistId(UUID.randomUUID());
+        Solo soloIdentity = new Solo();
+        soloIdentity.setArtist(soloArtist);
         
         Member member = new MemberBuilder()
             .setMemberName(memberName)
@@ -30,10 +32,11 @@ public class MemberTest {
             .setDescription(description)
             .setImage(image)
             .setBirthDate(birthDate)
-            .setSoloArtist(soloArtist)
             .setNationality(nationality)
             .build();
         member.setMemberId(memberId);
+        member.setSoloIdentities(java.util.List.of(soloIdentity));
+        soloIdentity.setMember(member);
         
         assertEquals(memberId, member.getMemberId());
         assertEquals(memberName, member.getMemberName());
@@ -41,7 +44,7 @@ public class MemberTest {
         assertEquals(description, member.getDescription());
         assertEquals(image, member.getImage());
         assertEquals(birthDate, member.getBirthDate());
-        assertEquals(soloArtist, member.getSoloArtist());
+        assertEquals(soloArtist, member.getSoloIdentities().get(0).getArtist());
         assertEquals(nationality, member.getNationality());
     }
     
@@ -72,7 +75,7 @@ public class MemberTest {
         member.setMemberId(UUID.randomUUID());
         member.setMemberName("KIMCHAEWON");
         member.setRealName("Kim Chae-won");
-        assertNull(member.getSoloArtist());
+        assertTrue(member.getSoloIdentities() == null || member.getSoloIdentities().isEmpty());
     }
     
     @Test
