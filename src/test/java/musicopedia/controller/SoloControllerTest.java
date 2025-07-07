@@ -49,9 +49,12 @@ public class SoloControllerTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
         SoloController soloController = new SoloController(soloService);
-        mockMvc = MockMvcBuilders.standaloneSetup(soloController).build();
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        mockMvc = MockMvcBuilders.standaloneSetup(soloController)
+            .setMessageConverters(new org.springframework.http.converter.json.MappingJackson2HttpMessageConverter(objectMapper))
+            .build();
 
         testId = UUID.randomUUID();
         testArtist = new ArtistBuilder()
@@ -322,5 +325,49 @@ public class SoloControllerTest {
                 .andExpect(jsonPath("$[0].artist.artistName").value("Taylor Swift"));
 
         verify(soloService, times(1)).findByRealNameContaining("Taylor Alison Swift");
+    }
+
+    @Test
+    void testGetSoloistsByDebutDate() throws Exception {
+        List<Solo> soloists = Arrays.asList(testSolo);
+        LocalDate debutDate = LocalDate.of(2006, 6, 19);
+        testSolo.setDebutDate(debutDate);
+        when(soloService.findByDebutDate(debutDate)).thenReturn(CompletableFuture.completedFuture(soloists));
+
+        var mvcResult = mockMvc.perform(get("/api/soloists/debutdate")
+                        .param("date", "2006-06-19"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].artistId").value(testId.toString()))
+                .andExpect(jsonPath("$[0].debutDate").value("2006-06-19"));
+
+        verify(soloService, times(1)).findByDebutDate(debutDate);
+    }
+
+    @Test
+    void testGetSoloistsByDebutDateRange() throws Exception {
+        List<Solo> soloists = Arrays.asList(testSolo);
+        LocalDate startDate = LocalDate.of(2005, 1, 1);
+        LocalDate endDate = LocalDate.of(2007, 12, 31);
+        testSolo.setDebutDate(LocalDate.of(2006, 6, 19));
+        when(soloService.findByDebutDateBetween(startDate, endDate)).thenReturn(CompletableFuture.completedFuture(soloists));
+
+        var mvcResult = mockMvc.perform(get("/api/soloists/debutdate/range")
+                        .param("start", "2005-01-01")
+                        .param("end", "2007-12-31"))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].artistId").value(testId.toString()))
+                .andExpect(jsonPath("$[0].debutDate").value("2006-06-19"));
+
+        verify(soloService, times(1)).findByDebutDateBetween(startDate, endDate);
     }
 }

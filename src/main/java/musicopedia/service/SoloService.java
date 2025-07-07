@@ -33,4 +33,8 @@ public interface SoloService {
     CompletableFuture<Boolean> existsById(UUID soloId);
 
     CompletableFuture<List<Solo>> findByRealNameContaining(String realName);
+
+    CompletableFuture<List<Solo>> findByDebutDate(LocalDate debutDate);
+
+    CompletableFuture<List<Solo>> findByDebutDateBetween(LocalDate startDate, LocalDate endDate);
 }

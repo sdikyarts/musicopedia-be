@@ -24,6 +24,7 @@ public class SoloTest {
         artist.setArtistId(artistId);
         LocalDate birthDate = LocalDate.of(1989, 12, 13);
         LocalDate deathDate = null;
+        LocalDate debutDate = LocalDate.of(2006, 6, 19);
         ArtistGender gender = ArtistGender.FEMALE;
         GroupAffiliationStatus groupAffiliationStatus = GroupAffiliationStatus.NEVER_IN_A_GROUP;
         String realName = "Taylor Alison Swift";
@@ -32,6 +33,7 @@ public class SoloTest {
             .setType(artist.getType())
             .setBirthDate(birthDate)
             .setDeathDate(deathDate)
+            .setDebutDate(debutDate)
             .setGender(gender)
             .setGroupAffiliationStatus(groupAffiliationStatus)
             .setRealName(realName)
@@ -42,10 +44,27 @@ public class SoloTest {
         assertEquals(artist, solo.getArtist());
         assertEquals(birthDate, solo.getBirthDate());
         assertNull(solo.getDeathDate());
+        assertEquals(debutDate, solo.getDebutDate());
         assertEquals(gender, solo.getGender());
         assertEquals(groupAffiliationStatus, solo.getGroupAffiliationStatus());
         assertEquals(realName, solo.getRealName());
         assertEquals("Taylor Swift", solo.getArtist().getArtistName());
+    }
+
+    @Test
+    public void testDebutDateRange() {
+        Solo solo = new Solo();
+        LocalDate debutDate = LocalDate.of(2010, 1, 1);
+        solo.setDebutDate(debutDate);
+        assertEquals(debutDate, solo.getDebutDate());
+        // Out of range
+        LocalDate start = LocalDate.of(2011, 1, 1);
+        LocalDate end = LocalDate.of(2012, 1, 1);
+        assertFalse(debutDate.isAfter(start) && debutDate.isBefore(end));
+        // In range
+        start = LocalDate.of(2009, 1, 1);
+        end = LocalDate.of(2011, 12, 31);
+        assertTrue((!debutDate.isBefore(start)) && (!debutDate.isAfter(end)));
     }
     
     @Test

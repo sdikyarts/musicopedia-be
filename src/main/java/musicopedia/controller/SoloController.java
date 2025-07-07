@@ -100,4 +100,19 @@ public class SoloController {
         return soloService.findByRealNameContaining(realName)
                 .thenApply(ResponseEntity::ok);
     }
+
+    @GetMapping("/debutdate")
+    public CompletableFuture<ResponseEntity<List<Solo>>> getSoloistsByDebutDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate debutDate) {
+        return soloService.findByDebutDate(debutDate)
+                .thenApply(ResponseEntity::ok);
+    }
+
+    @GetMapping("/debutdate/range")
+    public CompletableFuture<ResponseEntity<List<Solo>>> getSoloistsByDebutDateRange(
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return soloService.findByDebutDateBetween(startDate, endDate)
+                .thenApply(ResponseEntity::ok);
+    }
 }
