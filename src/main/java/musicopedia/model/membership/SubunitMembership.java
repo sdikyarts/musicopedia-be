@@ -2,6 +2,7 @@ package musicopedia.model.membership;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import musicopedia.model.Member;
 import musicopedia.model.Subunit;
 import java.io.Serializable;
@@ -11,26 +12,26 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "subunit_membership")
-@IdClass(SubunitMembership.SubunitMembershipId.class)
 public class SubunitMembership {
-    @Id
-    private UUID subunitId;
-    @Id
-    @Column(name = "member_id")
-    private UUID memberId;
+    @EmbeddedId
+    private SubunitMembershipId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subunit_id", referencedColumnName = "subunitId", insertable = false, updatable = false)
+    @MapsId("subunitId")
+    @JoinColumn(name = "subunit_id", referencedColumnName = "subunitId")
     private Subunit subunit;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", referencedColumnName = "memberId", insertable = false, updatable = false)
+    @MapsId("memberId")
+    @JoinColumn(name = "member_id", referencedColumnName = "memberId")
     private Member member;
 
     private LocalDate joinedDate;
     private LocalDate leftDate;
 
     @Data
+    @EqualsAndHashCode
+    @Embeddable
     public static class SubunitMembershipId implements Serializable {
         private UUID subunitId;
         private UUID memberId;

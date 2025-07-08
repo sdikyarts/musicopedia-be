@@ -23,32 +23,32 @@ public class SubunitMembershipServiceImpl implements SubunitMembershipService {
     @Override
     @Async
     public CompletableFuture<List<SubunitMembership>> findBySubunitId(UUID subunitId) {
-        return CompletableFuture.completedFuture(repository.findBySubunitId(subunitId));
+        return CompletableFuture.completedFuture(repository.findBySubunit_SubunitId(subunitId));
     }
 
     @Override
     @Async
     public CompletableFuture<List<SubunitMembership>> findByMemberId(UUID memberId) {
-        return CompletableFuture.completedFuture(repository.findByMemberId(memberId));
+        return CompletableFuture.completedFuture(repository.findByMember_MemberId(memberId));
     }
 
     @Override
     @Async
     public CompletableFuture<Void> deleteBySubunitId(UUID subunitId) {
-        repository.deleteBySubunitId(subunitId);
+        repository.deleteBySubunit_SubunitId(subunitId);
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
     public CompletableFuture<Void> deleteByMemberId(UUID memberId) {
-        repository.deleteByMemberId(memberId);
+        repository.deleteByMember_MemberId(memberId);
         return CompletableFuture.completedFuture(null);
     }
 
     @Override
     @Async
     public CompletableFuture<Boolean> existsBySubunitIdAndMemberId(UUID subunitId, UUID memberId) {
-        return CompletableFuture.completedFuture(repository.existsBySubunitIdAndMemberId(subunitId, memberId));
+        return CompletableFuture.completedFuture(repository.existsBySubunit_SubunitIdAndMember_MemberId(subunitId, memberId));
     }
 }

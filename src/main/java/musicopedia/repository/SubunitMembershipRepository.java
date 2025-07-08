@@ -8,9 +8,9 @@ import java.util.UUID;
 
 @Repository
 public interface SubunitMembershipRepository extends JpaRepository<SubunitMembership, SubunitMembership.SubunitMembershipId> {
-    List<SubunitMembership> findBySubunitId(UUID subunitId);
-    List<SubunitMembership> findByMemberId(UUID memberId);
-    void deleteBySubunitId(UUID subunitId);
-    void deleteByMemberId(UUID memberId);
-    boolean existsBySubunitIdAndMemberId(UUID subunitId, UUID memberId);
+    List<SubunitMembership> findBySubunit_SubunitId(UUID subunitId);
+    List<SubunitMembership> findByMember_MemberId(UUID memberId);
+    void deleteBySubunit_SubunitId(UUID subunitId);
+    void deleteByMember_MemberId(UUID memberId);
+    boolean existsBySubunit_SubunitIdAndMember_MemberId(UUID subunitId, UUID memberId);
 }

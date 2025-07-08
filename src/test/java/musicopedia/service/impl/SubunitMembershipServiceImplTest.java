@@ -38,42 +38,42 @@ class SubunitMembershipServiceImplTest {
     @Test
     void findBySubunitId_returnsMemberships() throws Exception {
         List<SubunitMembership> memberships = Arrays.asList(membership);
-        when(repository.findBySubunitId(subunitId)).thenReturn(memberships);
+        when(repository.findBySubunit_SubunitId(subunitId)).thenReturn(memberships);
         CompletableFuture<List<SubunitMembership>> future = service.findBySubunitId(subunitId);
         assertEquals(memberships, future.get());
-        verify(repository).findBySubunitId(subunitId);
+        verify(repository).findBySubunit_SubunitId(subunitId);
     }
 
     @Test
     void findByMemberId_returnsMemberships() throws Exception {
         List<SubunitMembership> memberships = Arrays.asList(membership);
-        when(repository.findByMemberId(memberId)).thenReturn(memberships);
+        when(repository.findByMember_MemberId(memberId)).thenReturn(memberships);
         CompletableFuture<List<SubunitMembership>> future = service.findByMemberId(memberId);
         assertEquals(memberships, future.get());
-        verify(repository).findByMemberId(memberId);
+        verify(repository).findByMember_MemberId(memberId);
     }
 
     @Test
     void deleteBySubunitId_deletes() throws Exception {
-        doNothing().when(repository).deleteBySubunitId(subunitId);
+        doNothing().when(repository).deleteBySubunit_SubunitId(subunitId);
         CompletableFuture<Void> future = service.deleteBySubunitId(subunitId);
         assertNull(future.get());
-        verify(repository).deleteBySubunitId(subunitId);
+        verify(repository).deleteBySubunit_SubunitId(subunitId);
     }
 
     @Test
     void deleteByMemberId_deletes() throws Exception {
-        doNothing().when(repository).deleteByMemberId(memberId);
+        doNothing().when(repository).deleteByMember_MemberId(memberId);
         CompletableFuture<Void> future = service.deleteByMemberId(memberId);
         assertNull(future.get());
-        verify(repository).deleteByMemberId(memberId);
+        verify(repository).deleteByMember_MemberId(memberId);
     }
 
     @Test
     void existsBySubunitIdAndMemberId_returnsBoolean() throws Exception {
-        when(repository.existsBySubunitIdAndMemberId(subunitId, memberId)).thenReturn(true);
+        when(repository.existsBySubunit_SubunitIdAndMember_MemberId(subunitId, memberId)).thenReturn(true);
         CompletableFuture<Boolean> future = service.existsBySubunitIdAndMemberId(subunitId, memberId);
         assertTrue(future.get());
-        verify(repository).existsBySubunitIdAndMemberId(subunitId, memberId);
+        verify(repository).existsBySubunit_SubunitIdAndMember_MemberId(subunitId, memberId);
     }
 }
