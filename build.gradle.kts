@@ -38,6 +38,7 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("me.paulschwarz:spring-dotenv:4.0.0")
     implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-security")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -55,6 +56,7 @@ dependencies {
     testImplementation("org.seleniumhq.selenium:selenium-java:${seleniumJavaVersion}")
     testImplementation("io.github.bonigarcia:selenium-jupiter:${seleniumJupiterVersion}")
     testImplementation("io.github.bonigarcia:webdrivermanager:${webdrivermanagerVersion}")
+    testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.register<Test>("unittest") {
