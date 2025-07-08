@@ -8,6 +8,8 @@ jobs:
   test:
     name: Run tests
     runs-on: ubuntu-22.04
+    env:
+      ADMIN_TOKEN: test-token
     steps:
       - name: Check out the Git repository
         uses: actions/checkout@v4
