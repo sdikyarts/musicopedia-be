@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -19,6 +20,8 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig implements WebMvcConfigurer {
+
+    private static final String API_PATH_PATTERN = "/api/**";
 
     @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:8080,https://musicopedia.vercel.app/}")
     private String allowedOrigins;
@@ -43,7 +46,7 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
+        registry.addMapping(API_PATH_PATTERN)
                 .allowedOrigins(allowedOrigins.split(","))
                 .allowedMethods(allowedMethods.split(","))
                 .allowedHeaders(allowedHeaders.equals("*") ? new String[]{"*"} : allowedHeaders.split(","))
@@ -87,7 +90,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration(API_PATH_PATTERN, configuration);
         return source;
     }
 
@@ -105,14 +108,14 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> {
-                auth.requestMatchers("/api/**").hasRole("ADMIN");
+                auth.requestMatchers(API_PATH_PATTERN).hasRole("ADMIN");
                 auth.anyRequest().permitAll();
             })
             .formLogin(form -> {
                 form.loginPage("/login");
                 form.permitAll();
             })
-            .logout(logout -> logout.permitAll());
+            .logout(LogoutConfigurer::permitAll);
         return http.build();
     }
 }
