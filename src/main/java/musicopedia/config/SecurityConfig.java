@@ -3,6 +3,11 @@ package musicopedia.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -15,7 +20,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig implements WebMvcConfigurer {
 
-    @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:8080}")
+    @Value("${app.cors.allowed-origins:http://localhost:3000,http://localhost:8080,https://musicopedia.vercel.app/}")
     private String allowedOrigins;
 
     @Value("${app.cors.allowed-methods:GET,POST,PUT,DELETE,OPTIONS}")
@@ -29,6 +34,12 @@ public class SecurityConfig implements WebMvcConfigurer {
 
     @Value("${app.cors.max-age:3600}")
     private long maxAge;
+
+    @Value("${app.admin.username}")
+    private String adminUsername;
+
+    @Value("${app.admin.password}")
+    private String adminPassword;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -78,5 +89,30 @@ public class SecurityConfig implements WebMvcConfigurer {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
         return source;
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return new InMemoryUserDetailsManager(
+            User.withUsername(adminUsername)
+                .password("{noop}" + adminPassword) // {noop} means no password encoder
+                .roles("ADMIN")
+                .build()
+        );
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers("/api/**").hasRole("ADMIN");
+                auth.anyRequest().permitAll();
+            })
+            .formLogin(form -> {
+                form.loginPage("/login");
+                form.permitAll();
+            })
+            .logout(logout -> logout.permitAll());
+        return http.build();
     }
 }

@@ -2,11 +2,20 @@ package musicopedia.config;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -266,5 +275,32 @@ public class SecurityConfigTest {
         // This test ensures the SecurityConfig constructor is covered
         SecurityConfig config = new SecurityConfig();
         assertNotNull(config);
+    }
+}
+
+@SpringBootTest
+@ActiveProfiles("test")
+class SecurityConfigWebIntegrationTest {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @org.junit.jupiter.api.Test
+    void apiRequiresAuthentication() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/test"))
+                .andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+                .andExpect(MockMvcResultMatchers.redirectedUrlPattern("**/login"));
+    }
+
+    @org.junit.jupiter.api.Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    void apiAllowsAdmin() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/test"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound()); // No controller, but passes security
+    }
+
+    @org.junit.jupiter.api.Test
+    void publicEndpointsAccessible() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/"))
+                .andExpect(MockMvcResultMatchers.status().isNotFound()); // No controller, but passes security
     }
 }

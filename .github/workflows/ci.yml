@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       ADMIN_TOKEN: test-token
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin
     steps:
       - name: Check out the Git repository
         uses: actions/checkout@v4
