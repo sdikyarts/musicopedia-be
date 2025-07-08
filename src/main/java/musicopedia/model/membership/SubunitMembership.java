@@ -16,6 +16,7 @@ public class SubunitMembership {
     @Id
     private UUID subunitId;
     @Id
+    @Column(name = "member_id")
     private UUID memberId;
 
     @ManyToOne(fetch = FetchType.LAZY)
