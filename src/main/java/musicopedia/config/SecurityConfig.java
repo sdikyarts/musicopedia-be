@@ -115,7 +115,11 @@ public class SecurityConfig implements WebMvcConfigurer {
                 form.loginPage("/login");
                 form.permitAll();
             })
-            .logout(LogoutConfigurer::permitAll);
+            .logout(LogoutConfigurer::permitAll)
+            .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless/API use cases
+            .sessionManagement(session -> session
+                .maximumSessions(-1) // Allow unlimited sessions per user
+            );
         return http.build();
     }
 }
