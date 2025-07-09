@@ -292,7 +292,7 @@ class SecurityConfigWebIntegrationTest {
     }
 
     @org.junit.jupiter.api.Test
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @WithMockUser(username = "admin", password = "admin", roles = {"ADMIN"})
     void apiAllowsAdmin() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/api/test"))
                 .andExpect(MockMvcResultMatchers.status().isNotFound()); // No controller, but passes security
